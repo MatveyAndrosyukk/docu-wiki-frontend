@@ -95,7 +95,6 @@ const OpenedFileHeader:React.FC<OpenedFileHeaderProps> = (
                 </div>
             </div>
             <div className={styles['header__right-side']}>
-                {/* ✅ ПРОВЕРКА ПРАВ ДО МЕНЮ! */}
                 {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
                     <>
                         {isMobile ? (

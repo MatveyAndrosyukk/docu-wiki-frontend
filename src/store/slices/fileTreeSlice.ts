@@ -25,6 +25,11 @@ const initialState: FileTreeState = {
     files: [],
 }
 
+interface ToggleLikeOptimisticPayload {
+    fileId: number;
+    isLiked: boolean;
+}
+
 const fileTreeSlice = createSlice({
     name: 'fileTree',
     initialState,
@@ -82,6 +87,23 @@ const fileTreeSlice = createSlice({
         },
         resetFiles(state) {
             state.files = []
+        },
+        toggleFileLikeOptimistic(state, action: PayloadAction<ToggleLikeOptimisticPayload>) {
+            const {fileId, isLiked} = action.payload;
+
+            findAndUpdate(state.files, fileId, (node) => {
+                if (node.type === FileType.File && node.likes !== null) {
+                    node.likes += isLiked ? -1 : +1;
+                }
+            });
+        },
+        revertFileLike(state, action: PayloadAction<ToggleLikeOptimisticPayload>) {
+            const {fileId, isLiked} = action.payload;
+            findAndUpdate(state.files, fileId, (node) => {
+                if (node.type === FileType.File && node.likes !== null) {
+                    node.likes += isLiked ? +1 : -1;
+                }
+            });
         },
     },
     extraReducers: (builder) => {
@@ -160,7 +182,9 @@ export const {
     toggleFolder,
     openPathToNode,
     resetFiles,
-    clearFiles
+    clearFiles,
+    toggleFileLikeOptimistic,
+    revertFileLike,
 } = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

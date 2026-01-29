@@ -10,6 +10,7 @@ export interface DeleteModalState {
     open: boolean;
     file: File | null;
     user: User | null;
+    isDeleting: boolean;
 }
 
 export interface DeleteFileState {
@@ -27,30 +28,54 @@ export default function useDeleteFileActions(
         open: false,
         file: null,
         user: null,
+        isDeleting: false,
     });
 
     const handleOpenDeleteModal = useCallback((file: File, user: User | null) => {
-        setDeleteModalState({open: true, file, user});
+        setDeleteModalState({open: true, file, user, isDeleting: false});
     }, [setDeleteModalState]);
 
     const handleConfirmDeleteFile = useCallback(async () => {
         if (!deleteModalState.file) return;
-        const deleteFileResult = dispatch(deleteFileById({
-            id: deleteModalState.file?.id,
-            email: deleteModalState.user?.email
-        }));
-        await deleteFileResult;
 
-        console.log(viewedUser)
+        const fileId = deleteModalState.file.id;
+        const userEmail = deleteModalState.user?.email;
 
-        if (viewedUser) {
-            dispatch(fetchViewedUserByEmail(viewedUser.email));
+        setDeleteModalState({
+            open: false,
+            file: null,
+            user: null,
+            isDeleting: true
+        });
+
+        try {
+            dispatch(deleteFileById({
+                id: fileId,
+                email: userEmail
+            }));
+
+            if (viewedUser) {
+                dispatch(fetchViewedUserByEmail(viewedUser.email));
+            }
+        } catch (error) {
+            console.error('Failed to delete file.')
         }
-        setDeleteModalState({open: false, file: null, user: null});
+
+        setDeleteModalState({
+            open: false,
+            file: null,
+            user: null,
+            isDeleting: false
+        });
     }, [deleteModalState.file, deleteModalState.user?.email, dispatch, viewedUser]);
 
     const handleCancelDeleteFile = useCallback(() => {
-        setDeleteModalState({open: false, file: null, user: null});
+        setDeleteModalState({
+            open: false,
+            file: null,
+            user: null,
+            isDeleting: false
+        });
     }, [setDeleteModalState]);
 
     return {

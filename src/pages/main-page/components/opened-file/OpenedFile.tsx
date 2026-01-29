@@ -10,6 +10,9 @@ import {useNavigate} from "react-router-dom";
 import {File} from "../../../../types/file";
 import EmptyFile from "./components/empty-file/EmptyFile";
 import OpenedFileHeader from "./opened-file-header/OpenedFileHeader";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../../../../store";
+import {toggleFileLikeOptimistic, revertFileLike} from "../../../../store/slices/fileTreeSlice";
 
 interface OpenedFileProps {
     file?: File | null
@@ -27,9 +30,11 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }) => {
     const navigate = useNavigate()
     const context = useContext(AppContext)
+    const dispatch = useDispatch<AppDispatch>();
     if (!context) throw new Error("Component can't be used without context")
     const {viewedUser, files, fileState, authState, loggedInUser} = context
     const [isLiked, setIsLiked] = React.useState(false)
+    const [isLiking, setIsLiking] = React.useState(false);
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
 
@@ -38,7 +43,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }, []);
 
     useEffect(() => {
-        if (!file) return;
+        if (!file || isLiking) return;
 
         async function checkLike(): Promise<boolean> {
             const dto = {
@@ -46,9 +51,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 email: localStorage.getItem('email') || '',
             }
             try {
-                return await checkIsUserLikedFileAsync(dto)
+                return await checkIsUserLikedFileAsync(dto);
             } catch (error) {
-                console.error('Failed to check like status', error)
                 return false
             }
         }
@@ -56,7 +60,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         checkLike().then(isLikedValue => {
             setIsLiked(isLikedValue)
         })
-    }, [file])
+    }, [file, isLiking])
 
     const parseFileTextToHTMLMemo = useCallback(
         (content: string,
@@ -84,23 +88,27 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     } = authState
 
     const handleTryToLikeFile = useCallback(async () => {
-        if (!file) return
-        const email = localStorage.getItem("email")
-        if (!email) {
-            handleOpenLoginModal()
-            return
-        }
-        const dto = {
-            id: file.id as number,
-            email: email,
-        }
-        setIsLiked(prev => !prev)
+        if (!file || isLiking) return;
+        setIsLiking(true);
+
+        const email = localStorage.getItem("email");
+        if (!email) return handleOpenLoginModal();
+
+        const fileId = file.id as number;
+        const prevLiked = isLiked;
+        setIsLiked(prev => !prev);
+        dispatch(toggleFileLikeOptimistic({fileId, isLiked}));
+
         try {
+            const dto = { id: fileId, email };
             await handleLikeFile(dto)
+                .then(() => setIsLiking(false))
         } catch (error) {
-            console.error("Failed to like file", error)
+            setIsLiked(prevLiked);
+            dispatch(revertFileLike({fileId, isLiked}));
+            setIsLiking(false);
         }
-    }, [file, handleOpenLoginModal, handleLikeFile])
+    }, [file, isLiking, handleOpenLoginModal, isLiked, dispatch, handleLikeFile]);
 
     const handleGoToUsersPage = useCallback((user: string | null) => {
         return navigate(`/${encodeURIComponent(user as string)}`)
@@ -143,7 +151,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 onDeleteFile: handleDeleteFile,
                 onOpenDeleteModal: handleOpenDeleteModal
             }}/>
-
             {openedImage && (
                 <div className={styles['opened-image__background']} onClick={() => setOpenedImage(null)}>
                     <img
