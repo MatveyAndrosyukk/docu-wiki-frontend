@@ -110,7 +110,6 @@ const fileTreeSlice = createSlice({
         builder
             .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
                 state.files = action.payload;
-                console.log(action.payload)
             })
             .addCase(fetchFilesByEmail.rejected, (state) => {
                 state.files = []

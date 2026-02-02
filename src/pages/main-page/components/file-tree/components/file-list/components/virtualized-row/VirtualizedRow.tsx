@@ -37,7 +37,7 @@ const VirtualizedRow: React.FC<VirtualizedRowProps> = React.memo(
         const {file, depth, isLastChild} = node;
 
         useEffect(() => {
-            console.log('перерисовка')
+            console.log('перерисовка VirtualizedRow')
         }, []);
 
         const linesBlock = (
@@ -98,15 +98,7 @@ const VirtualizedRow: React.FC<VirtualizedRowProps> = React.memo(
             </div>
         );
     }, (prevProps, nextProps) => {
-        return (
-            prevProps.node.file.id === nextProps.node.file.id &&
-            prevProps.node.file.status === nextProps.node.file.status &&
-            prevProps.node.file.likes === nextProps.node.file.likes &&
-            prevProps.node.file.isLiked === nextProps.node.file.isLiked &&
-            prevProps.node.depth === nextProps.node.depth &&
-            prevProps.node.isLastChild === nextProps.node.isLastChild &&
-            prevProps.emailParam === nextProps.emailParam
-        );
+        return prevProps.node.file.id === nextProps.node.file.id;
     });
 
 export default VirtualizedRow;

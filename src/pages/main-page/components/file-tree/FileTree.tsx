@@ -54,6 +54,10 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const {handleOpenModalByReason} = fileState;
 
     useEffect(() => {
+        console.log('перерисовка FileTree')
+    }, []);
+
+    useEffect(() => {
         if (window.innerWidth < 1270) {
             const handleClickOutsideFileTree = (event: MouseEvent) => {
                 if (fileTreeRef.current && !fileTreeRef.current.contains(event.target as Node)) {

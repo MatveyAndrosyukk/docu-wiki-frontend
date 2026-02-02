@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import {useMemo} from 'react';
 import {File, FileStatus, FileType} from "../../types/file";
 
 export interface TreeNode {
@@ -13,7 +13,12 @@ export const useFlattenedTree = (files: File[]): TreeNode[] => {
         const flattened: TreeNode[] = [];
 
         const flattenNode = (node: File, depth: number, index: number, isLastChild: boolean) => {
-            flattened.push({ file: node, depth, index, isLastChild });
+            flattened.push({
+                file: node,
+                depth,
+                index,
+                isLastChild
+            });
 
             if (node.type === FileType.Folder && node.status === FileStatus.Opened && node.children) {
                 node.children.forEach((child, childIdx) => {
@@ -29,5 +34,5 @@ export const useFlattenedTree = (files: File[]): TreeNode[] => {
         });
 
         return flattened;
-    }, [files]);
+    }, [files.map(f => `${f.id}_${f.status}`).join(',')]);
 };

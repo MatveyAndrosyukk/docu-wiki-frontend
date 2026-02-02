@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useRef} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef} from 'react';
 import {FixedSizeList, ListChildComponentProps} from 'react-window';
 import styles from './FileList.module.scss';
 import {useDispatch} from 'react-redux';
@@ -29,6 +29,10 @@ const FileList: React.FC<FileListProps> = React.memo((
     const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
     const flattenedNodes = useFlattenedTree(files);
 
+    useEffect(() => {
+        console.log('перерисовка FileList')
+    }, []);
+
     const onFolderClick = useCallback(
         (id: number | null) => {
             dispatch(toggleFolder({id}));
@@ -36,7 +40,7 @@ const FileList: React.FC<FileListProps> = React.memo((
         [dispatch],
     );
 
-    const Row: React.FC<ListChildComponentProps> = ({index, style}) => (
+    const Row: React.FC<ListChildComponentProps> = useCallback(({index, style}) => (
         <div style={style}>
             <VirtualizedRow
                 node={flattenedNodes[index]}
@@ -49,7 +53,7 @@ const FileList: React.FC<FileListProps> = React.memo((
                 isLoggedIn={authState.isLoggedIn}
             />
         </div>
-    );
+    ), [flattenedNodes, emailParam, onFolderClick, contextMenuAcState, viewedUser, loggedInUser, fileState.handleTryToOpenFile, authState.isLoggedIn]);
 
     return (
         <div
