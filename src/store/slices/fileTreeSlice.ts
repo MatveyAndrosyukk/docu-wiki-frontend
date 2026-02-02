@@ -12,7 +12,8 @@ import {
     deleteById,
     findAndUpdate,
     findPathToNode,
-    openFoldersOnPathPreserveOthers
+    openFoldersOnPathPreserveOthers,
+    updateLikesInTree
 } from "../utils/fileTreeActionUtils";
 import {findNodeById} from "../../utils/functions/modalUtils";
 import {updateFileName} from "../thunks/files/updateFileName";
@@ -27,7 +28,7 @@ const initialState: FileTreeState = {
 
 interface ToggleLikeOptimisticPayload {
     fileId: number;
-    isLiked: boolean;
+    isLiked: boolean | null | undefined;
 }
 
 const fileTreeSlice = createSlice({
@@ -90,18 +91,17 @@ const fileTreeSlice = createSlice({
         },
         toggleFileLikeOptimistic(state, action: PayloadAction<ToggleLikeOptimisticPayload>) {
             const {fileId, isLiked} = action.payload;
+            const newLikesDelta = isLiked ? -1 : +1;
+            const newIsLiked = !isLiked;
 
-            findAndUpdate(state.files, fileId, (node) => {
-                if (node.type === FileType.File && node.likes !== null) {
-                    node.likes += isLiked ? -1 : +1;
-                }
-            });
+            state.files = updateLikesInTree(state.files, fileId, newLikesDelta, newIsLiked);
         },
         revertFileLike(state, action: PayloadAction<ToggleLikeOptimisticPayload>) {
             const {fileId, isLiked} = action.payload;
             findAndUpdate(state.files, fileId, (node) => {
                 if (node.type === FileType.File && node.likes !== null) {
                     node.likes += isLiked ? +1 : -1;
+                    node.isLiked = !isLiked;
                 }
             });
         },
@@ -110,6 +110,7 @@ const fileTreeSlice = createSlice({
         builder
             .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
                 state.files = action.payload;
+                console.log(action.payload)
             })
             .addCase(fetchFilesByEmail.rejected, (state) => {
                 state.files = []
@@ -158,13 +159,6 @@ const fileTreeSlice = createSlice({
                 }
 
                 update(state.files);
-            })
-            .addCase(toggleFileLikes.fulfilled, (state, action) => {
-                const likedFile = action.payload;
-
-                findAndUpdate(state.files, likedFile.id, (node) => {
-                    node.likes = likedFile.likes
-                });
             })
             .addCase(updateFileName.fulfilled, (state, action) => {
                 const renamedFile = action.payload;

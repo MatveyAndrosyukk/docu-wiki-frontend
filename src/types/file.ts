@@ -19,4 +19,5 @@ export interface File {
     children: File[] | null;
     parent: number | { id: number } | null;
     lastEditor: string | null;
+    isLiked: boolean | null;
 }

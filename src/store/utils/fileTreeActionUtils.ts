@@ -18,6 +18,30 @@ export function findAndUpdate(
     return false;
 }
 
+export const updateLikesInTree = (
+    files: File[],
+    targetId: number,
+    newLikesDelta: number,
+    newIsLiked: boolean
+): File[] => {
+    return files.map(file => {
+        if (file.id === targetId && file.type === FileType.File) {
+            return {
+                ...file,
+                likes: (file.likes || 0) + newLikesDelta,
+                isLiked: newIsLiked
+            };
+        }
+        if (file.children?.length) {
+            return {
+                ...file,
+                children: updateLikesInTree(file.children, targetId, newLikesDelta, newIsLiked)
+            };
+        }
+        return file;
+    });
+};
+
 export function deepCloneWithNewIds(file: File): File {
     const newId = Date.now() + Math.floor(Math.random() * 1000000);
     return {

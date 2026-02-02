@@ -14,7 +14,7 @@ interface FileListProps {
     windowWidth: number;
 }
 
-const FileList: React.FC<FileListProps> = (
+const FileList: React.FC<FileListProps> = React.memo((
     {
         emailParam,
         windowWidth,
@@ -23,7 +23,7 @@ const FileList: React.FC<FileListProps> = (
     const context = useContext(AppContext);
     if (!context) throw new Error('Context required');
 
-    const {files} = context;
+    const {files, viewedUser, loggedInUser, fileState, authState} = context;
     const contextMenuAcState = useContextMenuActions();
     const listRef = useRef<any>(null);
     const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
@@ -43,6 +43,10 @@ const FileList: React.FC<FileListProps> = (
                 emailParam={emailParam}
                 onFolderClick={onFolderClick}
                 contextMenuState={contextMenuAcState}
+                viewedUser={viewedUser}
+                loggedInUser={loggedInUser}
+                handleTryToOpenFile={fileState.handleTryToOpenFile}
+                isLoggedIn={authState.isLoggedIn}
             />
         </div>
     );
@@ -58,7 +62,7 @@ const FileList: React.FC<FileListProps> = (
             }}>
                 <FixedSizeList
                     ref={listRef}
-                    height={Math.max(200, flattenedNodes.length * 27) + 5}
+                    height={windowWidth < 1270 ? 300 : 650}
                     itemCount={flattenedNodes.length}
                     itemSize={27}
                     width="100%"
@@ -77,6 +81,9 @@ const FileList: React.FC<FileListProps> = (
             )}
         </div>
     );
-};
+}, (prev, next) => {
+    return prev.emailParam === next.emailParam &&
+        prev.windowWidth === next.windowWidth;
+});
 
 export default FileList;

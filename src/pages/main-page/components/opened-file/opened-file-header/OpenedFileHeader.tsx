@@ -12,7 +12,7 @@ import findPathToFile from "../../../../../utils/functions/findFilePath";
 
 interface OpenedFileHeaderProps {
     file: File;
-    isLiked: boolean;
+    isLiked: boolean | null | undefined;
     onTryToLikeFile: () => void;
     viewedUser: User | null;
     files: File[];

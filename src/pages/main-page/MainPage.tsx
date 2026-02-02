@@ -101,7 +101,10 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
                 if (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn)) {
                     dispatch(clearFiles());
                 } else {
-                    dispatch(fetchFilesByEmail(viewedUser.email));
+                    dispatch(fetchFilesByEmail({
+                        viewedUserEmail: viewedUser.email,
+                        loggedInUserEmail: loggedInUser?.email
+                    }));
                 }
             }
 

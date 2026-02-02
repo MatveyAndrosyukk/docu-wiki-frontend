@@ -1,6 +1,6 @@
 import {createContext, FC, ReactNode} from "react";
 import useAuthorizationActions, {AuthorizationState} from "../utils/hooks/useAuthorizationActions";
-import {useSelector} from "react-redux";
+import {shallowEqual, useSelector} from "react-redux";
 import {RootState} from "../store";
 import {User} from "../store/slices/userSlice";
 import useFileActions, {FileActionsState} from "../utils/hooks/useFileActions";
@@ -25,7 +25,7 @@ export const AppContext = createContext<AppProviderState | null>(null);
 export const AppProvider: FC<AppProviderProps> = ({children}) => {
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
-    const files = useSelector((state: RootState) => state.fileTree.files);
+    const files = useSelector((state: RootState) => state.fileTree.files, shallowEqual);
     const authState = useAuthorizationActions();
     const fileState = useFileActions(files, viewedUser);
     const banState = useBanActions(viewedUser);

@@ -41,7 +41,8 @@ export default function useCopyPasteActions(
                 children: copiedFile.children,
                 lastEditor: copiedFile.lastEditor,
                 likes: 0,
-                parent: id
+                parent: id,
+                isLiked: false,
             }
             console.log(copiedFileToSave);
             dispatch(createFile(copiedFileToSave))

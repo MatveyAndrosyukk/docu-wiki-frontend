@@ -12,6 +12,7 @@ export interface CreateFilePayload {
     children: CreateFilePayload[] | null;
     parent: number | { id: number } | null;
     lastEditor: string | null;
+    isLiked: boolean | null;
 }
 
 export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>(

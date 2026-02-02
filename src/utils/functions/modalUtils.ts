@@ -87,6 +87,7 @@ export function createFilePayload(
         name,
         content: '',
         parent,
+        isLiked: null,
         ...extraFields,
     };
 }

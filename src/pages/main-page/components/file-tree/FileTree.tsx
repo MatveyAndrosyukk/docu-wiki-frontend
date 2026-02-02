@@ -30,7 +30,7 @@ interface FileTreeProps {
     setIsOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-const FileTree: FC<FileTreeProps> = (
+const FileTree: FC<FileTreeProps> = React.memo((
     {
         emailParam,
         isOpened,
@@ -191,6 +191,9 @@ const FileTree: FC<FileTreeProps> = (
             </div>
         </div>
     );
-};
+}, (prev, next) => {
+    return prev.isOpened === next.isOpened &&
+        prev.emailParam === next.emailParam
+});
 
 export default FileTree;

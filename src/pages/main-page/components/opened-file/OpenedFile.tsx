@@ -4,7 +4,6 @@ import emptyStyles from './components/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
 import {parseFileTextToHTML} from '../../../../utils/functions/parseFile'
 import EditMode from './components/edit-file-view/EditMode'
-import {checkIsUserLikedFileAsync} from '../../../../services/checkIsUserLikedFileAsync'
 import {AppContext} from '../../../../context/AppContext'
 import {useNavigate} from "react-router-dom";
 import {File} from "../../../../types/file";
@@ -12,7 +11,7 @@ import EmptyFile from "./components/empty-file/EmptyFile";
 import OpenedFileHeader from "./opened-file-header/OpenedFileHeader";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../../store";
-import {toggleFileLikeOptimistic, revertFileLike} from "../../../../store/slices/fileTreeSlice";
+import {revertFileLike, toggleFileLikeOptimistic} from "../../../../store/slices/fileTreeSlice";
 
 interface OpenedFileProps {
     file?: File | null
@@ -33,34 +32,32 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const dispatch = useDispatch<AppDispatch>();
     if (!context) throw new Error("Component can't be used without context")
     const {viewedUser, files, fileState, authState, loggedInUser} = context
-    const [isLiked, setIsLiked] = React.useState(false)
+    const [isLiked, setIsLiked] = React.useState(file?.isLiked)
     const [isLiking, setIsLiking] = React.useState(false);
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
 
-    const handleImageClick = useCallback((imageUrl: string) => {
-        setOpenedImage(imageUrl)
-    }, []);
+    const {
+        isEditing,
+        setIsEditing,
+        handleLikeFile,
+        handleOpenDeleteModal,
+    } = fileState
+
+    const {
+        isLoggedIn,
+        handleOpenLoginModal
+    } = authState
 
     useEffect(() => {
         if (!file || isLiking) return;
 
-        async function checkLike(): Promise<boolean> {
-            const dto = {
-                id: file?.id as number,
-                email: localStorage.getItem('email') || '',
-            }
-            try {
-                return await checkIsUserLikedFileAsync(dto);
-            } catch (error) {
-                return false
-            }
-        }
-
-        checkLike().then(isLikedValue => {
-            setIsLiked(isLikedValue)
-        })
+        setIsLiked(file?.isLiked)
     }, [file, isLiking])
+
+    const handleImageClick = useCallback((imageUrl: string) => {
+        setOpenedImage(imageUrl)
+    }, []);
 
     const parseFileTextToHTMLMemo = useCallback(
         (content: string,
@@ -75,17 +72,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened);
     }, [file?.content, handleImageClick, isFileTreeOpened]);
 
-    const {
-        isEditing,
-        setIsEditing,
-        handleLikeFile,
-        handleOpenDeleteModal,
-    } = fileState
 
-    const {
-        isLoggedIn,
-        handleOpenLoginModal
-    } = authState
 
     const handleTryToLikeFile = useCallback(async () => {
         if (!file || isLiking) return;
@@ -97,10 +84,14 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         const fileId = file.id as number;
         const prevLiked = isLiked;
         setIsLiked(prev => !prev);
-        dispatch(toggleFileLikeOptimistic({fileId, isLiked}));
+
+        dispatch(toggleFileLikeOptimistic({
+            fileId,
+            isLiked: prevLiked
+        }));
 
         try {
-            const dto = { id: fileId, email };
+            const dto = {id: fileId, email};
             await handleLikeFile(dto)
                 .then(() => setIsLiking(false))
         } catch (error) {
@@ -108,7 +99,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             dispatch(revertFileLike({fileId, isLiked}));
             setIsLiking(false);
         }
-    }, [file, isLiking, handleOpenLoginModal, isLiked, dispatch, handleLikeFile]);
+    }, [dispatch, file, handleLikeFile, handleOpenLoginModal, isLiked, isLiking]);
 
     const handleGoToUsersPage = useCallback((user: string | null) => {
         return navigate(`/${encodeURIComponent(user as string)}`)
@@ -134,6 +125,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     return (
         <div className={styles['opened-file']}>
+            <button onClick={() => console.log(file.isLiked)}>df</button>
             <OpenedFileHeader {...{
                 file,
                 isLiked,
