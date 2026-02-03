@@ -125,7 +125,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     return (
         <div className={styles['opened-file']}>
-            <button onClick={() => console.log(file.isLiked)}>df</button>
             <OpenedFileHeader {...{
                 file,
                 isLiked,

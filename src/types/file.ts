@@ -20,4 +20,13 @@ export interface File {
     parent: number | { id: number } | null;
     lastEditor: string | null;
     isLiked: boolean | null;
+    isPending?: boolean | null;
+}
+
+export interface TempFile {
+    id: number;
+    name: string;
+    type: FileType;
+    parent: number | null;
+    isPending: true;
 }

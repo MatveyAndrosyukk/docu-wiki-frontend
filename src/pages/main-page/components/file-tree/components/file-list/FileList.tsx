@@ -1,93 +1,72 @@
-import React, {useCallback, useContext, useEffect, useMemo, useRef} from 'react';
-import {FixedSizeList, ListChildComponentProps} from 'react-window';
+import React, {useCallback, useContext} from 'react';
 import styles from './FileList.module.scss';
 import {useDispatch} from 'react-redux';
 import {toggleFolder} from '../../../../../../store/slices/fileTreeSlice';
 import {AppContext} from '../../../../../../context/AppContext';
 import useContextMenuActions from '../../../../../../utils/hooks/useContextMenuActions';
 import ContextMenu from '../../../../../../ui-components/context-menu/ContextMenu';
-import {useFlattenedTree} from '../../../../../../utils/hooks/useFlattenedTree';
-import VirtualizedRow from './components/virtualized-row/VirtualizedRow';
+import {TreeNode, useFlattenedTree} from '../../../../../../utils/hooks/useFlattenedTree';
+import FileNode from './components/virtualized-row/FileNode';
 
 interface FileListProps {
     emailParam: string | undefined;
     windowWidth: number;
 }
 
-const FileList: React.FC<FileListProps> = React.memo((
-    {
-        emailParam,
-        windowWidth,
-    }) => {
-    const dispatch = useDispatch();
-    const context = useContext(AppContext);
-    if (!context) throw new Error('Context required');
+const FileList: React.FC<FileListProps> = React.memo(
+    ({emailParam, windowWidth}) => {
+        const dispatch = useDispatch();
+        const context = useContext(AppContext);
+        if (!context) throw new Error('Context required');
 
-    const {files, viewedUser, loggedInUser, fileState, authState} = context;
-    const contextMenuAcState = useContextMenuActions();
-    const listRef = useRef<any>(null);
-    const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
-    const flattenedNodes = useFlattenedTree(files);
+        const {files, viewedUser, loggedInUser, fileState, authState} = context;
+        const contextMenuAcState = useContextMenuActions();
+        const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
 
-    useEffect(() => {
-        console.log('перерисовка FileList')
-    }, []);
+        const flattenedNodes = useFlattenedTree(files);
 
-    const onFolderClick = useCallback(
-        (id: number | null) => {
-            dispatch(toggleFolder({id}));
-        },
-        [dispatch],
-    );
+        const onFolderClick = useCallback(
+            (id: number | null) => {
+                dispatch(toggleFolder({id}));
+            },
+            [dispatch],
+        );
 
-    const Row: React.FC<ListChildComponentProps> = useCallback(({index, style}) => (
-        <div style={style}>
-            <VirtualizedRow
-                node={flattenedNodes[index]}
-                emailParam={emailParam}
-                onFolderClick={onFolderClick}
-                contextMenuState={contextMenuAcState}
-                viewedUser={viewedUser}
-                loggedInUser={loggedInUser}
-                handleTryToOpenFile={fileState.handleTryToOpenFile}
-                isLoggedIn={authState.isLoggedIn}
-            />
-        </div>
-    ), [flattenedNodes, emailParam, onFolderClick, contextMenuAcState, viewedUser, loggedInUser, fileState.handleTryToOpenFile, authState.isLoggedIn]);
+        return (
+            <div
+                className={styles['file-list']}
+                style={{maxHeight: windowWidth < 1270 ? '300px' : '81vh'}}
+            >
+                <div>
+                    {flattenedNodes.map((node: TreeNode) => (
+                        <FileNode
+                            key={node.file.id}
+                            node={node}
+                            emailParam={emailParam}
+                            onFolderClick={onFolderClick}
+                            contextMenuState={contextMenuAcState}
+                            viewedUser={viewedUser}
+                            loggedInUser={loggedInUser}
+                            handleTryToOpenFile={fileState.handleTryToOpenFile}
+                            isLoggedIn={authState.isLoggedIn}
+                        />
+                    ))}
+                </div>
 
-    return (
-        <div
-            className={styles['file-list']}
-            style={{maxHeight: windowWidth < 1270 ? '300px' : '81vh'}}
-        >
-            <div style={{
-                height: Math.max(200, flattenedNodes.length * 27),
-                overflowY: 'hidden'
-            }}>
-                <FixedSizeList
-                    ref={listRef}
-                    height={windowWidth < 1270 ? 300 : 650}
-                    itemCount={flattenedNodes.length}
-                    itemSize={27}
-                    width="100%"
-                >
-                    {Row}
-                </FixedSizeList>
+                {contextMenuState.visible && contextMenuState.file && (
+                    <ContextMenu
+                        clickX={contextMenuState.clickX}
+                        clickY={contextMenuState.clickY}
+                        file={contextMenuState.file}
+                        onCloseContextMenu={handleCloseContextMenu}
+                    />
+                )}
             </div>
-
-            {contextMenuState.visible && contextMenuState.file && (
-                <ContextMenu
-                    clickX={contextMenuState.clickX}
-                    clickY={contextMenuState.clickY}
-                    file={contextMenuState.file}
-                    onCloseContextMenu={handleCloseContextMenu}
-                />
-            )}
-        </div>
-    );
-}, (prev, next) => {
-    return prev.emailParam === next.emailParam &&
-        prev.windowWidth === next.windowWidth;
-});
+        );
+    },
+    (prev, next) =>
+        prev.emailParam === next.emailParam &&
+        prev.windowWidth === next.windowWidth,
+);
 
 export default FileList;

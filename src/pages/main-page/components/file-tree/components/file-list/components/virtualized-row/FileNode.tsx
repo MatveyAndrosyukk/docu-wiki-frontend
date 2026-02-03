@@ -1,6 +1,5 @@
 import {TreeNode} from "../../../../../../../../utils/hooks/useFlattenedTree";
-import React, {useEffect} from "react";
-import {AppContext} from "../../../../../../../../context/AppContext";
+import React from "react";
 import styles from "../../FileList.module.scss"
 import {isUserCanEdit} from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
 import {FileStatus, FileType} from "../../../../../../../../types/file";
@@ -10,9 +9,10 @@ import OpenedImg from '../../images/file-list-opened.svg';
 import ClosedImg from '../../images/file-list-closed.svg';
 import {ReactComponent as FileImg} from '../../images/file-list-file.svg';
 import {User} from "../../../../../../../../store/slices/userSlice";
+import FileLoader from "../../../../../../../../ui-components/file-loader/FileLoader";
 
 
-interface VirtualizedRowProps {
+interface Props {
     node: TreeNode;
     emailParam: string | undefined;
     onFolderClick: (id: number | null) => void;
@@ -23,22 +23,18 @@ interface VirtualizedRowProps {
     loggedInUser: User | null;
 }
 
-const VirtualizedRow: React.FC<VirtualizedRowProps> = React.memo(
+const FileNode: React.FC<Props> = React.memo(
     ({
          node,
          emailParam,
          onFolderClick,
          contextMenuState,
-        isLoggedIn,
-        handleTryToOpenFile,
-        viewedUser,
-        loggedInUser,
+         isLoggedIn,
+         handleTryToOpenFile,
+         viewedUser,
+         loggedInUser,
      }) => {
         const {file, depth, isLastChild} = node;
-
-        useEffect(() => {
-            console.log('перерисовка VirtualizedRow')
-        }, []);
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
@@ -85,20 +81,38 @@ const VirtualizedRow: React.FC<VirtualizedRowProps> = React.memo(
                     ) : (
                         <div
                             className={styles['file-list__node-file']}
-                            onContextMenu={openContextMenuHandler}
-                            onClick={() => handleTryToOpenFile(file.id)}
+                            onContextMenu={!file.isPending ? openContextMenuHandler : undefined}
+                            onClick={!file.isPending ? () => handleTryToOpenFile(file.id) : undefined}
                         >
-                            <FileImg className={styles['file-list__node-image']}/>
-                            <span
-                                style={{fontWeight: file.status === FileStatus.Opened ? 'bold' : 'normal'}}
-                                className={styles['file-list__node-text']}>{file.name}</span>
+                            {file.isPending ? (
+                                <>
+                                    <FileLoader />
+                                </>
+                            ) : (
+                                <>
+                                    <FileImg className={styles['file-list__node-image']} />
+                                    <span
+                                        className={styles['file-list__node-text']}
+                                        style={{
+                                            fontWeight:
+                                                file.status === FileStatus.Opened ? 'bold' : 'normal',
+                                        }}
+                                    >
+                {file.name}
+            </span>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
         );
     }, (prevProps, nextProps) => {
-        return prevProps.node.file.id === nextProps.node.file.id;
+        return prevProps.node.file.id === nextProps.node.file.id &&
+            prevProps.node.file.status === nextProps.node.file.status &&
+            prevProps.node.file.name === nextProps.node.file.name &&
+            prevProps.node.depth === nextProps.node.depth &&
+            prevProps.node.isLastChild === nextProps.node.isLastChild;
     });
 
-export default VirtualizedRow;
+export default FileNode;

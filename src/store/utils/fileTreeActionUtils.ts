@@ -18,6 +18,14 @@ export function findAndUpdate(
     return false;
 }
 
+export const normalizeParentId = (
+    parent: number | { id: number } | null
+): number | null => {
+    if (parent === null) return null;
+    if (typeof parent === 'number') return parent;
+    return parent.id;
+};
+
 export const updateLikesInTree = (
     files: File[],
     targetId: number,

@@ -9,30 +9,32 @@ export interface TreeNode {
 }
 
 export const useFlattenedTree = (files: File[]): TreeNode[] => {
-    return useMemo(() => {
-        const flattened: TreeNode[] = [];
+    const flattened: TreeNode[] = [];
 
-        const flattenNode = (node: File, depth: number, index: number, isLastChild: boolean) => {
-            flattened.push({
-                file: node,
-                depth,
-                index,
-                isLastChild
+    const flattenNode = (
+        node: File,
+        depth: number,
+        index: number,
+        isLastChild: boolean
+    ) => {
+        flattened.push({ file: node, depth, index, isLastChild });
+
+        if (
+            node.type === FileType.Folder &&
+            node.status === FileStatus.Opened &&
+            node.children
+        ) {
+            node.children.forEach((child, childIdx) => {
+                const childIsLast = childIdx === node.children!.length - 1;
+                flattenNode(child, depth + 1, flattened.length, childIsLast);
             });
+        }
+    };
 
-            if (node.type === FileType.Folder && node.status === FileStatus.Opened && node.children) {
-                node.children.forEach((child, childIdx) => {
-                    const childIsLast = childIdx === node.children!.length - 1;
-                    flattenNode(child, depth + 1, flattened.length, childIsLast);
-                });
-            }
-        };
+    files.forEach((root, idx) => {
+        const isLast = idx === files.length - 1;
+        flattenNode(root, 0, 0, isLast);
+    });
 
-        files.forEach((root, idx) => {
-            const isLast = idx === files.length - 1;
-            flattenNode(root, 0, 0, isLast);
-        });
-
-        return flattened;
-    }, [files.map(f => `${f.id}_${f.status}`).join(',')]);
+    return flattened;
 };

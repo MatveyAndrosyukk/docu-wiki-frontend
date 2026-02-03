@@ -1,17 +1,16 @@
-import {File, FileStatus, FileType} from "../../types/file";
+import {File, FileStatus, FileType, TempFile} from "../../types/file";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {fetchFilesByEmail} from "../thunks/files/fetchFilesByEmail";
 import {createFile} from "../thunks/files/createFile";
 import {deleteFileById} from "../thunks/files/deleteFileById";
 import {updateFileContent} from "../thunks/files/updateFileContent";
-import {toggleFileLikes} from "../thunks/files/toggleFileLikes";
 import {
     closeAllChildren,
     closeAllFiles,
     closeAllFilesExcept,
     deleteById,
     findAndUpdate,
-    findPathToNode,
+    findPathToNode, normalizeParentId,
     openFoldersOnPathPreserveOthers,
     updateLikesInTree
 } from "../utils/fileTreeActionUtils";
@@ -20,10 +19,12 @@ import {updateFileName} from "../thunks/files/updateFileName";
 
 interface FileTreeState {
     files: File[];
+    pendingFiles: Record<number, number | null>
 }
 
 const initialState: FileTreeState = {
     files: [],
+    pendingFiles: {},
 }
 
 interface ToggleLikeOptimisticPayload {
@@ -105,6 +106,25 @@ const fileTreeSlice = createSlice({
                 }
             });
         },
+        addTempFile(state, action: PayloadAction<TempFile>) {
+            const tempFile = action.payload;
+
+            findAndUpdate(state.files, tempFile.parent, (node) => {
+                if (node.type === FileType.Folder) {
+                    node.children = node.children
+                        ? [...node.children, tempFile as unknown as File]
+                        : [tempFile as unknown as File];
+
+                    node.status = FileStatus.Opened;
+                }
+            });
+        },
+        registerPendingFile(
+            state,
+            action: PayloadAction<{ tempId: number; parentId: number | null }>
+        ) {
+            state.pendingFiles[action.payload.tempId] = action.payload.parentId;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -115,26 +135,32 @@ const fileTreeSlice = createSlice({
                 state.files = []
             })
             .addCase(createFile.fulfilled, (state, action) => {
-                const newFile = action.payload;
-                const parentId =
-                    newFile.parent === null
-                        ? null
-                        : typeof newFile.parent === 'number'
-                            ? newFile.parent
-                            : newFile.parent.id;
+                const realFile = action.payload;
+                const parentId = normalizeParentId(realFile.parent);
 
-                if (parentId === null) {
-                    state.files.push(newFile);
-                } else {
-                    findAndUpdate(state.files, parentId, (node) => {
-                        if (node.type === FileType.Folder) {
-                            node.children = node.children ? [...node.children, newFile] : [newFile];
-                        }
-                        if (node.status === FileStatus.Closed) {
-                            node.status = FileStatus.Opened;
-                        }
-                    });
+                const tempId = Object.entries(state.pendingFiles)
+                    .find(([, pId]) => pId === parentId)?.[0];
+
+                if (tempId) {
+                    state.files = deleteById(state.files, Number(tempId));
+                    delete state.pendingFiles[Number(tempId)];
                 }
+
+                findAndUpdate(state.files, parentId, node => {
+                    if (node.type === FileType.Folder) {
+                        node.children?.push(realFile);
+                    }
+                });
+            })
+            .addCase(createFile.rejected, (state) => {
+                const tempIds = Object.keys(state.pendingFiles);
+
+                if (tempIds.length === 0) return;
+
+                const lastTempId = Number(tempIds[tempIds.length - 1]);
+
+                state.files = deleteById(state.files, lastTempId);
+                delete state.pendingFiles[lastTempId];
             })
             .addCase(deleteFileById.fulfilled, (state, action) => {
                 const deletedFileId = action.payload;
@@ -178,6 +204,8 @@ export const {
     clearFiles,
     toggleFileLikeOptimistic,
     revertFileLike,
+    addTempFile,
+    registerPendingFile,
 } = fileTreeSlice.actions;
 export default fileTreeSlice.reducer;
 

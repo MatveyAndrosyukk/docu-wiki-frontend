@@ -13,7 +13,8 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {User} from "../../store/slices/userSlice";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
-import {File} from "../../types/file";
+import {File, FileType} from "../../types/file";
+import {addTempFile, registerPendingFile} from "../../store/slices/fileTreeSlice";
 
 export enum ActionType {
     RenameFile = "RenameFile",
@@ -158,16 +159,30 @@ export default function useModalActions(
                     ActionType.ResolveNameConflictAddFile,
                     handleOpenModalByReason
                 )) return;
+
                 if (viewedUser && viewedUser.amountOfFiles >= 20) {
                     setModalError(`You can't create more than 20 files`);
                     return;
                 }
+
+                const tempId = Date.now();
+                dispatch(addTempFile({
+                    id: tempId,
+                    name: '',
+                    type: FileType.File,
+                    parent: id,
+                    isPending: true
+                }))
+
+                dispatch(registerPendingFile({ tempId, parentId: id }));
+
                 dispatch(createFile(createFilePayload(
                     trimmedTitle,
                     localStorage.getItem('email'),
                     'File',
                     id
                 )));
+
                 if (viewedUser) {
                     dispatch(fetchViewedUserByEmail(viewedUser.email));
                 }

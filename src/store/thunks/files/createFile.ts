@@ -15,10 +15,16 @@ export interface CreateFilePayload {
     isLiked: boolean | null;
 }
 
+const delay = (ms: number) =>
+    new Promise(resolve => setTimeout(resolve, ms));
+
 export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>(
     'fileTree/createFile',
     async (body) => {
         const token = localStorage.getItem('token');
+
+        // ⏳ искусственная задержка
+        await delay(3000);
 
         const response = await fetch(`${API_BASE_URL}/files`, {
             method: 'POST',
@@ -27,10 +33,12 @@ export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>
                 Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(body)
-        })
+        });
+
         if (!response.ok) {
-            throw new Error('Failed to create file on server')
+            throw new Error('Failed to create file on server');
         }
+
         return await response.json();
     }
-)
+);
