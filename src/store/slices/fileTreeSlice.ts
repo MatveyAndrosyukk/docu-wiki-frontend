@@ -8,10 +8,10 @@ import {
     closeAllChildren,
     closeAllFiles,
     closeAllFilesExcept,
-    deleteById,
+    deleteById, extractOpenFolders, extractPendingFiles,
     findAndUpdate,
-    findPathToNode, normalizeParentId,
-    openFoldersOnPathPreserveOthers,
+    findPathToNode, mergeFiles, normalizeParentId,
+    openFoldersOnPathPreserveOthers, restoreOpenFolders,
     updateLikesInTree
 } from "../utils/fileTreeActionUtils";
 import {findNodeById} from "../../utils/functions/modalUtils";
@@ -129,7 +129,13 @@ const fileTreeSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
-                state.files = action.payload;
+                const pendingFiles = extractPendingFiles(state.files);
+                const openFolders = extractOpenFolders(state.files);
+
+                let merged = mergeFiles(action.payload, pendingFiles);
+                merged = restoreOpenFolders(merged, openFolders);
+
+                state.files = merged;
             })
             .addCase(fetchFilesByEmail.rejected, (state) => {
                 state.files = []

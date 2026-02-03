@@ -26,6 +26,25 @@ export const normalizeParentId = (
     return parent.id;
 };
 
+export const extractPendingFiles = (files: File[]): File[] => {
+    const result: File[] = [];
+
+    const walk = (nodes: File[]) => {
+        nodes.forEach(node => {
+            if ((node as any).isPending) {
+                result.push(node);
+            }
+
+            if (node.type === FileType.Folder && node.children) {
+                walk(node.children);
+            }
+        });
+    };
+
+    walk(files);
+    return result;
+};
+
 export const updateLikesInTree = (
     files: File[],
     targetId: number,
@@ -146,3 +165,89 @@ export function closeAllFilesExcept(
         return newNode;
     });
 }
+
+const addFileToParent = (files: File[], parentId: number, file: File): boolean => {
+    for (const node of files) {
+        if (node.id === parentId && node.children) {
+            node.children.push(file);
+            return true;
+        }
+
+        if (node.children) {
+            const added = addFileToParent(node.children, parentId, file);
+            if (added) return true;
+        }
+    }
+    return false;
+};
+
+export const mergeFiles = (
+    serverFiles: File[],
+    pendingFiles: File[]
+): File[] => {
+    const merged = structuredClone(serverFiles);
+
+    pendingFiles.forEach(pending => {
+        if (!pending.parent) return;
+
+        const parentId =
+            typeof pending.parent === 'number'
+                ? pending.parent
+                : pending.parent.id;
+
+        addFileToParent(merged, parentId, pending);
+    });
+
+    return merged;
+};
+
+export const extractOpenFolders = (files: File[]): Set<number> => {
+    const openFolders = new Set<number>();
+
+    const walk = (nodes: File[]) => {
+        nodes.forEach(node => {
+            if (
+                node.type === FileType.Folder &&
+                node.status === FileStatus.Opened
+            ) {
+                openFolders.add(node.id as number);
+            }
+
+            if (node.children) {
+                walk(node.children);
+            }
+        });
+    };
+
+    walk(files);
+    return openFolders;
+};
+
+export const restoreOpenFolders = (
+    files: File[],
+    openFolders: Set<number>
+): File[] => {
+    const walk = (nodes: File[]) =>
+        nodes.map(node => {
+            if (
+                node.type === FileType.Folder &&
+                openFolders.has(node.id as number)
+            ) {
+                node = {
+                    ...node,
+                    status: FileStatus.Opened
+                };
+            }
+
+            if (node.children) {
+                node = {
+                    ...node,
+                    children: walk(node.children)
+                };
+            }
+
+            return node;
+        });
+
+    return walk(files);
+};
