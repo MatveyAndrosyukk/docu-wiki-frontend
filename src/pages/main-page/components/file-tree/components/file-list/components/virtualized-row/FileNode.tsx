@@ -111,11 +111,9 @@ const FileNode: React.FC<Props> = React.memo(
                                 <>
                                     <FileImg className={styles['file-list__node-image']}/>
                                     <span
-                                        className={styles['file-list__node-text']}
-                                        style={{
-                                            fontWeight:
-                                                file.id === openedFile?.id ? 'bold' : 'normal',
-                                        }}
+                                        className={`${styles['file-list__node-text']} ${
+                                            file.id === openedFile?.id ? styles['file-list__node-text--opened'] : ''
+                                        }`}
                                     >
                 {file.name}
             </span>
