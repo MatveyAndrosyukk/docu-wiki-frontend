@@ -46,12 +46,10 @@ const userSlice = createSlice({
         clearLoggedInUser(state) {
             state.loggedInUser = null;
         },
-        incrementUserFilesCount: (state, action) => {
-            if (!state.viewedUser || state.viewedUser.email !== action.payload.email) {
-                return;
-            }
+        incrementUserFilesCount: (state, action: { payload: { email: string; count: number } }) => {
+            if (!state.viewedUser || state.viewedUser.email !== action.payload.email) return;
             state.viewedUser.amountOfFiles += action.payload.count;
-        }
+        },
     },
     extraReducers: (builder) => {
         builder

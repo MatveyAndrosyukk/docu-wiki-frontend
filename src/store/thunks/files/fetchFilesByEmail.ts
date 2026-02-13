@@ -1,14 +1,14 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import API_BASE_URL from "../../../config/api-config";
-import {File} from "../../../types/file";
+import {ServerFile} from "../../types/ServerFile";
 
-interface GetFilesForUserDto{
+interface GetFilesForUserDto {
     viewedUserEmail: string;
     loggedInUserEmail?: string | null;
 }
 
 export const fetchFilesByEmail = createAsyncThunk<
-    File[],
+    ServerFile[],
     GetFilesForUserDto>(
     'fileTree/fetchFilesByEmail',
     async (dto: GetFilesForUserDto) => {
@@ -16,7 +16,7 @@ export const fetchFilesByEmail = createAsyncThunk<
 
         const params = new URLSearchParams({
             viewedUserEmail: dto.viewedUserEmail,
-            ...(dto.loggedInUserEmail && { loggedInUserEmail: dto.loggedInUserEmail })
+            ...(dto.loggedInUserEmail && {loggedInUserEmail: dto.loggedInUserEmail})
         });
 
         const response = await fetch(

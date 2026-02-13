@@ -4,18 +4,18 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {User} from "../../store/slices/userSlice";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
-import {File} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
 export interface DeleteModalState {
     open: boolean;
-    file: File | null;
+    file: UiFile | null;
     user: User | null;
     isDeleting: boolean;
 }
 
 export interface DeleteFileState {
     deleteModalState: DeleteModalState;
-    handleOpenDeleteModal: (file: File, user: User | null) => void;
+    handleOpenDeleteModal: (file: UiFile, user: User | null) => void;
     handleConfirmDeleteFile: () => void;
     handleCancelDeleteFile: () => void;
 }
@@ -31,14 +31,14 @@ export default function useDeleteFileActions(
         isDeleting: false,
     });
 
-    const handleOpenDeleteModal = useCallback((file: File, user: User | null) => {
+    const handleOpenDeleteModal = useCallback((file: UiFile, user: User | null) => {
         setDeleteModalState({open: true, file, user, isDeleting: false});
     }, [setDeleteModalState]);
 
     const handleConfirmDeleteFile = useCallback(async () => {
         if (!deleteModalState.file) return;
 
-        const fileId = deleteModalState.file.id;
+        const deletedFile = deleteModalState.file;
         const userEmail = deleteModalState.user?.email;
 
         setDeleteModalState({
@@ -49,16 +49,15 @@ export default function useDeleteFileActions(
         });
 
         try {
-            dispatch(deleteFileById({
-                id: fileId,
-                email: userEmail
-            }));
+            await dispatch(deleteFileById({file: deletedFile, email: userEmail})).unwrap();
 
             if (viewedUser) {
                 dispatch(fetchViewedUserByEmail(viewedUser.email));
             }
+
         } catch (error) {
-            console.error('Failed to delete file.')
+            console.error('Failed to delete file', error);
+            alert("Failed to delete file on server. File was restored.");
         }
 
         setDeleteModalState({

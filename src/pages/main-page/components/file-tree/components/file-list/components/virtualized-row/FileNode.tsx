@@ -10,15 +10,17 @@ import ClosedImg from '../../images/file-list-closed.svg';
 import {ReactComponent as FileImg} from '../../images/file-list-file.svg';
 import {User} from "../../../../../../../../store/slices/userSlice";
 import FileLoader from "../../../../../../../../ui-components/file-loader/FileLoader";
+import {useSelector} from "react-redux";
+import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
 
 
 interface Props {
     node: TreeNode;
     emailParam: string | undefined;
-    onFolderClick: (id: number | null) => void;
+    onFolderClick: (id: number) => void;
     contextMenuState: any;
     isLoggedIn: boolean;
-    handleTryToOpenFile: (id: number | null) => void;
+    handleTryToOpenFile: (id: number) => void;
     viewedUser: User | null;
     loggedInUser: User | null;
 }
@@ -34,21 +36,33 @@ const FileNode: React.FC<Props> = React.memo(
          viewedUser,
          loggedInUser,
      }) => {
-        const {file, depth, isLastChild} = node;
+        const {file, depth, isLastChild, hasNextOnLevel} = node;
+        const openedFile = useSelector(selectOpenedFile)
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
-            {depth > 0 && !isLastChild && (
-                <span className={styles['file-list__node-line']}>
-          <img style={{width: 10}} src={ChildLine} alt="line"/>
+    {Array.from({length: depth}).map((_, levelIndex) => {
+        const isLastLevel = levelIndex === depth - 1;
+
+        if (!isLastLevel && !hasNextOnLevel[levelIndex]) {
+            return (
+                <span className={styles['file-list__node-line']} key={levelIndex}>
+            {/* пустое место */}
+          </span>
+            );
+        }
+
+        const lineSrc = isLastLevel
+            ? (isLastChild ? LastChildLine : ChildLine)
+            : ChildLine;
+
+        return (
+            <span className={styles['file-list__node-line']} key={levelIndex}>
+          <img style={{width: 10}} src={lineSrc} alt="line"/>
         </span>
-            )}
-                {depth > 0 && isLastChild && (
-                    <span className={styles['file-list__node-line']}>
-          <img style={{width: 10}} src={LastChildLine} alt="line"/>
-        </span>
-                )}
-    </span>
+        );
+    })}
+  </span>
         );
 
         const openContextMenuHandler = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -60,7 +74,6 @@ const FileNode: React.FC<Props> = React.memo(
         return (
             <div
                 className={styles['file-list__node']}
-                style={{paddingLeft: `${(depth - 1) * 22}px`}}
                 key={file.id}
             >
                 <div className={styles['file-list__node-container']}>
@@ -76,7 +89,13 @@ const FileNode: React.FC<Props> = React.memo(
                                 alt="Folder"
                                 style={{marginRight: 8}}
                             />
-                            {file.name}
+                            {file.isPending ? (
+                                <FileLoader/>
+                            ) : (
+                                <span className={styles['file-list__node-text']}>
+                                {file.name}
+                            </span>
+                            )}
                         </div>
                     ) : (
                         <div
@@ -86,16 +105,16 @@ const FileNode: React.FC<Props> = React.memo(
                         >
                             {file.isPending ? (
                                 <>
-                                    <FileLoader />
+                                    <FileLoader/>
                                 </>
                             ) : (
                                 <>
-                                    <FileImg className={styles['file-list__node-image']} />
+                                    <FileImg className={styles['file-list__node-image']}/>
                                     <span
                                         className={styles['file-list__node-text']}
                                         style={{
                                             fontWeight:
-                                                file.status === FileStatus.Opened ? 'bold' : 'normal',
+                                                file.id === openedFile?.id ? 'bold' : 'normal',
                                         }}
                                     >
                 {file.name}

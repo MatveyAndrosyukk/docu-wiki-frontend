@@ -1,4 +1,5 @@
-import {File, FileType} from "../../types/file";
+import {FileType} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
 export interface SearchResult {
     id: number;
@@ -9,7 +10,7 @@ export interface SearchResult {
 }
 
 export default function searchFilesByName(
-    nodes: File[],
+    nodes: UiFile[],
     query: string,
     path: string = ''
 ): SearchResult[] {

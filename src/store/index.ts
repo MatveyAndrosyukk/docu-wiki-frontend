@@ -1,10 +1,12 @@
 import {configureStore} from "@reduxjs/toolkit";
-import fileTreeReducer from './slices/fileTreeSlice';
+import fileServerReducer from './slices/fileServerSlice';
+import fileUiReducer from './slices/fileUiSlice';
 import userReducer from "./slices/userSlice";
 
 export const store = configureStore({
     reducer: {
-        fileTree: fileTreeReducer,
+        fileServer: fileServerReducer,
+        fileUi: fileUiReducer,
         user: userReducer
     },
 });

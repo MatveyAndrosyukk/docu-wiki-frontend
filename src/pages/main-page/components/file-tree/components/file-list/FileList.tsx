@@ -1,12 +1,13 @@
 import React, {useCallback, useContext} from 'react';
 import styles from './FileList.module.scss';
-import {useDispatch} from 'react-redux';
-import {toggleFolder} from '../../../../../../store/slices/fileTreeSlice';
+import {useDispatch, useSelector} from 'react-redux';
 import {AppContext} from '../../../../../../context/AppContext';
 import useContextMenuActions from '../../../../../../utils/hooks/useContextMenuActions';
 import ContextMenu from '../../../../../../ui-components/context-menu/ContextMenu';
 import {TreeNode, useFlattenedTree} from '../../../../../../utils/hooks/useFlattenedTree';
 import FileNode from './components/virtualized-row/FileNode';
+import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
+import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 
 interface FileListProps {
     emailParam: string | undefined;
@@ -18,18 +19,23 @@ const FileList: React.FC<FileListProps> = React.memo(
         const dispatch = useDispatch();
         const context = useContext(AppContext);
         if (!context) throw new Error('Context required');
-
-        const {files, viewedUser, loggedInUser, fileState, authState} = context;
+        const {
+            viewedUser,
+            loggedInUser,
+            fileState,
+            authState
+        } = context;
         const contextMenuAcState = useContextMenuActions();
         const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
+        const files = useSelector(selectFileTree)
 
         const flattenedNodes = useFlattenedTree(files);
 
         const onFolderClick = useCallback(
-            (id: number | null) => {
-                dispatch(toggleFolder({id}));
+            (id: number) => {
+                dispatch(toggleFolder({id, tree: files}));
             },
-            [dispatch],
+            [dispatch, files],
         );
 
         return (

@@ -1,7 +1,8 @@
 import {Dispatch, SetStateAction, useCallback, useState} from "react";
 import {SearchType} from "../../types/searchType";
-import {openPathToNode} from "../../store/slices/fileTreeSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {openPathToNode} from "../../store/slices/fileUiSlice";
+import {selectFileTree} from "../../store/selectors/selectFileTree";
 
 export interface FileSearchState {
     searchType: SearchType;
@@ -13,10 +14,11 @@ export interface FileSearchState {
 export default function useFileSearchActions(): FileSearchState {
     const dispatch = useDispatch();
     const [searchType, setSearchType] = useState<SearchType>(SearchType.InFileNames);
+    const files = useSelector(selectFileTree);
 
     const handleOpenPathToSelectedFile = useCallback((id: number) => {
-        dispatch(openPathToNode({id}));
-    }, [dispatch]);
+        dispatch(openPathToNode({id, files}));
+    }, [dispatch, files]);
 
     const handleSwitchSearchType = useCallback(() => {
         if (searchType === SearchType.InFileNames) {

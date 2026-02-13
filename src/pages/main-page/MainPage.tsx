@@ -4,13 +4,11 @@ import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store";
-import findOpenedFile from "../../utils/functions/findOpenedFile";
+import {AppDispatch} from "../../store";
 import EditModal from "../../ui-components/edit-modal/EditModal";
 import DeleteModal from "../../ui-components/delete-modal/DeleteModal";
 import {fetchFilesByEmail} from "../../store/thunks/files/fetchFilesByEmail";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
-import {clearFiles} from "../../store/slices/fileTreeSlice";
 import {clearLoggedInUser, clearViewedUser, User} from "../../store/slices/userSlice";
 import {AppContext} from "../../context/AppContext";
 import LoginModal from "../../ui-components/login-modal/LoginModal";
@@ -20,6 +18,10 @@ import ResetPasswordModal from "../../ui-components/reset-password-modal/ResetPa
 import {isUserOwner} from "../../utils/functions/permissions-utils/isUserOwner";
 import BanModal from "../../ui-components/ban-modal/BanModal";
 import findPathToFile from "../../utils/functions/findFilePath";
+import {selectOpenedFile} from "../../store/selectors/selectOpenedFile";
+import {selectFileTree} from "../../store/selectors/selectFileTree";
+import {clearServerFiles} from "../../store/slices/fileServerSlice";
+import {clearUiState} from "../../store/slices/fileUiSlice";
 
 interface MainPageProps {
     emailParam?: string | undefined;
@@ -30,8 +32,9 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const dispatch = useDispatch<AppDispatch>();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, loggedInUser, authState, files} = context;
-    const openedFile = useSelector((state: RootState) => findOpenedFile(state.fileTree.files));
+    const {viewedUser, loggedInUser, authState} = context;
+    const files = useSelector(selectFileTree);
+    const openedFile = useSelector(selectOpenedFile);
     const authorizedUserEmail = localStorage.getItem('email');
     const currentUserEmail = emailParam || authorizedUserEmail;
     const prevViewedUserRef = useRef<User | null>(null);
@@ -68,7 +71,8 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
             dispatch(fetchViewedUserByEmail(currentUserEmail));
             dispatch(fetchLoggedInUserByEmail(authorizedUserEmail))
         } else {
-            dispatch(clearFiles());
+            dispatch(clearServerFiles());
+            dispatch(clearUiState())
             dispatch(clearViewedUser());
             dispatch(clearLoggedInUser());
         }
@@ -99,7 +103,8 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
                 const isUserEqualsLoggedIn = viewedUser.email === loggedInUser?.email;
 
                 if (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn)) {
-                    dispatch(clearFiles());
+                    dispatch(clearServerFiles());
+                    dispatch(clearUiState())
                 } else {
                     dispatch(fetchFilesByEmail({
                         viewedUserEmail: viewedUser.email,
@@ -115,7 +120,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     useEffect(() => {
         if (openedFile) {
             document.title = findPathToFile(files, openedFile.id)?.join('/') as string
-        }else {
+        } else {
             document.title = "DocuWiki"
         }
     }, [files, openedFile]);

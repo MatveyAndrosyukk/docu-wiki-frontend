@@ -39,7 +39,13 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const dispatch = useDispatch<AppDispatch>();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, loggedInUser, authState, fileState, banState} = context;
+    const {
+        viewedUser,
+        loggedInUser,
+        authState,
+        fileState,
+        banState
+    } = context;
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);

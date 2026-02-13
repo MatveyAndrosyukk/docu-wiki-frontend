@@ -3,7 +3,7 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {performLoginAsync} from "../../services/performLoginAsync";
 import {jwtDecode} from "jwt-decode";
-import {resetFiles} from "../../store/slices/fileTreeSlice";
+import {clearUiState} from "../../store/slices/fileUiSlice";
 
 export interface LoginModalValue {
     login: string;
@@ -50,7 +50,7 @@ export default function useLoginActions(): LoginState {
         localStorage.removeItem('token');
         localStorage.removeItem('email');
         localStorage.removeItem('roles');
-        dispatch(resetFiles());
+        dispatch(clearUiState());
         setIsLoggedIn(false);
     }, [dispatch, setIsLoggedIn]);
 

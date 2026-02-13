@@ -1,26 +1,21 @@
 import {ActionType} from "../supporting-hooks/useModalActions";
-import {File} from "../../types/file";
-
-export function findNodeById(nodes: File[], id: number | null): File | null {
-    for (const node of nodes) {
-        if (node.id === id) return node;
-        if (node.type === 'Folder' && node.children) {
-            const found = findNodeById(node.children, id);
-            if (found) return found;
-        }
-    }
-    return null;
-}
+import {FileType} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
+import {CreateFilePayload} from "../../types/CreateFilePayload";
+import {NameConflictResult} from "../../types/NameConflictResult";
 
 export function checkIfNameExistsInFolder(
-    files: File[],
+    files: UiFile[],
     folderId: number | null,
     name: string
 ): boolean {
-    function findFolderById(nodes: File[]): File | null {
+    function findFolderById(nodes: UiFile[]): UiFile | null {
         for (const node of nodes) {
-            if (node.id === folderId && node.type === 'Folder') return node;
-            if (node.type === 'Folder' && node.children) {
+            if (node.id === folderId && node.type === FileType.Folder) {
+                return node;
+            }
+
+            if (node.children?.length) {
                 const found = findFolderById(node.children);
                 if (found) return found;
             }
@@ -28,66 +23,43 @@ export function checkIfNameExistsInFolder(
         return null;
     }
 
+    if (folderId === null) {
+        return files.some(file => file.name === name);
+    }
+
     const targetFolder = findFolderById(files);
-    if (targetFolder && targetFolder.children) {
-        return targetFolder.children.some(child => child.name === name);
-    }
-    return false;
+    return targetFolder
+        ? targetFolder.children.some(child => child.name === name)
+        : false;
 }
 
-export function isNameExistsInRoot(files: File[], name: string): boolean {
-    return files.some(file => file.name === name);
+export function isNameExistsInRoot(files: UiFile[], name: string): boolean {
+    return files.some(file => file.name === name && file.parent === null);
 }
 
-export function handleNameConflictInFolder(
-    files: File[],
-    id: number | null,
-    name: string,
-    reason: ActionType,
-    openModalByReasonHandler: (payload: { reason: ActionType; id: number | null, title: string }) => void
+export function checkNameConflictInFolder(
+    files: UiFile[],
+    folderId: number | null,
+    name: string
 ): boolean {
-    if (id === null) return true;
-    if (checkIfNameExistsInFolder(files, id, name)) {
-        switch (reason) {
-            case ActionType.AddFile:
-            case ActionType.ResolveNameConflictAddFile:
-                openModalByReasonHandler({reason: ActionType.ResolveNameConflictAddFile, id, title: "Add file"});
-                break;
-            case ActionType.AddFolder:
-            case ActionType.ResolveNameConflictAddFolder:
-                openModalByReasonHandler({reason: ActionType.ResolveNameConflictAddFolder, id, title: "Add folder"});
-                break;
-            case ActionType.ResolveNameConflictPaste:
-                openModalByReasonHandler({reason: ActionType.ResolveNameConflictPaste, id, title: "Paste file"});
-                break;
-            case ActionType.ResolveNameConflictRename:
-                openModalByReasonHandler({reason: ActionType.ResolveNameConflictRename, id, title: "Rename file"});
-                break;
-        }
-        return true;
-    }
-    return false;
+    return checkIfNameExistsInFolder(files, folderId, name);
 }
 
 export function createFilePayload(
     name: string,
-    author: string | null,
-    type: 'File' | 'Folder',
-    parent: number | null,
-    extraFields?: Partial<File>
-): File {
+    authorEmail: string,
+    type: FileType,
+    parent: number | null
+): CreateFilePayload {
+    if (!authorEmail) {
+        throw new Error("authorEmail is required to create a file");
+    }
+
     return {
-        id: null,
-        status: null,
-        likes: null,
-        children: null,
-        lastEditor: null,
-        author,
-        type,
         name,
-        content: '',
+        type,
         parent,
-        isLiked: null,
-        ...extraFields,
+        author: authorEmail,
+        ...(type === FileType.File && {content: ""}),
     };
 }

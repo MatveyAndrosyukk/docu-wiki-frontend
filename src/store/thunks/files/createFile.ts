@@ -1,29 +1,19 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import API_BASE_URL from "../../../config/api-config";
-
-export interface CreateFilePayload {
-    id: number | null;
-    author: string | null;
-    type: string;
-    name: string;
-    content: string;
-    status: string | null;
-    likes: number | null;
-    children: CreateFilePayload[] | null;
-    parent: number | { id: number } | null;
-    lastEditor: string | null;
-    isLiked: boolean | null;
-}
+import {ServerFile} from "../../types/ServerFile";
+import {CreateFilePayload} from "../../../types/CreateFilePayload";
 
 const delay = (ms: number) =>
     new Promise(resolve => setTimeout(resolve, ms));
 
-export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>(
+export const createFile = createAsyncThunk<
+    ServerFile,
+    CreateFilePayload
+>(
     'fileTree/createFile',
     async (body) => {
         const token = localStorage.getItem('token');
 
-        // ⏳ искусственная задержка
         await delay(3000);
 
         const response = await fetch(`${API_BASE_URL}/files`, {
@@ -39,6 +29,8 @@ export const createFile = createAsyncThunk<CreateFilePayload, CreateFilePayload>
             throw new Error('Failed to create file on server');
         }
 
-        return await response.json();
+        const data = await response.json();
+
+        return { ...data, tempId: body.tempId };
     }
 );

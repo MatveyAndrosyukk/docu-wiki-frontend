@@ -1,4 +1,11 @@
 import {File, FileStatus, FileType} from "../../types/file";
+import {ServerFile} from "../types/ServerFile";
+import {UiFile} from "../types/UiFile";
+
+interface TreeNodeBase {
+    id: number;
+    children?: TreeNodeBase[];
+}
 
 export function findAndUpdate(
     nodes: File[],
@@ -113,43 +120,6 @@ export function deleteById(
         }));
 }
 
-export function findPathToNode(
-    nodes: File[],
-    targetId: number,
-    path: number[] | null = []
-): number[] | null {
-    for (const node of nodes) {
-        // @ts-ignore
-        const currentPath = [...path, node.id];
-        if (node.id === targetId) {
-            return currentPath;
-        }
-        if (node.children && node.children.length > 0) {
-            const result = findPathToNode(node.children, targetId, currentPath);
-            if (result) return result;
-        }
-    }
-    return null;
-}
-
-export function openFoldersOnPathPreserveOthers(
-    nodes: File[],
-    pathIds: number[]
-): File[] {
-    return nodes.map(node => {
-        const newNode = {...node};
-        if (newNode.type === FileType.Folder) {
-            if (pathIds.includes(newNode.id as number)) {
-                newNode.status = FileStatus.Opened;
-            }
-            if (newNode.children && newNode.children.length > 0) {
-                newNode.children = openFoldersOnPathPreserveOthers(newNode.children, pathIds);
-            }
-        }
-        return newNode;
-    });
-}
-
 export function closeAllFilesExcept(
     nodes: File[],
     openedFileId: number | null
@@ -165,41 +135,6 @@ export function closeAllFilesExcept(
         return newNode;
     });
 }
-
-const addFileToParent = (files: File[], parentId: number, file: File): boolean => {
-    for (const node of files) {
-        if (node.id === parentId && node.children) {
-            node.children.push(file);
-            return true;
-        }
-
-        if (node.children) {
-            const added = addFileToParent(node.children, parentId, file);
-            if (added) return true;
-        }
-    }
-    return false;
-};
-
-export const mergeFiles = (
-    serverFiles: File[],
-    pendingFiles: File[]
-): File[] => {
-    const merged = structuredClone(serverFiles);
-
-    pendingFiles.forEach(pending => {
-        if (!pending.parent) return;
-
-        const parentId =
-            typeof pending.parent === 'number'
-                ? pending.parent
-                : pending.parent.id;
-
-        addFileToParent(merged, parentId, pending);
-    });
-
-    return merged;
-};
 
 export const extractOpenFolders = (files: File[]): Set<number> => {
     const openFolders = new Set<number>();
@@ -251,3 +186,47 @@ export const restoreOpenFolders = (
 
     return walk(files);
 };
+
+export const getAllChildFolderIdsUi = (node: UiFile): number[] => {
+    let ids: number[] = [];
+    for (const child of node.children) {
+        if (child.type === FileType.Folder) {
+            ids.push(child.id);
+            ids = ids.concat(getAllChildFolderIdsUi(child));
+        }
+    }
+    return ids;
+};
+
+export function findFileById<T extends TreeNodeBase>(
+    files: T[],
+    id: number
+): T | null {
+    for (const file of files) {
+        if (file.id === id) return file;
+        if (file.children) {
+            const found = findFileById(file.children as T[], id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+export function findPathToFile(files: File[], targetId: number): number[] | null {
+    for (const file of files) {
+        if (file.id === targetId) return [file.id];
+        if (file.children) {
+            const childPath = findPathToFile(file.children, targetId);
+            if (childPath) return [file.id, ...childPath];
+        }
+    }
+    return null;
+}
+
+export function openFoldersOnPathPreserveOthers(openedFolders: number[], path: number[]): number[] {
+    const newOpened = [...openedFolders];
+    for (const id of path) {
+        if (!newOpened.includes(id)) newOpened.push(id);
+    }
+    return newOpened;
+}

@@ -6,14 +6,14 @@ import useModalActions, {ModalActionsState} from "../supporting-hooks/useModalAc
 import useEditFileActions, {EditFileViewState} from "../supporting-hooks/useEditFileActions";
 import {useCallback} from "react";
 import {User} from "../../store/slices/userSlice";
-import {File} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
 export type FileActionsState = DeleteFileState & ModalActionsState & EditFileViewState & {
     handleLikeFile: (dto: ChangeFileLikesPayload) => any;
 }
 
 export default function useFileActions(
-    files: File[],
+    files: UiFile[],
     viewedUser: User | null,
 ): FileActionsState {
     const dispatch = useDispatch<AppDispatch>();

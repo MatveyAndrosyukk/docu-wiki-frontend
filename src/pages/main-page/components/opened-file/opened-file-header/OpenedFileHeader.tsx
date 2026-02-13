@@ -1,7 +1,6 @@
 import React, {Dispatch, SetStateAction, useEffect, useMemo} from 'react';
 import styles from "../OpenedFile.module.scss";
 import {isUserCanEdit} from "../../../../../utils/functions/permissions-utils/isUserCanEdit";
-import {File} from "../../../../../types/file";
 import {ReactComponent as HeartBtn} from '../images/opened-file-heart.svg'
 import {ReactComponent as LikedHeartBtn} from '../images/opened-file-red-heart.svg'
 import {ReactComponent as EditFileSvg} from '../images/opened-file-edit.svg'
@@ -9,32 +8,35 @@ import {ReactComponent as DeleteFileSvg} from '../images/opened-file-delete.svg'
 import {ReactComponent as OpenButtonsSvg} from '../images/opened-file-open.svg'
 import {User} from "../../../../../store/slices/userSlice";
 import findPathToFile from "../../../../../utils/functions/findFilePath";
+import {UiFile} from "../../../../../store/types/UiFile";
 
 interface OpenedFileHeaderProps {
-    file: File;
+    file: UiFile;
     isLiked: boolean | null | undefined;
     onTryToLikeFile: () => void;
     viewedUser: User | null;
-    files: File[];
+    files: UiFile[];
+    likes: number;
     isBurgerMenuOpened: boolean;
     setIsBurgerMenuOpened: Dispatch<SetStateAction<boolean>>;
     isEditing: boolean;
     onOpenEditionMode: () => void;
-    onDeleteFile: (file: File) => void;
+    onDeleteFile: (file: UiFile) => void;
     isLoggedIn: boolean;
     emailParam: string | undefined;
     loggedInUser: User | null;
     setIsEditing: Dispatch<SetStateAction<boolean>>;
-    onOpenDeleteModal: (file: File, user: User | null) => void;
+    onOpenDeleteModal: (file: UiFile, user: User | null) => void;
 }
 
-const OpenedFileHeader:React.FC<OpenedFileHeaderProps> = (
+const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
     {
         file,
         isLiked,
         onTryToLikeFile,
         viewedUser,
         files,
+        likes,
         isBurgerMenuOpened,
         setIsBurgerMenuOpened,
         isEditing,
@@ -81,7 +83,7 @@ const OpenedFileHeader:React.FC<OpenedFileHeaderProps> = (
             <div className={styles['header__left-side']}>
                 <div className={styles['header__likes']}>
                     <div
-                        className={`${styles['header__likes-amount']} ${styles[likesClass]}`}>{file?.likes}</div>
+                        className={`${styles['header__likes-amount']} ${styles[likesClass]}`}>{likes}</div>
                     {
                         isLiked ?
                             <LikedHeartBtn onClick={() => onTryToLikeFile()}/> :

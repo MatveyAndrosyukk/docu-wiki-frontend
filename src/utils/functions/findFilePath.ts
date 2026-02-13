@@ -1,6 +1,6 @@
-import {File} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
-export default function findPathToFile(nodes: File[], targetId: number | null, path: string[] = []): string[] | null {
+export default function findPathToFile(nodes: UiFile[], targetId: number | null, path: string[] = []): string[] | null {
     for (const node of nodes) {
         const currentPath = [...path, node.name];
         if (node.id === targetId) {

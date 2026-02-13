@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import searchFilesByName, {SearchResult} from "../../../../../../utils/functions/searchFilesByName";
 import styles from './SearchInput.module.scss'
 import FileImage from './images/search-input-file.svg'
@@ -6,7 +6,8 @@ import FolderImage from './images/search-input-folder.svg'
 import {FileType} from "../../../../../../types/file";
 import {SearchType} from "../../../../../../types/searchType";
 import searchFilesByContent from "../../../../../../utils/functions/searchFilesByContent";
-import {AppContext} from "../../../../../../context/AppContext";
+import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
+import {useSelector} from "react-redux";
 
 interface SearchProps {
     onClick: (id: number) => void;
@@ -14,9 +15,7 @@ interface SearchProps {
 }
 
 const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {files} = context;
+    const files = useSelector(selectFileTree);
     const [query, setQuery] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const searchInputBlockRef = useRef<HTMLDivElement>(null);

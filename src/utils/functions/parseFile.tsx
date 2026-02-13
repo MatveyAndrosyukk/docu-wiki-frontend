@@ -5,7 +5,9 @@ import TerminalBlock from "../../pages/main-page/components/opened-file/componen
 
 function parseInline(
     text: string,
-    onImageClick: (imageUrl: string) => void | null): React.ReactNode[] {
+    onImageClick: (imageUrl: string) => void | null,
+    pendingImages: Record<string, { status: 'pending' | 'ready' | 'error' }>
+): React.ReactNode[] {
     const parts: React.ReactNode[] = [];
 
     const imageRegx = /\[image\/(.+?)]/g;
@@ -55,7 +57,7 @@ function parseInline(
         if (type === 'link') {
             const href = match[1];
             const innerContent = match[2];
-            const children = parseInline(innerContent, onImageClick);
+            const children = parseInline(innerContent, onImageClick, pendingImages);
             parts.push(
                 <a key={index} className={styles['opened-file__content-link']} href={href} target="_blank"
                    rel="noopener noreferrer">
@@ -65,7 +67,7 @@ function parseInline(
         } else if (type === 'simple') {
             const tag = match[1];
             const innerContent = match[2];
-            const children = parseInline(innerContent, onImageClick);
+            const children = parseInline(innerContent, onImageClick, pendingImages);
 
             let className = '';
             switch (tag) {
@@ -87,20 +89,36 @@ function parseInline(
             );
         } else if (type === 'image') {
             const fileName = match[1].split(':')[0];
-            console.log(fileName)
             const imageUrl = `https://i.ibb.co/${fileName}`;
-            parts.push(
-                <img
-                    key={index}
-                    src={imageUrl}
-                    alt={fileName}
-                    style={{maxWidth: '100%', height: 'auto'}}
-                    onClick={() => onImageClick(imageUrl)}
-                />
-            );
-        }else if (type === 'lineCode') {
+
+            const imageState = pendingImages[fileName];
+
+            if (imageState?.status === 'pending') {
+                parts.push(
+                    <div key={index} className={styles.imagePlaceholder}>
+                        <div className={styles.loader}/>
+                        <span>Image is loading…</span>
+                    </div>
+                );
+            } else if (imageState?.status === 'error') {
+                parts.push(
+                    <div key={index} className={styles.imageError}>
+                        ❌ Failed to load image
+                    </div>
+                );
+            } else {
+                parts.push(
+                    <img
+                        key={index}
+                        src={imageUrl}
+                        alt={fileName}
+                        onClick={() => onImageClick(imageUrl)}
+                    />
+                );
+            }
+        } else if (type === 'lineCode') {
             const innerContent = match[1];
-            const children = parseInline(innerContent, onImageClick);
+            const children = parseInline(innerContent, onImageClick, pendingImages);
             parts.push(
                 <span key={index} className={styles['opened-file__content-span-code']}>
             {children}
@@ -123,6 +141,7 @@ export function parseFileTextToHTML(
     file: string,
     onImageClick: (imageUrl: string) => void | null,
     isFileTreeOpened: boolean,
+    pendingImages: Record<string, { status: 'pending' | 'ready' | 'error' }>,
 ): ReactNode[] {
     const lines = file.split('\n');
 
@@ -198,7 +217,7 @@ export function parseFileTextToHTML(
         if (line.length > 0) {
             elements.push(
                 <div key={`text-${i}`} className={styles['opened-file__content-text']}>
-                    {parseInline(line, onImageClick)}
+                    {parseInline(line, onImageClick, pendingImages)}
                 </div>
             );
             i++;

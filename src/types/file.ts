@@ -9,18 +9,18 @@ export enum FileStatus {
 }
 
 export interface File {
-    id: number | null;
-    author: string | null;
+    id: number;
     type: string;
     name: string;
     content: string;
-    status: string | null;
-    likes: number | null;
-    children: File[] | null;
-    parent: number | { id: number } | null;
-    lastEditor: string | null;
-    isLiked: boolean | null;
-    isPending?: boolean | null;
+    likes: number;
+    children: File[];
+    parent: number | null;
+    lastEditor: string;
+    isLiked: boolean;
+    author: {email: string};
+    status?: string;
+    isPending?: boolean;
 }
 
 export interface TempFile {

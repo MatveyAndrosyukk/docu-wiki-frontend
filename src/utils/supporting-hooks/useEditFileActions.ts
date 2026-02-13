@@ -1,10 +1,10 @@
 import {useDispatch} from "react-redux";
 import {Dispatch, SetStateAction, useCallback, useState} from "react";
-import {openFile} from "../../store/slices/fileTreeSlice";
 import {updateFileContent} from "../../store/thunks/files/updateFileContent";
 import extractImagesName from "../functions/extractImageNames";
 import {deleteExtraImagesAsync} from "../../services/deleteExtraImagesAsync";
 import {AppDispatch} from "../../store";
+import {openFile} from "../../store/slices/fileUiSlice";
 
 export interface EditFileViewState {
     isEditing: boolean;
@@ -17,7 +17,7 @@ export interface EditFileViewState {
     setSwitchedFileId: Dispatch<SetStateAction<number | null>>;
     contentError: string;
     setContentError: Dispatch<SetStateAction<string>>;
-    handleTryToOpenFile: (targetFileId: number | null) => void;
+    handleTryToOpenFile: (targetFileId: number) => void;
     handleRejectSwitch: () => void;
     handleConfirmSwitch: () => void;
     handleSaveEditedFileChanges: (
@@ -25,7 +25,7 @@ export interface EditFileViewState {
         newContent: string,
         addedImages: string[],
         editorEmail?: string
-    ) => Promise<void>;
+    ) => void;
     handleCancelEditedFileChanges: (
         contentBeforeEdition: string,
         addedImages: string[],
@@ -40,7 +40,7 @@ export default function useEditFileActions(): EditFileViewState {
     const [switchedFileId, setSwitchedFileId] = useState<number | null>(null);
     const [contentError, setContentError] = useState<string>('');
 
-    const handleTryToOpenFile = useCallback((targetFileId: number | null) => {
+    const handleTryToOpenFile = useCallback((targetFileId: number) => {
         if (isEditing && isFileContentChanged) {
             setIsTryToSwitchWhileEditing(true);
             setSwitchedFileId(targetFileId);
@@ -49,13 +49,13 @@ export default function useEditFileActions(): EditFileViewState {
             setIsFileContentChanged(false);
             setIsTryToSwitchWhileEditing(false);
             setSwitchedFileId(null);
-            dispatch(openFile({id: targetFileId}));
+            dispatch(openFile(targetFileId));
         }
     }, [isEditing, isFileContentChanged, dispatch, setIsEditing, setIsFileContentChanged, setIsTryToSwitchWhileEditing, setSwitchedFileId]);
 
     const handleConfirmSwitch = useCallback(() => {
         if (switchedFileId !== null) {
-            dispatch(openFile({id: switchedFileId}));
+            dispatch(openFile(switchedFileId));
             setIsEditing(false);
             setIsFileContentChanged(false);
             setIsTryToSwitchWhileEditing(false);
@@ -68,40 +68,36 @@ export default function useEditFileActions(): EditFileViewState {
         setSwitchedFileId(null);
     }, [setIsTryToSwitchWhileEditing, setSwitchedFileId]);
 
-    const handleSaveEditedFileChanges = useCallback(async (
+    const handleSaveEditedFileChanges = useCallback((
         fileId: number,
         newContent: string,
         addedImages: string[],
         editorEmail?: string
     ) => {
-        if (!editorEmail) {
-            console.error('Editor email is required');
-            return;
-        }
-        if (contentError) return;
+        if (!editorEmail || contentError) return;
 
-        try {
-            await dispatch(updateFileContent({
-                id: fileId,
-                content: newContent,
-                editor: editorEmail
-            })).unwrap();
+        setIsEditing(false);
+        setIsFileContentChanged(false);
 
-            const savedImages = extractImagesName(newContent);
-            const extraImages = addedImages.filter(image => !savedImages.includes(image));
+        dispatch(updateFileContent({
+            id: fileId,
+            content: newContent,
+            editor: editorEmail
+        }))
+            .unwrap()
+            .then(() => {
+                const savedImages = extractImagesName(newContent);
+                const extraImages = addedImages.filter(img => !savedImages.includes(img));
 
-            if (extraImages.length > 0) {
-                await deleteExtraImagesAsync(extraImages);
-            }
-
-            setIsEditing(false);
-            setIsFileContentChanged(false);
-
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            throw error;
-        }
-    }, [contentError, dispatch]);
+                if (extraImages.length) {
+                    deleteExtraImagesAsync(extraImages)
+                        .catch((err) => {console.error('Failed to delete images. Message: ', err)});
+                }
+            })
+            .catch(err => {
+                console.error('Save failed:', err);
+            });
+    }, [dispatch, contentError]);
 
     const handleCancelEditedFileChanges = useCallback(async (
         contentBeforeEdition: string,

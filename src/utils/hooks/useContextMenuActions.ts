@@ -1,17 +1,17 @@
 import React, {Dispatch, SetStateAction, useCallback} from "react";
-import {File} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
 export interface OpenedContextMenuState {
     visible: boolean,
     clickX: number,
     clickY: number,
-    file: File | null;
+    file: UiFile | null;
 }
 
 export interface ContextMenuState {
     contextMenuState: OpenedContextMenuState;
     setContextMenuState: Dispatch<SetStateAction<OpenedContextMenuState>>;
-    handleOpenContextMenu: (event: React.MouseEvent, file: File) => void;
+    handleOpenContextMenu: (event: React.MouseEvent, file: UiFile) => void;
     handleCloseContextMenu: () => void;
 }
 
@@ -23,7 +23,7 @@ export default function useContextMenuActions(): ContextMenuState {
         file: null
     });
 
-    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: File) => {
+    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: UiFile) => {
         event.preventDefault();
         setContextMenuState({
             visible: true,

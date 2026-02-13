@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from './components/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
@@ -6,15 +6,16 @@ import {parseFileTextToHTML} from '../../../../utils/functions/parseFile'
 import EditMode from './components/edit-file-view/EditMode'
 import {AppContext} from '../../../../context/AppContext'
 import {useNavigate} from "react-router-dom";
-import {File} from "../../../../types/file";
 import EmptyFile from "./components/empty-file/EmptyFile";
 import OpenedFileHeader from "./opened-file-header/OpenedFileHeader";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../../store";
-import {revertFileLike, toggleFileLikeOptimistic} from "../../../../store/slices/fileTreeSlice";
+import {useSelector} from "react-redux";
+import {UiFile} from "../../../../store/types/UiFile";
+import {selectFileTree} from "../../../../store/selectors/selectFileTree";
+import {useFileLikes} from "../../../../utils/hooks/useFileLikes";
+import {RootState} from "../../../../store";
 
 interface OpenedFileProps {
-    file?: File | null
+    file?: UiFile | null
     emailParam: string | undefined
     isFileTreeOpened: boolean
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>
@@ -29,31 +30,25 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }) => {
     const navigate = useNavigate()
     const context = useContext(AppContext)
-    const dispatch = useDispatch<AppDispatch>();
     if (!context) throw new Error("Component can't be used without context")
-    const {viewedUser, files, fileState, authState, loggedInUser} = context
-    const [isLiked, setIsLiked] = React.useState(file?.isLiked)
-    const [isLiking, setIsLiking] = React.useState(false);
+    const {viewedUser, fileState, authState, loggedInUser} = context
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
+    const files = useSelector(selectFileTree)
+    const {isLiked, likes, toggleLike} = useFileLikes({fileId: file?.id as number});
+    const pendingImages = useSelector(
+        (state: RootState) => state.fileUi.pendingImages
+    );
 
     const {
         isEditing,
         setIsEditing,
-        handleLikeFile,
         handleOpenDeleteModal,
     } = fileState
 
     const {
         isLoggedIn,
-        handleOpenLoginModal
     } = authState
-
-    useEffect(() => {
-        if (!file || isLiking) return;
-
-        setIsLiked(file?.isLiked)
-    }, [file, isLiking])
 
     const handleImageClick = useCallback((imageUrl: string) => {
         setOpenedImage(imageUrl)
@@ -63,43 +58,14 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         (content: string,
          onImageClick: (url: string) => void,
          isFileTreeOpened: boolean) =>
-            parseFileTextToHTML(content, onImageClick, isFileTreeOpened),
-        []
+            parseFileTextToHTML(content, onImageClick, isFileTreeOpened, pendingImages),
+        [pendingImages]
     );
 
     const contentElements = useMemo(() => {
         if (!file?.content) return [];
-        return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened);
+        return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened, pendingImages);
     }, [file?.content, handleImageClick, isFileTreeOpened]);
-
-
-
-    const handleTryToLikeFile = useCallback(async () => {
-        if (!file || isLiking) return;
-        setIsLiking(true);
-
-        const email = localStorage.getItem("email");
-        if (!email) return handleOpenLoginModal();
-
-        const fileId = file.id as number;
-        const prevLiked = isLiked;
-        setIsLiked(prev => !prev);
-
-        dispatch(toggleFileLikeOptimistic({
-            fileId,
-            isLiked: prevLiked
-        }));
-
-        try {
-            const dto = {id: fileId, email};
-            await handleLikeFile(dto)
-                .then(() => setIsLiking(false))
-        } catch (error) {
-            setIsLiked(prevLiked);
-            dispatch(revertFileLike({fileId, isLiked}));
-            setIsLiking(false);
-        }
-    }, [dispatch, file, handleLikeFile, handleOpenLoginModal, isLiked, isLiking]);
 
     const handleGoToUsersPage = useCallback((user: string | null) => {
         return navigate(`/${encodeURIComponent(user as string)}`)
@@ -110,7 +76,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsBurgerMenuOpened(false);
     }, [setIsEditing])
 
-    const handleDeleteFile = useCallback((file: File) => {
+    const handleDeleteFile = useCallback((file: UiFile) => {
         handleOpenDeleteModal(file, viewedUser)
         setIsBurgerMenuOpened(false);
     }, [handleOpenDeleteModal, viewedUser])
@@ -128,6 +94,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             <OpenedFileHeader {...{
                 file,
                 isLiked,
+                likes,
                 viewedUser,
                 loggedInUser,
                 files,
@@ -137,7 +104,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 emailParam,
                 setIsEditing,
                 setIsBurgerMenuOpened,
-                onTryToLikeFile: handleTryToLikeFile,
+                onTryToLikeFile: toggleLike,
                 onOpenEditionMode: handleOpenEditionMode,
                 onDeleteFile: handleDeleteFile,
                 onOpenDeleteModal: handleOpenDeleteModal
@@ -165,7 +132,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             <div className={styles['opened-file__footer']}>
                 Last edited by:
                 <span
-                    onClick={() => handleGoToUsersPage(file.lastEditor)}
+                    onClick={() => handleGoToUsersPage(file.lastEditor as string)}
                     className={styles['footer__editor']}>
                             {file.lastEditor}
                         </span>

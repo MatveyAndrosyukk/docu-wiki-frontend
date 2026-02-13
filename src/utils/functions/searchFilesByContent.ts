@@ -1,8 +1,8 @@
 import {SearchResult} from "./searchFilesByName";
-import {File} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
 
 export default function searchFilesByContent(
-    nodes: File[],
+    nodes: UiFile[],
     query: string,
     path: string = ''
 ): SearchResult[] {
@@ -12,7 +12,8 @@ export default function searchFilesByContent(
 
     for (const node of nodes) {
         const currentPath = path ? `${path}/${node.name}` : node.name;
-        const contentLower = node.content.toLowerCase();
+
+        const contentLower = node.content?.toLowerCase() ?? '';
         const idx = contentLower.indexOf(lowerQuery);
 
         if (idx !== -1) {
@@ -20,13 +21,15 @@ export default function searchFilesByContent(
                 id: node.id,
                 type: node.type,
                 name: node.name,
-                content: node.content.substring(idx),
+                content: node.content?.substring(idx) ?? '',
                 fullPath: currentPath,
             } as SearchResult);
         }
+
         if (node.children && node.children.length > 0) {
             results = results.concat(searchFilesByContent(node.children, query, currentPath));
         }
     }
+
     return results;
 }

@@ -1,30 +1,22 @@
 import {Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
-import {updateFileName} from "../../store/thunks/files/updateFileName";
-import {
-    checkIfNameExistsInFolder,
-    createFilePayload,
-    findNodeById,
-    handleNameConflictInFolder,
-    isNameExistsInRoot
-} from "../functions/modalUtils";
+import {checkNameConflictInFolder, createFilePayload, isNameExistsInRoot} from "../functions/modalUtils";
 import {createFile} from "../../store/thunks/files/createFile";
 import useCopyPasteActions, {CopyPasteState} from "./useCopyPasteActions";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../store";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../store";
 import {User} from "../../store/slices/userSlice";
+import {FileType} from "../../types/file";
+import {UiFile} from "../../store/types/UiFile";
+import {findFileById} from "../../store/utils/fileTreeActionUtils";
 import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
-import {File, FileType} from "../../types/file";
-import {addTempFile, registerPendingFile} from "../../store/slices/fileTreeSlice";
+import {addPendingFile, addPendingRootFolder, openFolder} from "../../store/slices/fileUiSlice";
+import {updateFileName} from "../../store/thunks/files/updateFileName";
 
 export enum ActionType {
     RenameFile = "RenameFile",
     AddRootFolder = "AddRootFolder",
     AddFolder = "AddFolder",
-    ResolveNameConflictRoot = "ResolveNameConflictRoot",
-    ResolveNameConflictAddFile = "ResolveNameConflictAddFile",
-    ResolveNameConflictAddFolder = "ResolveNameConflictAddFolder",
-    ResolveNameConflictPaste = "ResolveNameConflictPaste",
-    ResolveNameConflictRename = "ResolveNameConflictRename",
+    PasteFile = "PasteFile",
     AddFile = "AddFile"
 }
 
@@ -32,6 +24,7 @@ export interface ModalOpenState {
     reason: ActionType | null;
     id: number | null;
     title: string | null;
+    defaultValue?: string;
 }
 
 export type ModalActionsState = CopyPasteState & {
@@ -45,14 +38,14 @@ export type ModalActionsState = CopyPasteState & {
     setModalOpenState: Dispatch<SetStateAction<ModalOpenState>>;
     modalInputRef: Ref<HTMLInputElement | null> | null;
     isNameConflictReason: () => boolean;
-    handleOpenRenameModal: (file: File) => void;
+    handleOpenRenameModal: (file: UiFile) => void;
     handleCloseModal: () => void;
     handleConfirmModalByReason: (modalState: ModalOpenState & { title: string }) => void;
     handleOpenModalByReason: (modalState: ModalOpenState) => void;
 }
 
 export default function useModalActions(
-    files: File[],
+    files: UiFile[],
     viewedUser: User | null,
 ): ModalActionsState {
     const dispatch = useDispatch<AppDispatch>();
@@ -62,20 +55,42 @@ export default function useModalActions(
     const [modalOpenState, setModalOpenState] = useState<ModalOpenState>({reason: null, id: null, title: null});
     const modalInputRef = useRef<HTMLInputElement>(null);
     const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
+    const [localCreatedFiles, setLocalCreatedFiles] = useState(0);
+    const loggedInUserEmail = useSelector(
+        (state: RootState) => state.user.loggedInUser?.email
+    );
+    const pendingFiles = useSelector(
+        (state: RootState) => state.fileUi.pendingFiles
+    );
 
-    const handleOpenModalByReason = useCallback((modalState: ModalOpenState) => {
+    const openModal = useCallback((modalState: ModalOpenState) => {
         setModalOpenState(modalState);
 
-        const node = findNodeById(files, modalState.id);
-        if (modalState.reason === ActionType.RenameFile) {
+        if (modalState.reason === ActionType.RenameFile && modalState.id) {
+            const node = findFileById(files, modalState.id);
             setModalValue(node?.name || '');
+        } else if (modalState.defaultValue) {
+            setModalValue(modalState.defaultValue);
         } else {
-            setModalValue('')
+            setModalValue('');
         }
+
         setIsModalOpen(true);
     }, [files]);
 
-    const copyPasteActions = useCopyPasteActions(files, handleOpenModalByReason, checkIfNameExistsInFolder);
+    const copyPasteActions = useCopyPasteActions(openModal);
+
+    const closeModal = useCallback(() => {
+        setModalValue('');
+        setModalError('')
+        setIsModalOpen(false);
+        const modalState = {
+            reason: null,
+            id: null,
+            title: null
+        }
+        setModalOpenState(modalState);
+    }, []);
 
     useEffect(() => {
         if (isModalOpen && modalInputRef.current) {
@@ -90,229 +105,208 @@ export default function useModalActions(
         }
     }, [pendingPasteId, copyPasteActions]);
 
-    const handleConfirmModalByReason = useCallback(async (
+    useEffect(() => {
+        if (
+            modalOpenState.reason === ActionType.PasteFile &&
+            modalOpenState.id &&
+            copyPasteActions.copiedFile
+        ) {
+            const trimmedTitle = modalValue.trim();
+
+            if (!trimmedTitle) {
+                setModalError('');
+                return;
+            }
+
+            if (checkNameConflictInFolder(files, modalOpenState.id, trimmedTitle)) {
+                const typeLabel =
+                    copyPasteActions.copiedFile.type === FileType.File
+                        ? 'File'
+                        : 'Folder';
+
+                setModalError(`${typeLabel} with this name exists`);
+            } else {
+                setModalError('');
+            }
+        }
+    }, [
+        modalValue,
+        modalOpenState,
+        files,
+        copyPasteActions.copiedFile
+    ]);
+
+    const confirmModal = useCallback((
         modalState: ModalOpenState & { title: string }
     ) => {
         const {reason, id, title} = modalState;
         const trimmedTitle = title.trim();
+
         if (!trimmedTitle) return;
 
         switch (reason) {
-            case ActionType.AddRootFolder:
+            case ActionType.AddRootFolder: {
                 if (isNameExistsInRoot(files, trimmedTitle)) {
-                    handleOpenModalByReason({
-                        reason: ActionType.ResolveNameConflictRoot,
-                        id: null,
-                        title: 'Add root folder'
-                    });
-                    return;
-                }
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'Folder',
-                    null
-                )));
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
-
-            case ActionType.RenameFile:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictRename,
-                    handleOpenModalByReason
-                )) return;
-                dispatch(updateFileName({id: id as number, name: trimmedTitle}));
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
-
-            case ActionType.AddFolder:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictAddFolder,
-                    handleOpenModalByReason
-                )) return;
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'Folder',
-                    id
-                )));
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
-
-            case ActionType.AddFile:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictAddFile,
-                    handleOpenModalByReason
-                )) return;
-
-                if (viewedUser && viewedUser.amountOfFiles >= 20) {
-                    setModalError(`You can't create more than 20 files`);
+                    setModalError('Folder with this name exists');
                     return;
                 }
 
                 const tempId = Date.now();
-                dispatch(addTempFile({
-                    id: tempId,
-                    name: '',
-                    type: FileType.File,
-                    parent: id,
-                    isPending: true
-                }))
 
-                dispatch(registerPendingFile({ tempId, parentId: id }));
+                dispatch(addPendingRootFolder({tempId}));
 
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'File',
-                    id
-                )));
+                dispatch(
+                    createFile({
+                        ...createFilePayload(
+                            trimmedTitle,
+                            loggedInUserEmail as string,
+                            FileType.Folder,
+                            null
+                        ),
+                        tempId
+                    })
+                );
 
-                if (viewedUser) {
-                    dispatch(fetchViewedUserByEmail(viewedUser.email));
-                }
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
+                closeModal();
                 return;
+            }
 
-            case ActionType.ResolveNameConflictRoot:
-                if (isNameExistsInRoot(files, trimmedTitle)) return;
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'Folder',
-                    null
-                )));
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
-
-            case ActionType.ResolveNameConflictPaste:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictPaste,
-                    handleOpenModalByReason
-                )) return;
-                if (copyPasteActions.copiedFile) {
-                    copyPasteActions.setCopiedFile({
-                        ...copyPasteActions.copiedFile,
-                        name: trimmedTitle
-                    });
-                    setPendingPasteId(id)
-                }
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
-
-            case ActionType.ResolveNameConflictAddFile:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictAddFile,
-                    handleOpenModalByReason
-                )) return;
-                if (viewedUser && viewedUser.amountOfFiles >= 20) {
-                    setModalError(`You can't create more than 20 files`);
+            case ActionType.AddFolder: {
+                if (checkNameConflictInFolder(files, id, trimmedTitle)) {
+                    setModalError('Folder with this name exists');
                     return;
                 }
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'File',
-                    id
-                )));
+
+                const tempId = Date.now();
+
+                dispatch(openFolder(id as number));
+                dispatch(addPendingFile({tempId, parentId: id}));
+
+                dispatch(
+                    createFile({
+                        ...createFilePayload(
+                            trimmedTitle,
+                            loggedInUserEmail as string,
+                            FileType.Folder,
+                            id
+                        ),
+                        tempId
+                    })
+                );
+
+                closeModal();
+                return;
+            }
+
+            case ActionType.AddFile: {
+                if (checkNameConflictInFolder(files, id, trimmedTitle)) {
+                    setModalError('File with this name exists');
+                    return;
+                }
+
+                const totalFiles = (viewedUser?.amountOfFiles ?? 0) + localCreatedFiles;
+
+                if (totalFiles >= 5) {
+                    setModalError(`You can't create more than 5 files`);
+                    return;
+                }
+
+                const tempId = Date.now();
+
+                dispatch(openFolder(id as number));
+                dispatch(addPendingFile({tempId, parentId: id}));
+
+                dispatch(
+                    createFile({
+                        ...createFilePayload(
+                            trimmedTitle,
+                            loggedInUserEmail as string,
+                            FileType.File,
+                            id
+                        ),
+                        tempId
+                    })
+                );
+
+                setLocalCreatedFiles(prev => prev + 1);
+
+                closeModal();
+                return;
+            }
+
+            case ActionType.RenameFile: {
+                if (checkNameConflictInFolder(files, id, trimmedTitle)) {
+                    setModalError('File with this name exists');
+                    return;
+                }
+
+                dispatch(updateFileName({
+                    id: id as number,
+                    name: trimmedTitle,
+                    viewedUserEmail: viewedUser?.email as string,
+                    loggedInUserEmail: loggedInUserEmail ?? null,
+                }));
+
+                closeModal();
+                return;
+            }
+            case ActionType.PasteFile: {
+                if (!copyPasteActions.copiedFile) return;
+
+                if (checkNameConflictInFolder(files, id, trimmedTitle)) {
+                    const typeLabel =
+                        copyPasteActions.copiedFile?.type === FileType.File
+                            ? 'File'
+                            : 'Folder';
+
+                    setModalError(`${typeLabel} with this name exists`);
+                    return;
+                }
+
+                const tempId = Date.now();
+
+                dispatch(openFolder(id as number));
+                dispatch(addPendingFile({tempId, parentId: id}));
+
+                dispatch(
+                    createFile({
+                        ...createFilePayload(
+                            trimmedTitle,
+                            loggedInUserEmail as string,
+                            copyPasteActions.copiedFile.type,
+                            id
+                        ),
+                        tempId
+                    })
+                );
+
                 if (viewedUser) {
                     dispatch(fetchViewedUserByEmail(viewedUser.email));
                 }
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
 
-            case ActionType.ResolveNameConflictAddFolder:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictAddFolder,
-                    handleOpenModalByReason
-                )) return;
-                dispatch(createFile(createFilePayload(
-                    trimmedTitle,
-                    localStorage.getItem('email'),
-                    'Folder',
-                    id
-                )));
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
+                closeModal();
                 return;
-
-            case ActionType.ResolveNameConflictRename:
-                if (handleNameConflictInFolder(
-                    files,
-                    id,
-                    trimmedTitle,
-                    ActionType.ResolveNameConflictRename,
-                    handleOpenModalByReason
-                )) return;
-                if (copyPasteActions.copiedFile) {
-                    dispatch(updateFileName({
-                        id: copyPasteActions.copiedFile.id as number,
-                        name: trimmedTitle
-                    }));
-                }
-                setModalValue('');
-                setIsModalOpen(false);
-                setModalOpenState({reason: null, id: null, title: null});
-                return;
+            }
 
             default:
                 return;
         }
-    }, [files, dispatch, handleOpenModalByReason, viewedUser, copyPasteActions]);
+    }, [files, dispatch, loggedInUserEmail, closeModal, viewedUser, copyPasteActions.copiedFile]);
 
 
-    const handleOpenRenameModal = useCallback((file: File) => {
-        handleOpenModalByReason({reason: ActionType.RenameFile, id: file.id, title: 'Rename file'});
+    const handleOpenRenameModal = useCallback((file: UiFile) => {
+        const modalState = {
+            reason: ActionType.RenameFile,
+            id: file.id,
+            title: 'Rename file'
+        }
+        openModal(modalState);
         setModalValue(file.name);
-    }, [handleOpenModalByReason]);
-
-    const handleCloseModal = useCallback(() => {
-        setModalValue('');
-        setIsModalOpen(false);
-        setModalOpenState({reason: null, id: null, title: null});
-    }, []);
+    }, [openModal]);
 
     const isNameConflictReason = useCallback(() => {
-        const {reason} = modalOpenState;
-        return reason === ActionType.ResolveNameConflictRoot ||
-            reason === ActionType.ResolveNameConflictAddFolder ||
-            reason === ActionType.ResolveNameConflictAddFile ||
-            reason === ActionType.ResolveNameConflictRename ||
-            reason === ActionType.ResolveNameConflictPaste;
-    }, [modalOpenState]);
+        return modalError !== '';
+    }, [modalError]);
 
     return {
         ...copyPasteActions,
@@ -325,10 +319,10 @@ export default function useModalActions(
         modalOpenState,
         setModalOpenState,
         modalInputRef,
-        handleConfirmModalByReason,
-        handleOpenModalByReason,
+        handleConfirmModalByReason: confirmModal,
+        handleOpenModalByReason: openModal,
         handleOpenRenameModal,
-        handleCloseModal,
+        handleCloseModal: closeModal,
         isNameConflictReason,
     };
 }

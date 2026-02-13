@@ -11,15 +11,18 @@ import {ReactComponent as LineImage} from './images/edit-file-view__line.svg'
 import {ReactComponent as LinkImage} from './images/edit-file-view__link.svg'
 import {ReactComponent as ImgImage} from './images/edit-file-view__image.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
-import {CreateFilePayload} from "../../../../../../store/thunks/files/createFile";
 import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
 import {AppContext} from "../../../../../../context/AppContext";
 import extractImagesName from "../../../../../../utils/functions/extractImageNames";
 import {isUserAdminOrOwner} from "../../../../../../utils/functions/permissions-utils/isUserAdminOrOwner";
 import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue";
+import {UiFile} from "../../../../../../store/types/UiFile";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../../../../../store";
+import {addPendingImage, markImageError, removePendingImage} from "../../../../../../store/slices/fileUiSlice";
 
 interface EditFileViewProps {
-    file: CreateFilePayload;
+    file: UiFile;
     parseFileTextToHTML: (
         content: string,
         onImageClick: (imageUrl: string) => void | null,
@@ -39,13 +42,17 @@ const EditMode: React.FC<EditFileViewProps> = (
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {fileState, loggedInUser} = context;
-    const [textareaContent, setTextareaContent] = useState(file.content);
+    const dispatch = useDispatch<AppDispatch>();
+    const [textareaContent, setTextareaContent] = useState(file.content ?? '');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
     const [amountOfImagesInTextArea, setAmountOfImagesInTextArea] = useState<string[]>([]);
     const [previewContent, setPreviewContent] = useState<React.ReactNode>([]);
     const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
+    const isSaving = useSelector(
+        (state: RootState) => state.fileUi.isSaving
+    );
 
     useEffect(() => {
         setPreviewContent(parseFileTextToHTML(debouncedTextareaContent, onImageClick, isFileTreeOpened));
@@ -60,7 +67,7 @@ const EditMode: React.FC<EditFileViewProps> = (
     } = fileState
 
     useEffect(() => {
-        setAddedImagesWhileEditing(extractImagesName(file.content));
+        setAddedImagesWhileEditing(extractImagesName(file.content ?? ''));
     }, [file.content]);
 
     useEffect(() => {
@@ -69,7 +76,7 @@ const EditMode: React.FC<EditFileViewProps> = (
     }, [debouncedTextareaContent]);
 
     useEffect(() => {
-        setTextareaContent(file.content);
+        setTextareaContent(file.content ?? '');
         setIsFileContentChanged(false);
     }, [file.content, setIsFileContentChanged]);
 
@@ -93,13 +100,25 @@ const EditMode: React.FC<EditFileViewProps> = (
         }
     }, [textareaContent.length, amountOfImagesInTextArea.length, loggedInUser, setContentError]);
 
-    const handleSaveEdition = useCallback(async (
+    const replaceImageTag = useCallback(
+        (tempName: string, realName: string) => {
+            setTextareaContent(prev =>
+                prev.replace(
+                    `[image/${tempName}]`,
+                    `[image/${realName}]`
+                )
+            );
+        },
+        []
+    );
+
+    const handleSaveEdition = useCallback((
             newContent: string,
             addedImages: string[],
         ) => {
             if (!file) return;
             try {
-                await handleSaveEditedFileChanges(
+                handleSaveEditedFileChanges(
                     file.id as number,
                     newContent,
                     addedImages,
@@ -152,21 +171,36 @@ const EditMode: React.FC<EditFileViewProps> = (
         }, 0);
     }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
 
-    const handleSelectImage = useCallback(async (file: File) => {
-        if (contentError.includes("You have inserted too many pictures")) {
-            return;
-        }
+    const handleSelectImage = useCallback(async (image: File) => {
+        if (contentError.includes("You have inserted too many pictures")) return;
+
+        const tempName = `temp-${Date.now()}`;
+
+        dispatch(addPendingImage({
+            fileId: file.id,
+            imageName: tempName,
+        }));
+
+        pasteTag(`[image/${tempName}]`);
 
         try {
-            const data = await uploadImageAsync(file);
-            if (data && data.fileName) {
-                pasteTag(`[image/${data.fileName}]`);
-                setAddedImagesWhileEditing(prev => [...prev, data.fileName.split(':')[1]]);
-            }
+            // 3️⃣ загрузка
+            const data = await uploadImageAsync(image);
+
+            replaceImageTag(tempName, data.fileName);
+
+            dispatch(removePendingImage(tempName));
+
         } catch (error) {
-            console.error("Failed to upload image:", error);
+            dispatch(markImageError(tempName));
         }
-    }, [contentError, pasteTag]);
+    }, [
+        contentError,
+        dispatch,
+        file.id,
+        pasteTag,
+        replaceImageTag
+    ]);
 
     const handleOpenFileDialog = useCallback(() => {
         fileInputRef.current?.click();
@@ -301,12 +335,14 @@ const EditMode: React.FC<EditFileViewProps> = (
                         className={styles['header__action-buttons-save']}
                         onClick={() => handleSaveEdition(
                             textareaContent,
-                            addedImagesWhileEditing)}>Save
+                            addedImagesWhileEditing)}
+                        disabled={isSaving}
+                    >{isSaving ? 'Saving…' : 'Save'}
                     </button>
                     <button
                         onClick={() => handleCancelEdition(
                             addedImagesWhileEditing,
-                            file.content)}
+                            file.content ?? '')}
                         className={styles['header__action-buttons-cancel']}>Cancel
                     </button>
                 </div>
@@ -326,7 +362,7 @@ const EditMode: React.FC<EditFileViewProps> = (
                 </div>
             </div>
             <SwitchWhileEditModal
-                contentBeforeEdition={file.content}
+                contentBeforeEdition={file.content ?? ''}
                 onCancelEditedFileChange={handleCancelEdition}
                 addedImagesWhileEditing={addedImagesWhileEditing}/>
         </div>
