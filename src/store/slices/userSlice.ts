@@ -1,4 +1,4 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {fetchViewedUserByEmail} from "../thunks/user/fetchViewedUserByEmail";
 import {addUserWhoCanEdit} from "../thunks/user/addUserWhoCanEdit";
 import {deleteUserWhoCanEdit} from "../thunks/user/deleteUserWhoCanEdit";
@@ -46,9 +46,18 @@ const userSlice = createSlice({
         clearLoggedInUser(state) {
             state.loggedInUser = null;
         },
-        incrementUserFilesCount: (state, action: { payload: { email: string; count: number } }) => {
-            if (!state.viewedUser || state.viewedUser.email !== action.payload.email) return;
-            state.viewedUser.amountOfFiles += action.payload.count;
+        updateUserFilesCount: (
+            state,
+            action: PayloadAction<{ email: string; delta: number }>
+        ) => {
+            if (!state.viewedUser) return;
+            if (state.viewedUser.email !== action.payload.email) return;
+
+            state.viewedUser.amountOfFiles += action.payload.delta;
+
+            if (state.viewedUser.amountOfFiles < 0) {
+                state.viewedUser.amountOfFiles = 0;
+            }
         },
     },
     extraReducers: (builder) => {
@@ -83,7 +92,7 @@ const userSlice = createSlice({
 export const {
     clearViewedUser,
     clearLoggedInUser,
-    incrementUserFilesCount
+    updateUserFilesCount
 } = userSlice.actions;
 
 export default userSlice.reducer;

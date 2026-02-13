@@ -4,7 +4,7 @@ import {ChangeFileLikesPayload, toggleFileLikes} from "../../store/thunks/files/
 import useDeleteFileActions, {DeleteFileState} from "../supporting-hooks/useDeleteFileActions";
 import useModalActions, {ModalActionsState} from "../supporting-hooks/useModalActions";
 import useEditFileActions, {EditFileViewState} from "../supporting-hooks/useEditFileActions";
-import {useCallback} from "react";
+import {Dispatch, SetStateAction, useCallback, useEffect, useState} from "react";
 import {User} from "../../store/slices/userSlice";
 import {UiFile} from "../../store/types/UiFile";
 
@@ -17,9 +17,9 @@ export default function useFileActions(
     viewedUser: User | null,
 ): FileActionsState {
     const dispatch = useDispatch<AppDispatch>();
-    const deleteFileState = useDeleteFileActions(viewedUser)
-    const modalState = useModalActions(files, viewedUser)
-    const editFileState = useEditFileActions()
+    const deleteFileState = useDeleteFileActions(viewedUser);
+    const modalState = useModalActions(files, viewedUser);
+    const editFileState = useEditFileActions();
 
     const handleLikeFile = useCallback((dto: ChangeFileLikesPayload) => {
         return dispatch(toggleFileLikes(dto));

@@ -2,9 +2,10 @@ import {useCallback, useState} from "react";
 import {deleteFileById} from "../../store/thunks/files/deleteFileById";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
-import {User} from "../../store/slices/userSlice";
-import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
+import {updateUserFilesCount, User} from "../../store/slices/userSlice";
 import {UiFile} from "../../store/types/UiFile";
+import {FileType} from "../../types/file";
+import {countFilesRecursively} from "../functions/modalUtils";
 
 export interface DeleteModalState {
     open: boolean;
@@ -41,6 +42,19 @@ export default function useDeleteFileActions(
         const deletedFile = deleteModalState.file;
         const userEmail = deleteModalState.user?.email;
 
+        let filesToSubtract = 0;
+
+        if (deletedFile.type === FileType.File) {
+            filesToSubtract = 1;
+        } else {
+            filesToSubtract = countFilesRecursively(deletedFile);
+        }
+
+        dispatch(updateUserFilesCount({
+            email: viewedUser?.email ?? 'unknown',
+            delta: -filesToSubtract
+        }));
+
         setDeleteModalState({
             open: false,
             file: null,
@@ -48,17 +62,16 @@ export default function useDeleteFileActions(
             isDeleting: true
         });
 
-        try {
-            await dispatch(deleteFileById({file: deletedFile, email: userEmail})).unwrap();
 
-            if (viewedUser) {
-                dispatch(fetchViewedUserByEmail(viewedUser.email));
-            }
+        dispatch(deleteFileById({file: deletedFile, email: userEmail}))
+            .unwrap()
+            .catch(() => {
+                dispatch(updateUserFilesCount({
+                    email: viewedUser?.email ?? 'unknown',
+                    delta: +filesToSubtract
+                }));
+            });
 
-        } catch (error) {
-            console.error('Failed to delete file', error);
-            alert("Failed to delete file on server. File was restored.");
-        }
 
         setDeleteModalState({
             open: false,
@@ -66,7 +79,7 @@ export default function useDeleteFileActions(
             user: null,
             isDeleting: false
         });
-    }, [deleteModalState.file, deleteModalState.user?.email, dispatch, viewedUser]);
+    }, [deleteModalState.file, deleteModalState.user?.email, dispatch, viewedUser?.email]);
 
     const handleCancelDeleteFile = useCallback(() => {
         setDeleteModalState({

@@ -16,6 +16,8 @@ export const createFile = createAsyncThunk<
 
         await delay(3000);
 
+        console.log(JSON.stringify(body))
+
         const response = await fetch(`${API_BASE_URL}/files`, {
             method: 'POST',
             headers: {

@@ -1,14 +1,18 @@
 import {Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
-import {checkNameConflictInFolder, createFilePayload, isNameExistsInRoot} from "../functions/modalUtils";
+import {
+    checkNameConflictInFolder,
+    countFilesRecursively,
+    createFilePayload,
+    isNameExistsInRoot
+} from "../functions/modalUtils";
 import {createFile} from "../../store/thunks/files/createFile";
 import useCopyPasteActions, {CopyPasteState} from "./useCopyPasteActions";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store";
-import {User} from "../../store/slices/userSlice";
+import {updateUserFilesCount, User} from "../../store/slices/userSlice";
 import {FileType} from "../../types/file";
 import {UiFile} from "../../store/types/UiFile";
 import {findFileById} from "../../store/utils/fileTreeActionUtils";
-import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
 import {addPendingFile, addPendingRootFolder, openFolder} from "../../store/slices/fileUiSlice";
 import {updateFileName} from "../../store/thunks/files/updateFileName";
 
@@ -55,12 +59,11 @@ export default function useModalActions(
     const [modalOpenState, setModalOpenState] = useState<ModalOpenState>({reason: null, id: null, title: null});
     const modalInputRef = useRef<HTMLInputElement>(null);
     const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
-    const [localCreatedFiles, setLocalCreatedFiles] = useState(0);
+    const totalFiles = useSelector(
+        (state: RootState) => state.user.viewedUser?.amountOfFiles ?? 0
+    );
     const loggedInUserEmail = useSelector(
         (state: RootState) => state.user.loggedInUser?.email
-    );
-    const pendingFiles = useSelector(
-        (state: RootState) => state.fileUi.pendingFiles
     );
 
     const openModal = useCallback((modalState: ModalOpenState) => {
@@ -136,7 +139,7 @@ export default function useModalActions(
         copyPasteActions.copiedFile
     ]);
 
-    const confirmModal = useCallback((
+    const confirmModal = useCallback(async (
         modalState: ModalOpenState & { title: string }
     ) => {
         const {reason, id, title} = modalState;
@@ -204,8 +207,6 @@ export default function useModalActions(
                     return;
                 }
 
-                const totalFiles = (viewedUser?.amountOfFiles ?? 0) + localCreatedFiles;
-
                 if (totalFiles >= 5) {
                     setModalError(`You can't create more than 5 files`);
                     return;
@@ -215,7 +216,12 @@ export default function useModalActions(
 
                 dispatch(openFolder(id as number));
                 dispatch(addPendingFile({tempId, parentId: id}));
+                dispatch(updateUserFilesCount({
+                    email: viewedUser?.email ?? 'unknown',
+                    delta: +1
+                }));
 
+                closeModal();
                 dispatch(
                     createFile({
                         ...createFilePayload(
@@ -225,12 +231,14 @@ export default function useModalActions(
                             id
                         ),
                         tempId
-                    })
-                );
+                    })).unwrap()
+                    .catch(() => {
+                        dispatch(updateUserFilesCount({
+                            email: viewedUser?.email ?? 'unknown',
+                            delta: -1
+                        }));
+                    });
 
-                setLocalCreatedFiles(prev => prev + 1);
-
-                closeModal();
                 return;
             }
 
@@ -263,35 +271,52 @@ export default function useModalActions(
                     return;
                 }
 
+                let filesToAdd = 0;
+
+                if (copyPasteActions.copiedFile.type === FileType.File) {
+                    filesToAdd = 1;
+                } else {
+                    filesToAdd = countFilesRecursively(copyPasteActions.copiedFile);
+                }
+
+                if (totalFiles + filesToAdd > 5) {
+                    setModalError(`You can't create more than 5 files`);
+                    return;
+                }
+
                 const tempId = Date.now();
 
                 dispatch(openFolder(id as number));
                 dispatch(addPendingFile({tempId, parentId: id}));
+                dispatch(updateUserFilesCount({
+                    email: viewedUser?.email ?? 'unknown',
+                    delta: +filesToAdd
+                }));
+
+                closeModal();
 
                 dispatch(
                     createFile({
-                        ...createFilePayload(
-                            trimmedTitle,
-                            loggedInUserEmail as string,
-                            copyPasteActions.copiedFile.type,
-                            id
-                        ),
+                        ...copyPasteActions.copiedFile,
+                        name: trimmedTitle,
+                        parent: id,
+                        author: loggedInUserEmail ?? 'unknown',
                         tempId
                     })
-                );
-
-                if (viewedUser) {
-                    dispatch(fetchViewedUserByEmail(viewedUser.email));
-                }
-
-                closeModal();
+                ).unwrap()
+                    .catch(() => {
+                        dispatch(updateUserFilesCount({
+                            email: viewedUser?.email ?? 'unknown',
+                            delta: -filesToAdd
+                        }));
+                    });
                 return;
             }
 
             default:
                 return;
         }
-    }, [files, dispatch, loggedInUserEmail, closeModal, viewedUser, copyPasteActions.copiedFile]);
+    }, [files, dispatch, loggedInUserEmail, closeModal, totalFiles, viewedUser?.email, copyPasteActions.copiedFile]);
 
 
     const handleOpenRenameModal = useCallback((file: UiFile) => {

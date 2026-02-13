@@ -43,7 +43,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const {
         isEditing,
         setIsEditing,
-        handleOpenDeleteModal,
+        handleOpenDeleteModal
     } = fileState
 
     const {
@@ -65,7 +65,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const contentElements = useMemo(() => {
         if (!file?.content) return [];
         return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened, pendingImages);
-    }, [file?.content, handleImageClick, isFileTreeOpened]);
+    }, [file?.content, handleImageClick, isFileTreeOpened, pendingImages]);
 
     const handleGoToUsersPage = useCallback((user: string | null) => {
         return navigate(`/${encodeURIComponent(user as string)}`)

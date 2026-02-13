@@ -63,3 +63,19 @@ export function createFilePayload(
         ...(type === FileType.File && {content: ""}),
     };
 }
+
+export const countFilesRecursively = (node: UiFile): number => {
+    let count = 0;
+
+    for (const child of node.children) {
+        if (child.type === FileType.File) {
+            count += 1;
+        }
+
+        if (child.type === FileType.Folder) {
+            count += countFilesRecursively(child);
+        }
+    }
+
+    return count;
+};
