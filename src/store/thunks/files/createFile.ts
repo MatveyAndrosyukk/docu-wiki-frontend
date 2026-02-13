@@ -3,9 +3,6 @@ import API_BASE_URL from "../../../config/api-config";
 import {ServerFile} from "../../types/ServerFile";
 import {CreateFilePayload} from "../../../types/CreateFilePayload";
 
-const delay = (ms: number) =>
-    new Promise(resolve => setTimeout(resolve, ms));
-
 export const createFile = createAsyncThunk<
     ServerFile,
     CreateFilePayload
@@ -13,10 +10,6 @@ export const createFile = createAsyncThunk<
     'fileTree/createFile',
     async (body) => {
         const token = localStorage.getItem('token');
-
-        await delay(3000);
-
-        console.log(JSON.stringify(body))
 
         const response = await fetch(`${API_BASE_URL}/files`, {
             method: 'POST',

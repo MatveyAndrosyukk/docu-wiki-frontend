@@ -10,9 +10,6 @@ interface DeleteFilePayload {
     email: string | undefined;
 }
 
-const delay = (ms: number) =>
-    new Promise(resolve => setTimeout(resolve, ms));
-
 export const deleteFileById = createAsyncThunk<
     number,
     DeleteFilePayload,
