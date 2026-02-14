@@ -128,7 +128,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
     return (
         <div ref={fileTreeRef} className={fileTreeStyles}>
             <div className={styles['file-tree__content']}>
-                {(isViewedUserLoading && areFilesLoading) ? (
+                {(isViewedUserLoading || areFilesLoading) ? (
                     <FileTreeSkeleton/>
                 ) : (
                     <>

@@ -4,7 +4,7 @@ import API_BASE_URL from "../../../config/api-config";
 
 export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
     'user/fetchViewedUserByEmail',
-    async (email, {rejectWithValue}) => {
+    async (email, { rejectWithValue }) => {
         const token = localStorage.getItem('token');
 
         try {
@@ -22,7 +22,11 @@ export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
                 throw new Error('Failed to fetch user');
             }
 
-            return await response.json();
+            const userData = await response.json();
+
+            // await new Promise(resolve => setTimeout(resolve, 2000));
+
+            return userData;
         } catch (error) {
             return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
         }
