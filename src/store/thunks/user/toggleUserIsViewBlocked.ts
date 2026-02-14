@@ -21,6 +21,7 @@ export const toggleUserIsViewBlocked = createAsyncThunk<User, string>(
             const errorData = await response.json();
             throw new Error(errorData.message || JSON.stringify(errorData));
         }
+
         return await response.json();
     }
 )

@@ -59,6 +59,17 @@ const userSlice = createSlice({
                 state.viewedUser.amountOfFiles = 0;
             }
         },
+        updateUserFilesBlock: (
+            state,
+            action: PayloadAction<{ email: string;}>
+        ) => {
+            if (!state.viewedUser) return;
+            if (state.viewedUser.email !== action.payload.email) return;
+
+            const prev = state.viewedUser.isViewBlocked;
+
+            state.viewedUser.isViewBlocked = !prev;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -83,8 +94,17 @@ const userSlice = createSlice({
             .addCase(changeUserName.fulfilled, (state, action) => {
                 state.loggedInUser = action.payload;
             })
-            .addCase(toggleUserIsViewBlocked.fulfilled, (state, action) => {
-                state.viewedUser = action.payload;
+            .addCase(toggleUserIsViewBlocked.pending, (state, action) => {
+                if (!state.viewedUser) return;
+                if (state.viewedUser.email !== action.meta.arg) return;
+
+                state.viewedUser.isViewBlocked = !state.viewedUser.isViewBlocked;
+            })
+            .addCase(toggleUserIsViewBlocked.rejected, (state, action) => {
+                if (!state.viewedUser) return;
+                if (state.viewedUser.email !== action.meta.arg) return;
+
+                state.viewedUser.isViewBlocked = !state.viewedUser.isViewBlocked;
             })
     }
 })

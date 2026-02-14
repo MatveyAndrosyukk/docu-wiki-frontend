@@ -97,17 +97,17 @@ const FileTree: FC<FileTreeProps> = React.memo((
     }, [isOpened, windowWidth]);
 
     const blockViewHandler = useCallback(async () => {
-        if (viewedUser?.email) {
-            try {
-                await dispatch(toggleUserIsViewBlocked(viewedUser.email));
-                setShowBlockMessage(true);
+        if (!viewedUser?.email) return;
 
-                setTimeout(() => {
-                    setShowBlockMessage(false);
-                }, 3000);
-            } catch (error) {
-                console.error('Failed to toggle view block:', error);
-            }
+        setShowBlockMessage(true);
+        setTimeout(() => {
+            setShowBlockMessage(false);
+        }, 3000);
+
+        try {
+            await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
+        } catch (error) {
+            console.error('Failed to toggle view block:', error);
         }
     }, [dispatch, viewedUser]);
 
