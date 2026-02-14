@@ -23,6 +23,7 @@ import {isUserCanEdit} from "../../../../utils/functions/permissions-utils/isUse
 import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUserCanView";
 import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-utils/isUserEqualsLoggedIn";
 import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserOwner";
+import FileTreeSkeleton from "../../../../ui-components/FileTreeSkeleton";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -49,6 +50,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
+    const isViewedUserLoading = !viewedUser;
 
     const {setIsBanModalOpened} = banState;
 
@@ -123,76 +125,80 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const isBanned = !!viewedUser?.banned;
 
     return (
-        <div
-            ref={fileTreeRef}
-            className={fileTreeStyles}
-        >
+        <div ref={fileTreeRef} className={fileTreeStyles}>
             <div className={styles['file-tree__content']}>
-                {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
-                    <div className={styles['file-tree__header']}>
-                        <div className={styles['file-tree__top']}>
-                            <div className={styles['file-tree__user']}>
-                                {viewedUser?.email}
-                            </div>
-                            {isUserOwner(loggedInUser) && (
-                                <div
-                                    className={styles['file-tree__ban']}
-                                    onClick={() => setIsBanModalOpened(true)}
-                                >
-                                    <BanSvg/>
-                                </div>
-                            )}
-                        </div>
-                        <div className={styles['file-tree__line']}></div>
-                    </div>
-                )}
-
-                {isBanned ? (
-                    <div className={styles['file-tree__view']}>
-                        This user has been banned
-                    </div>
+                {isViewedUserLoading ? (
+                    <FileTreeSkeleton/>
                 ) : (
-                    !isUserCanView(viewedUser, loggedInUser) && (
-                        <div className={styles['file-tree__view']}>
-                            User blocked his files for view
-                        </div>
-                    )
-                )}
-
-                {showBlockMessage && (
-                    <div className={commonStyles['common__notification']}>
-                        You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
-                    </div>
-                )}
-
-                {!isBanned && isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
-                    <div className={styles['file-tree__buttons']}>
-                        <div
-                            className={styles['file-tree__button-create']}
-                            onClick={handleCreateRootFolder}
-                        >
-                            Create a root folder
-                        </div>
-                        {isLoggedIn && (
-                            <div
-                                className={styles['file-tree__button-block']}
-                                title={viewedUser?.isViewBlocked
-                                    ? 'Unblock view for other users'
-                                    : 'Block view for other users'}
-                                onClick={blockViewHandler}
-                                style={{background: viewedUser?.isViewBlocked ? '#191A1A' : '#202222'}}
-                            >
-                                <LockSvg/>
+                    // === ВАШ ИСХОДНЫЙ КОНТЕНТ ===
+                    <>
+                        {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
+                            <div className={styles['file-tree__header']}>
+                                <div className={styles['file-tree__top']}>
+                                    <div className={styles['file-tree__user']}>
+                                        {viewedUser?.email}
+                                    </div>
+                                    {isUserOwner(loggedInUser) && (
+                                        <div
+                                            className={styles['file-tree__ban']}
+                                            onClick={() => setIsBanModalOpened(true)}
+                                        >
+                                            <BanSvg/>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles['file-tree__line']}></div>
                             </div>
                         )}
-                    </div>
-                )}
-                {!isBanned && isUserCanView(viewedUser, loggedInUser) && (
-                    <div className={styles['file-tree__files']}>
-                        <FileList
-                            windowWidth={windowWidth}
-                            emailParam={emailParam}/>
-                    </div>
+
+                        {isBanned ? (
+                            <div className={styles['file-tree__view']}>
+                                This user has been banned
+                            </div>
+                        ) : (
+                            !isUserCanView(viewedUser, loggedInUser) && (
+                                <div className={styles['file-tree__view']}>
+                                    User blocked his files for view
+                                </div>
+                            )
+                        )}
+
+                        {showBlockMessage && (
+                            <div className={commonStyles['common__notification']}>
+                                You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
+                            </div>
+                        )}
+
+                        {!isBanned && isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
+                            <div className={styles['file-tree__buttons']}>
+                                <div
+                                    className={styles['file-tree__button-create']}
+                                    onClick={handleCreateRootFolder}
+                                >
+                                    Create a root folder
+                                </div>
+                                {isLoggedIn && (
+                                    <div
+                                        className={styles['file-tree__button-block']}
+                                        title={viewedUser?.isViewBlocked
+                                            ? 'Unblock view for other users'
+                                            : 'Block view for other users'}
+                                        onClick={blockViewHandler}
+                                        style={{background: viewedUser?.isViewBlocked ? '#191A1A' : '#202222'}}
+                                    >
+                                        <LockSvg/>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {!isBanned && isUserCanView(viewedUser, loggedInUser) && (
+                            <div className={styles['file-tree__files']}>
+                                <FileList
+                                    windowWidth={windowWidth}
+                                    emailParam={emailParam}/>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

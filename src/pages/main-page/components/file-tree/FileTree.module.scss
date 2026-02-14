@@ -149,3 +149,59 @@ $button-block-hover-bg: #191A1A;
   border: 1px solid $button-create-border-color;
   position: absolute;
 }
+
+.skeleton-user,
+.skeleton-ban,
+.skeleton-button,
+.skeleton-files,
+.skeleton-file-row {
+  background: linear-gradient(
+                  90deg,
+                  #2B2C2D 25%,
+                  #363738 50%,
+                  #2B2C2D 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-user {
+  height: 13px;
+  width: 120px;
+  margin: 0 auto;
+}
+
+.skeleton-ban {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.skeleton-buttons {
+}
+
+.skeleton-button {
+  height: 28px !important;
+}
+
+.skeleton-button-circle {
+  composes: skeleton-button;
+  width: 30px !important;
+  border-radius: 50% !important;
+}
+
+.skeleton-files {
+  padding: 8px 0;
+}
+
+.skeleton-file-row {
+  height: 20px;
+  margin: 4px 12px;
+  border-radius: 3px;
+}
