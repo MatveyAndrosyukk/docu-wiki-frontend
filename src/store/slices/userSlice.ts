@@ -29,11 +29,13 @@ export interface User {
 interface UserState {
     viewedUser: User | null;
     loggedInUser: User | null;
+    isViewedUserLoading: boolean;
 }
 
 const initialState: UserState = {
     viewedUser: null,
     loggedInUser: null,
+    isViewedUserLoading: false,
 }
 
 const userSlice = createSlice({
@@ -73,10 +75,15 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchViewedUserByEmail.pending, (state) => {
+                state.isViewedUserLoading = true;
+            })
             .addCase(fetchViewedUserByEmail.fulfilled, (state, action) => {
+                state.isViewedUserLoading = false;
                 state.viewedUser = action.payload;
             })
             .addCase(fetchViewedUserByEmail.rejected, (state) => {
+                state.isViewedUserLoading = false;
                 state.viewedUser = null;
             })
             .addCase(fetchLoggedInUserByEmail.fulfilled, (state, action) => {

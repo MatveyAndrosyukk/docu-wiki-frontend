@@ -45,13 +45,13 @@ const FileTree: FC<FileTreeProps> = React.memo((
         fileState,
         banState
     } = context;
-    const viewedUser = useSelector((state: RootState)=> state.user.viewedUser)
-    const loggedInUser = useSelector((state: RootState)=> state.user.loggedInUser)
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);
+    const isViewedUserLoading = useSelector((state: RootState) => state.user.isViewedUserLoading);
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
-    const isViewedUserLoading = !viewedUser;
 
     const {setIsBanModalOpened} = banState;
 
