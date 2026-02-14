@@ -4,7 +4,7 @@ import API_BASE_URL from "../../../config/api-config";
 
 export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
     'user/fetchViewedUserByEmail',
-    async (email, { rejectWithValue }) => {
+    async (email, {rejectWithValue}) => {
         const token = localStorage.getItem('token');
 
         try {
@@ -22,15 +22,8 @@ export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
                 throw new Error('Failed to fetch user');
             }
 
-            const userData = await response.json();
-
-            // 🔥 ИМИТАЦИЯ ДОЛГОЙ ЗАГРУЗКИ СЕРВЕРА (2 секунды)
-            // УДАЛИТЕ ЭТО В ПРОДАКШЕНЕ!
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            return userData;
+            return await response.json();
         } catch (error) {
-            // Поддержка rejectWithValue для обработки ошибок в slice
             return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
         }
     }
