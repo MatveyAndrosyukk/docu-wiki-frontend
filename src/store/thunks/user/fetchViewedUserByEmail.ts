@@ -22,8 +22,15 @@ export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
                 throw new Error('Failed to fetch user');
             }
 
-            return await response.json();
+            const userData = await response.json();
+
+            // 🔥 ИМИТАЦИЯ ДОЛГОЙ ЗАГРУЗКИ СЕРВЕРА (2 секунды)
+            // УДАЛИТЕ ЭТО В ПРОДАКШЕНЕ!
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            return userData;
         } catch (error) {
+            // Поддержка rejectWithValue для обработки ошибок в slice
             return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
         }
     }

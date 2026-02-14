@@ -188,9 +188,11 @@ $button-block-hover-bg: #191A1A;
 
 .skeleton-button {
   height: 28px !important;
+  border: 0;
 }
 
 .skeleton-button-circle {
+  border: 0;
   composes: skeleton-button;
   width: 30px !important;
   border-radius: 50% !important;
