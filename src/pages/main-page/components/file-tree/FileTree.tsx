@@ -14,8 +14,8 @@ import commonStyles from '../../../../styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
 import {ReactComponent as BanSvg} from './images/fileTree-ban.svg'
 import FileList from "./components/file-list/FileList";
-import {AppDispatch} from "../../../../store";
-import {useDispatch} from "react-redux";
+import {AppDispatch, RootState} from "../../../../store";
+import {useDispatch, useSelector} from "react-redux";
 import {toggleUserIsViewBlocked} from "../../../../store/thunks/user/toggleUserIsViewBlocked";
 import {AppContext} from "../../../../context/AppContext";
 import {ActionType} from "../../../../utils/supporting-hooks/useModalActions";
@@ -41,12 +41,13 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
     const {
-        viewedUser,
-        loggedInUser,
         authState,
         fileState,
         banState
     } = context;
+    const viewedUser = useSelector((state: RootState)=> state.user.viewedUser)
+    const loggedInUser = useSelector((state: RootState)=> state.user.loggedInUser)
+    const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
@@ -127,10 +128,9 @@ const FileTree: FC<FileTreeProps> = React.memo((
     return (
         <div ref={fileTreeRef} className={fileTreeStyles}>
             <div className={styles['file-tree__content']}>
-                {isViewedUserLoading ? (
+                {(isViewedUserLoading && areFilesLoading) ? (
                     <FileTreeSkeleton/>
                 ) : (
-                    // === ВАШ ИСХОДНЫЙ КОНТЕНТ ===
                     <>
                         {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
                             <div className={styles['file-tree__header']}>
