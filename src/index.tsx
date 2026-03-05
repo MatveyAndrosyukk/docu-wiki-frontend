@@ -5,6 +5,7 @@ import {Provider} from "react-redux";
 import {store} from './store';
 import {AppProvider} from "./context/AppContext";
 import {GoogleOAuthProvider} from "@react-oauth/google";
+import './styles/Fonts.module.scss'
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
