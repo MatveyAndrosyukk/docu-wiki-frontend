@@ -8,6 +8,7 @@ import {TreeNode, useFlattenedTree} from '../../../../../../utils/hooks/useFlatt
 import FileNode from './components/virtualized-row/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
+import commonStyles from "../../../../../../styles/Common.module.scss";
 
 interface FileListProps {
     emailParam: string | undefined;
@@ -43,6 +44,12 @@ const FileList: React.FC<FileListProps> = React.memo(
                 className={styles['file-list']}
                 style={{maxHeight: windowWidth < 1270 ? '300px' : '81vh'}}
             >
+                {fileState.isLimitError && (
+                    <div className={commonStyles['common__notification']}>
+                        You can't create more than 20 files without premium :(
+                    </div>
+                )}
+
                 <div>
                     {flattenedNodes.map((node: TreeNode) => (
                         <FileNode

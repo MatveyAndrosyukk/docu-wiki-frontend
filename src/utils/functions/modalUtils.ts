@@ -1,8 +1,6 @@
-import {ActionType} from "../supporting-hooks/useModalActions";
 import {FileType} from "../../types/file";
 import {UiFile} from "../../store/types/UiFile";
 import {CreateFilePayload} from "../../types/CreateFilePayload";
-import {NameConflictResult} from "../../types/NameConflictResult";
 
 export function checkIfNameExistsInFolder(
     files: UiFile[],
@@ -47,19 +45,16 @@ export function checkNameConflictInFolder(
 
 export function createFilePayload(
     name: string,
-    authorEmail: string,
     type: FileType,
-    parent: number | null
+    parent: number | null,
+    targetUserEmail: string,
 ): CreateFilePayload {
-    if (!authorEmail) {
-        throw new Error("authorEmail is required to create a file");
-    }
 
     return {
         name,
         type,
         parent,
-        author: authorEmail,
+        targetUserEmail,
         ...(type === FileType.File && {content: ""}),
     };
 }

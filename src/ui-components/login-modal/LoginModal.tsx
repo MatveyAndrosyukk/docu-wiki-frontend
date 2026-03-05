@@ -96,8 +96,13 @@ const LoginModal: FC = () => {
                             <button
                                 className={`${modalStyles.modal__button}`}
                                 disabled={loginLoading}
-                                onClick={handleAuthorize}>
-                                {getAuthorizationText()}
+                                onClick={handleAuthorize}
+                            >
+                                {loginLoading ? (
+                                    <span className={styles['login-modal__loader']} />
+                                ) : (
+                                    getAuthorizationText()
+                                )}
                             </button>
                         </div>
                         <div className={`${styles['footer__right']}`}>

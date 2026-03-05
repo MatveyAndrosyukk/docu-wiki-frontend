@@ -36,6 +36,8 @@ export type ModalActionsState = CopyPasteState & {
     setIsModalOpen: Dispatch<SetStateAction<boolean>>;
     modalValue: string,
     modalError: string,
+    isLimitError: boolean,
+    setIsLimitError: Dispatch<SetStateAction<boolean>>;
     setModalError: Dispatch<SetStateAction<string>>
     setModalValue: Dispatch<SetStateAction<string>>;
     modalOpenState: ModalOpenState;
@@ -57,6 +59,7 @@ export default function useModalActions(
     const [modalValue, setModalValue] = useState<string>('');
     const [modalError, setModalError] = useState<string>('');
     const [modalOpenState, setModalOpenState] = useState<ModalOpenState>({reason: null, id: null, title: null});
+    const [isLimitError, setIsLimitError] = useState<boolean>(false);
     const modalInputRef = useRef<HTMLInputElement>(null);
     const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
     const totalFiles = useSelector(
@@ -65,6 +68,8 @@ export default function useModalActions(
     const loggedInUserEmail = useSelector(
         (state: RootState) => state.user.loggedInUser?.email
     );
+
+    const filesLimit = 20;
 
     const openModal = useCallback((modalState: ModalOpenState) => {
         setModalOpenState(modalState);
@@ -162,11 +167,11 @@ export default function useModalActions(
                     createFile({
                         ...createFilePayload(
                             trimmedTitle,
-                            loggedInUserEmail as string,
                             FileType.Folder,
-                            null
+                            null,
+                            viewedUser?.email ?? 'unknown'
                         ),
-                        tempId
+                        tempId,
                     })
                 );
 
@@ -189,11 +194,11 @@ export default function useModalActions(
                     createFile({
                         ...createFilePayload(
                             trimmedTitle,
-                            loggedInUserEmail as string,
                             FileType.Folder,
-                            id
+                            id,
+                            viewedUser?.email ?? 'unknown'
                         ),
-                        tempId
+                        tempId,
                     })
                 );
 
@@ -207,8 +212,12 @@ export default function useModalActions(
                     return;
                 }
 
-                if (totalFiles >= 5) {
-                    setModalError(`You can't create more than 5 files`);
+                if (totalFiles >= filesLimit) {
+                    closeModal();
+                    setIsLimitError(true)
+                    setTimeout(() => {
+                        setIsLimitError(false);
+                    }, 3000);
                     return;
                 }
 
@@ -226,9 +235,9 @@ export default function useModalActions(
                     createFile({
                         ...createFilePayload(
                             trimmedTitle,
-                            loggedInUserEmail as string,
                             FileType.File,
-                            id
+                            id,
+                            viewedUser?.email ?? 'unknown'
                         ),
                         tempId
                     })).unwrap()
@@ -279,8 +288,12 @@ export default function useModalActions(
                     filesToAdd = countFilesRecursively(copyPasteActions.copiedFile);
                 }
 
-                if (totalFiles + filesToAdd > 5) {
-                    setModalError(`You can't create more than 5 files`);
+                if (totalFiles + filesToAdd > filesLimit) {
+                    closeModal();
+                    setIsLimitError(true)
+                    setTimeout(() => {
+                        setIsLimitError(false);
+                    }, 3000);
                     return;
                 }
 
@@ -300,8 +313,8 @@ export default function useModalActions(
                         ...copyPasteActions.copiedFile,
                         name: trimmedTitle,
                         parent: id,
-                        author: loggedInUserEmail ?? 'unknown',
-                        tempId
+                        tempId,
+                        targetUserEmail: viewedUser?.email ?? 'unknown',
                     })
                 ).unwrap()
                     .catch(() => {
@@ -349,5 +362,7 @@ export default function useModalActions(
         handleOpenRenameModal,
         handleCloseModal: closeModal,
         isNameConflictReason,
+        isLimitError,
+        setIsLimitError,
     };
 }

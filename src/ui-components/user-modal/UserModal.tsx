@@ -1,10 +1,6 @@
 import React, {FC, useCallback, useContext, useState} from 'react';
 import styles from './UserModal.module.scss'
-import commonStyles from '../../styles/Common.module.scss'
-import modalStyles from '../modal/ModalContent.module.scss'
 import Modal from "../modal/Modal";
-import CopyLinkSvg from './images/user-modal-copyLink.svg'
-import DeleteUserSvg from './images/user-modal-delete.svg'
 import {User} from "../../store/slices/userSlice";
 import {AppContext} from "../../context/AppContext";
 import {UserModalState} from "../../utils/hooks/useUserModalActions";
@@ -25,6 +21,8 @@ const UserModal: FC<LoginModalProps> = (
     const [showCopyMessage, setShowCopyMessage] = useState(false);
 
     const {
+        isAddingEditor,
+        isChangingName,
         isEditingName,
         setIsEditingName,
         editedName,
@@ -72,129 +70,120 @@ const UserModal: FC<LoginModalProps> = (
             isOpen={isUserModalOpen}
             onClose={handleCloseUserModal}
         >
-            <div className={`${modalStyles['modal__overlay']} ${styles['user-modal__overlay']}`}>
-                <div className={`${modalStyles['modal__form']} ${styles['user-modal__form']}`}>
-                    <div className={styles['user-modal__head']}>
-                        {showCopyMessage && (
-                            <div className={commonStyles['common__notification']}>
-                                Link copied to clipboard
-                            </div>
-                        )}
-                        <div className={styles['user-modal__head-name']}>
-                            <div className={styles['user-modal__name']}>
-                                {isEditingName ? (
-                                    <div>
-                                        {editedNameError ? (
-                                            <p className={styles['user-modal__name-symbol-error']}>
-                                                {editedNameError}
-                                            </p>
-                                        ) : (
-                                            <p className={styles['user-modal__name-invisible-error']}>
-                                                Username is too long
-                                            </p>
-                                        )}
-                                        <input
-                                            ref={nameInputRef}
-                                            className={styles['user-modal__name-change-input']}
-                                            value={editedName}
-                                            onChange={(e) => setEditedName(e.target.value)}
-                                            onKeyDown={handleKeyDownWhileEditing}
-                                            onBlur={handleBlurNameAfterEdition}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p className={styles['user-modal__name-invisible-error']}>
-                                            Username is too long
-                                        </p>
-                                        <div className={styles['user-modal__username']}>
-                                            <div
-                                                onClick={() => setIsEditingName(true)}
-                                                className={styles['user-modal__username-name']}>
-                                                {loggedInUser?.name}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            <div className={styles['user-modal__email']}>
-                                {"(" + loggedInUser?.email + ")"}
-                            </div>
-                            {changeNameError ? (
-                                <p
-                                    className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}
-                                >
-                                    {changeNameError}
-                                </p>
+            <div className={styles.userModal}>
+                <div className={styles.section}>
+                    <div className={styles.sectionTitle}>Profile</div>
+
+                    <div className={styles.profileBlock}>
+                        <div className={styles.profileNameRow}>
+                            {isEditingName ? (
+                                <input
+                                    ref={nameInputRef}
+                                    className={styles.nameInput}
+                                    value={editedName}
+                                    disabled={isChangingName}
+                                    onChange={(e) => setEditedName(e.target.value)}
+                                    onKeyDown={handleKeyDownWhileEditing}
+                                    onBlur={handleBlurNameAfterEdition}
+                                />
                             ) : (
-                                <p className={`${styles['user-modal__name-invisible-error']} ${styles['user-modal__email-error']}`}>
-                                    Username is too long
-                                </p>
+                                <div
+                                    className={styles.profileName}
+                                    onClick={() => setIsEditingName(true)}
+                                >
+                                    {loggedInUser?.name}
+                                </div>
+                            )}
+
+                            {isChangingName && <div className={styles.loaderSmall}/>}
+                        </div>
+
+                        <div className={styles.profileEmail}>
+                            {loggedInUser?.email}
+                        </div>
+
+                        <div className={styles.errorContainer}>
+                            {editedNameError && (
+                                <div className={styles.errorText}>
+                                    <div className={styles.errorText}>{editedNameError}</div>
+                                </div>
                             )}
                         </div>
-                        <div className={styles['user-modal__head-link']}>
-                            <img
-                                src={CopyLinkSvg}
-                                alt="Copy link"
-                                title="Copy profile link"
-                                className={styles['user-modal__head-link-icon']}
-                                onClick={handleCopyProfileLink}
-                            />
-                        </div>
-                    </div>
-                    <div className={styles['user-modal__editors-manager']}>
-                        <div className={styles['editors-manager__title']}>
 
-                        </div>
-                        <div className={styles['editors-manager__body']}>
+                    </div>
+                </div>
+
+                <div className={styles.divider}/>
+
+                <div className={styles.section}>
+                    <div className={styles.sectionTitle}>Promote access</div>
+
+                    <div className={styles.addEditorBlock}>
+                        <div className={styles.addEditorRow}>
                             <input
                                 ref={userModalInputRef}
-                                type="text"
-                                className={`${styles['user-modal__input']} ${styles['editors-manager-input']}`}
-                                placeholder='Permit edition by email'
+                                className={styles.emailInput}
+                                placeholder="Enter email"
                                 value={userModalValue}
                                 onChange={(e) => setUserModalValue(e.target.value)}
                             />
+
                             <button
-                                className={styles['editors-manager-button']}
+                                className={styles.primaryButton}
+                                disabled={!userModalValue.trim() || isAddingEditor}
                                 onClick={handleAddUserWhoCanEdit}
                             >
-                                Permit
+                                {isAddingEditor ? (
+                                    <div className={styles.loaderSmall}/>
+                                ) : (
+                                    'Promote'
+                                )}
                             </button>
                         </div>
+
+                        <div className={styles.errorContainer}>
+                            {addEditorError && (
+                                <div className={styles.errorText}>
+                                    {addEditorError}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    {addEditorError ? (
-                        <p className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}>
-                            {addEditorError}
-                        </p>) : (
-                        <p className={`${styles['user-modal__name-symbol-error']} ${styles['user-modal__email-error']}`}
-                           style={{color: 'transparent'}}>
-                            User with this email does not exist
-                        </p>)}
-                    <div
-                        className={styles['user-modal__editors']}
-                        style={usersWhoCanEdit.length > 3 ? {overflowY: "auto"} : {overflowY: "hidden"}}>
+
+                    <div className={styles.editorsList}>
+                        {isAddingEditor && (
+                            <div className={styles.editorSkeletonCard}>
+                                <div className={styles.editorSkeletonLeft}>
+                                    <div className={styles.skeletonName}/>
+                                    <div className={styles.skeletonEmail}/>
+                                </div>
+                                <div className={styles.skeletonButton}/>
+                            </div>
+                        )}
+
                         {usersWhoCanEdit.map((user: User) => (
                             <div
                                 key={user.email}
-                                className={styles['editor']}
-                                onClick={() => handleGoToUsersPage(user)}>
-                                <div className={styles['editor__left']}>
-                                    <div className={styles['editor__left-name']}>
+                                className={styles.editorCard}
+                                onClick={() => handleGoToUsersPage(user)}
+                            >
+                                <div>
+                                    <div className={styles.editorName}>
                                         {user.name}
                                     </div>
-                                    <div className={styles['editor__left-email']}>
-                                        {`(${user.email})`}
+                                    <div className={styles.editorEmail}>
+                                        {user.email}
                                     </div>
                                 </div>
-                                <div className={styles['editor__right']}>
-                                    <img
-                                        alt={'Delete this user'}
-                                        onClick={(event) => handleDeleteUserWhoCanEdit(user.email, event)}
-                                        src={DeleteUserSvg}
-                                        className={styles['editor__right-delete']}>
-                                    </img>
-                                </div>
+
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={(event) =>
+                                        handleDeleteUserWhoCanEdit(user.email, event)
+                                    }
+                                >
+                                    Remove
+                                </button>
                             </div>
                         ))}
                     </div>
