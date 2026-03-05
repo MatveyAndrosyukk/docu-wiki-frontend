@@ -1,18 +1,17 @@
-import {TreeNode} from "../../../../../../../../utils/hooks/useFlattenedTree";
+import { TreeNode } from "../../../../../../../../utils/hooks/useFlattenedTree";
 import React from "react";
 import styles from "../../FileList.module.scss"
-import {isUserCanEdit} from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
-import {FileStatus, FileType} from "../../../../../../../../types/file";
-import ChildLine from '../../images/file-list-child-line.svg';
-import LastChildLine from '../../images/file-list-last-child-line.svg';
-import OpenedImg from '../../images/file-list-opened.svg';
-import ClosedImg from '../../images/file-list-closed.svg';
-import {ReactComponent as FileImg} from '../../images/file-list-file.svg';
-import {User} from "../../../../../../../../store/slices/userSlice";
+import { isUserCanEdit } from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
+import { FileStatus, FileType } from "../../../../../../../../types/file";
+import { ReactComponent as ChildLineSvg } from '../../images/file-list-child-line.svg';
+import { ReactComponent as LastChildLineSvg } from '../../images/file-list-last-child-line.svg';
+import { ReactComponent as OpenedSvg } from '../../images/file-list-opened.svg';
+import { ReactComponent as ClosedSvg } from '../../images/file-list-closed.svg';
+import { ReactComponent as FileImg } from '../../images/file-list-file.svg';
+import { User } from "../../../../../../../../store/slices/userSlice";
 import FileLoader from "../../../../../../../../ui-components/file-loader/FileLoader";
-import {useSelector} from "react-redux";
-import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
-
+import { useSelector } from "react-redux";
+import { selectOpenedFile } from "../../../../../../../../store/selectors/selectOpenedFile";
 
 interface Props {
     node: TreeNode;
@@ -36,33 +35,33 @@ const FileNode: React.FC<Props> = React.memo(
          viewedUser,
          loggedInUser,
      }) => {
-        const {file, depth, isLastChild, hasNextOnLevel} = node;
+        const { file, depth, isLastChild, hasNextOnLevel } = node;
         const openedFile = useSelector(selectOpenedFile)
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
-    {Array.from({length: depth}).map((_, levelIndex) => {
-        const isLastLevel = levelIndex === depth - 1;
+                {Array.from({ length: depth }).map((_, levelIndex) => {
+                    const isLastLevel = levelIndex === depth - 1;
 
-        if (!isLastLevel && !hasNextOnLevel[levelIndex]) {
-            return (
-                <span className={styles['file-list__node-line']} key={levelIndex}>
-            {/* пустое место */}
-          </span>
-            );
-        }
+                    if (!isLastLevel && !hasNextOnLevel[levelIndex]) {
+                        return (
+                            <span className={styles['file-list__node-line']} key={levelIndex}>
+                                {/* пустое место */}
+                            </span>
+                        );
+                    }
 
-        const lineSrc = isLastLevel
-            ? (isLastChild ? LastChildLine : ChildLine)
-            : ChildLine;
+                    const LineComponent = isLastLevel
+                        ? (isLastChild ? LastChildLineSvg : ChildLineSvg)
+                        : ChildLineSvg;
 
-        return (
-            <span className={styles['file-list__node-line']} key={levelIndex}>
-          <img style={{width: 10}} src={lineSrc} alt="line"/>
-        </span>
-        );
-    })}
-  </span>
+                    return (
+                        <span className={styles['file-list__node-line']} key={levelIndex}>
+                            <LineComponent style={{ width: 10 }} />
+                        </span>
+                    );
+                })}
+            </span>
         );
 
         const openContextMenuHandler = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -84,18 +83,12 @@ const FileNode: React.FC<Props> = React.memo(
                             onContextMenu={openContextMenuHandler}
                             onClick={() => onFolderClick(file.id)}
                         >
-                            <img
-                                src={file.status === FileStatus.Opened ? OpenedImg : ClosedImg}
-                                alt="Folder"
-                                style={{marginRight: 8}}
-                            />
-                            {file.isPending ? (
-                                <FileLoader/>
+                            {file.status === FileStatus.Opened ? (
+                                <OpenedSvg style={{ marginRight: 8 }} />
                             ) : (
-                                <span className={styles['file-list__node-text']}>
-                                {file.name}
-                            </span>
+                                <ClosedSvg style={{ marginRight: 8 }} />
                             )}
+                            {file.isPending ? <FileLoader /> : <span>{file.name}</span>}
                         </div>
                     ) : (
                         <div
@@ -104,19 +97,17 @@ const FileNode: React.FC<Props> = React.memo(
                             onClick={!file.isPending ? () => handleTryToOpenFile(file.id) : undefined}
                         >
                             {file.isPending ? (
-                                <>
-                                    <FileLoader/>
-                                </>
+                                <FileLoader />
                             ) : (
                                 <>
-                                    <FileImg className={styles['file-list__node-image']}/>
+                                    <FileImg className={styles['file-list__node-image']} />
                                     <span
                                         className={`${styles['file-list__node-text']} ${
                                             file.id === openedFile?.id ? styles['file-list__node-text--opened'] : ''
                                         }`}
                                     >
-                {file.name}
-            </span>
+                                        {file.name}
+                                    </span>
                                 </>
                             )}
                         </div>
@@ -124,12 +115,14 @@ const FileNode: React.FC<Props> = React.memo(
                 </div>
             </div>
         );
-    }, (prevProps, nextProps) => {
+    },
+    (prevProps, nextProps) => {
         return prevProps.node.file.id === nextProps.node.file.id &&
             prevProps.node.file.status === nextProps.node.file.status &&
             prevProps.node.file.name === nextProps.node.file.name &&
             prevProps.node.depth === nextProps.node.depth &&
             prevProps.node.isLastChild === nextProps.node.isLastChild;
-    });
+    }
+);
 
 export default FileNode;
