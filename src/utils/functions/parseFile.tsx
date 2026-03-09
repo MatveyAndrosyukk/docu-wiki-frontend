@@ -72,13 +72,13 @@ function parseInline(
             let className = '';
             switch (tag) {
                 case 'u':
-                    className = styles['opened-file__content--underline'];
+                    className = styles['opened-file__content-underline'];
                     break;
                 case 'b':
-                    className = styles['opened-file__content--bold'];
+                    className = styles['opened-file__content-bold'];
                     break;
                 case 'i':
-                    className = styles['opened-file__content--italic'];
+                    className = styles['opened-file__content-italic'];
                     break;
             }
 

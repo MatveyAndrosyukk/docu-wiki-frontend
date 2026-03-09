@@ -175,6 +175,7 @@
     max-width: 80%;
     min-width: 0;
   }
+
   &__likes {
     display: flex;
     align-items: center;
@@ -299,7 +300,7 @@
 }
 
 .opened-image {
-  &__background{
+  &__background {
     position: fixed;
     top: 0;
     left: 0;
@@ -312,6 +313,7 @@
     z-index: 9999;
     cursor: pointer;
   }
+
   &__image {
     max-height: 90%;
     max-width: 90%;
