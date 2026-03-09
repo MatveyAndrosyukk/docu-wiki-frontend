@@ -6,7 +6,6 @@
   border: 1px solid #2B2C2D;
   margin-top: 20px;
   font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
   font-style: normal;
   overflow: visible;
   scrollbar-width: thin;
@@ -44,6 +43,8 @@
   &__content {
     flex: 1 1 auto;
     overflow-y: auto;
+    will-change: transform;
+    contain: layout paint;
     padding: 0 9px;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #202222;
@@ -52,9 +53,9 @@
 
     &-text {
       font-family: "Roboto", sans-serif;
-      font-optical-sizing: auto;
       font-weight: 300;
       font-style: normal;
+      text-rendering: optimizeSpeed;
       font-size: 13px;
       line-height: 19px;
       color: #E8E8E6;
@@ -95,7 +96,6 @@
 
     &-point {
       font-family: "Roboto", sans-serif;
-      font-optical-sizing: auto;
       font-weight: 300;
       font-style: normal;
       font-size: 14px;
