@@ -25,11 +25,8 @@ const DeleteModal: FC = () => {
                 <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
                     {deleteModalState.file?.type === FileType.Folder ? (
                         <>
-                            Delete folder{" "}
-                            <span className={styles['delete-modal__text-highlighted']}>
-                                "{deleteModalState.file.name}"
-                            </span>{" "}
-                            and all its contents?
+                            Delete folder <span className={styles['delete-modal__text-highlighted']}>"{deleteModalState.file.name}"
+                            </span> and all its contents?
                         </>
                     ) : (
                         <>
