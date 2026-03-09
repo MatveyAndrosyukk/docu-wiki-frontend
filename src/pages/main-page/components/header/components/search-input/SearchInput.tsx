@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import searchFilesByName, {SearchResult} from "../../../../../../utils/functions/searchFilesByName";
 import styles from './SearchInput.module.scss'
-import FileImage from './images/search-input-file.svg'
-import FolderImage from './images/search-input-folder.svg'
 import {FileType} from "../../../../../../types/file";
 import {SearchType} from "../../../../../../types/searchType";
 import searchFilesByContent from "../../../../../../utils/functions/searchFilesByContent";
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {useSelector} from "react-redux";
+import { ReactComponent as FileIcon } from './images/search-input-file.svg'
+import { ReactComponent as FolderIcon } from './images/search-input-folder.svg'
 
 interface SearchProps {
     onClick: (id: number) => void;
@@ -79,26 +79,25 @@ const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
             />
             {(isInputFocused && results.length > 0) && (
                 <ul className={styles["search-input__list"]}>
-                    {results.map(({id, type, fullPath, content}) => (
-                        <li
+                    {results.map(({id, type, fullPath, content}) => {
+                        const Icon = type === FileType.Folder ? FolderIcon : FileIcon;
+
+                        return (<li
                             key={id}
                             title={fullPath}
                             onClick={() => onClick(id)}
                             className={styles["search-input__item"]}
                         >
-                            <img
-                                className={styles["search-input__icon"]}
-                                src={type === FileType.Folder ? FolderImage : FileImage}
-                                alt='FileImage'
-                            />
+                            <Icon className={styles["search-input__icon"]} />
+
                             <span
                                 className={styles["search-input__text"]}
                                 title={searchType === SearchType.InFileContents ? fullPath : undefined}
                             >
-                                {searchType === SearchType.InFileNames ? fullPath : content}
-                            </span>
-                        </li>
-                    ))}
+    {searchType === SearchType.InFileNames ? fullPath : content}
+  </span>
+                        </li>)
+                    })}
                 </ul>
             )}
         </div>
