@@ -8,6 +8,9 @@ import {jwtDecode} from "jwt-decode";
 import {performGoogleLoginAsync} from "../../services/performGoogleLoginAsync";
 import {CustomJwtPayload} from "../../types/customJWTPayload";
 import {useAuth} from "./useAuth";
+import {fetchLoggedInUserByEmail} from "../../store/thunks/user/fetchLoggedInUserByEmail";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../../store";
 
 export type AuthorizationState = RegisterState & EmailModalState & ResetPasswordState & LoginState & {
     handleChangeEmailInput: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -26,6 +29,7 @@ export default function useAuthorizationActions(): AuthorizationState {
     const loginState = useLoginActions();
     const emailModalState = useEmailModalActions();
     const resetPasswordState = useResetPasswordActions();
+    const dispatch = useDispatch<AppDispatch>();
     const {setAuthStatus} = useAuth();
 
     const handleGoogleSuccess = useCallback((codeResponse: CodeResponse) => {
@@ -39,6 +43,8 @@ export default function useAuthorizationActions(): AuthorizationState {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
+
+                dispatch(fetchLoggedInUserByEmail(decoded.email));
 
                 setAuthStatus('authenticated')
                 loginState.setIsLoginModalOpen(false);
