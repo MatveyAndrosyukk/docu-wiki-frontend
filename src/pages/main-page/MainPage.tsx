@@ -35,7 +35,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const {viewedUser, loggedInUser, authState} = context;
     const files = useSelector(selectFileTree);
     const openedFile = useSelector(selectOpenedFile);
-    const authorizedUserEmail = localStorage.getItem('email');
+    const authorizedUserEmail = loggedInUser?.email;
     const currentUserEmail = emailParam || authorizedUserEmail;
     const prevViewedUserRef = useRef<User | null>(null);
 

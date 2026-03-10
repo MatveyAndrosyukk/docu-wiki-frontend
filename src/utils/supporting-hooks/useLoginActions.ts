@@ -5,6 +5,7 @@ import {performLoginAsync} from "../../services/performLoginAsync";
 import {jwtDecode} from "jwt-decode";
 import {clearUiState} from "../../store/slices/fileUiSlice";
 import {useAuth} from "../hooks/useAuth";
+import {fetchLoggedInUserByEmail} from "../../store/thunks/user/fetchLoggedInUserByEmail";
 
 export interface LoginModalValue {
     login: string;
@@ -69,6 +70,8 @@ export default function useLoginActions(): LoginState {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
+
+                dispatch(fetchLoggedInUserByEmail(decoded.email));
 
                 setAuthStatus("authenticated");
             } catch (error) {
