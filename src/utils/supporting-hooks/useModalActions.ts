@@ -252,9 +252,15 @@ export default function useModalActions(
             }
 
             case ActionType.RenameFile: {
-                if (checkNameConflictInFolder(files, id, trimmedTitle)) {
-                    setModalError('File with this name exists');
-                    return;
+                const node = findFileById(files, id as number);
+
+                const parentId = node?.parent ?? null;
+
+                if (checkNameConflictInFolder(files, parentId, trimmedTitle)) {
+                    if (node?.name !== trimmedTitle) {
+                        setModalError('File with this name exists');
+                        return;
+                    }
                 }
 
                 dispatch(updateFileName({
