@@ -5,6 +5,7 @@ import Modal from "../modal/Modal";
 import {AppContext} from "../../context/AppContext";
 import CustomGoogleButton from "../custom-google-button/CustomGoogleButton";
 import {ReactComponent as SwitchAuthSvg} from './images/login-modal-switch-auth.svg';
+import {useAuth} from "../../utils/hooks/useAuth";
 
 const LoginModal: FC = () => {
     const context = useContext(AppContext);
@@ -30,6 +31,8 @@ const LoginModal: FC = () => {
         handleAuthorize,
         getAuthorizationText,
     } = authState;
+
+    const {authStatus} = useAuth();
 
     const handleOpenEnterEmailModal = useCallback(() => {
         handleCloseAuthModal()
@@ -95,7 +98,7 @@ const LoginModal: FC = () => {
                         <div className={`${styles['footer__center']}`}>
                             <button
                                 className={`${modalStyles.modal__button}`}
-                                disabled={loginLoading}
+                                disabled={loginLoading || authStatus === 'loading'}
                                 onClick={handleAuthorize}
                             >
                                 {loginLoading ? (

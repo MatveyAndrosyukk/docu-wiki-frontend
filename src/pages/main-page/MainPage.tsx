@@ -131,9 +131,13 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
         if (openedFile) {
             document.title = findPathToFile(files, openedFile.id)?.join('/') as string
         } else {
-            document.title = "DocuWiki"
+            if (loggedInUser){
+                document.title = "Docuwiki Workspace"
+            } else {
+                document.title = "Docuwiki Studio"
+            }
         }
-    }, [files, openedFile]);
+    }, [files, loggedInUser, openedFile]);
 
     return (
         <div className={styles['main']}>
