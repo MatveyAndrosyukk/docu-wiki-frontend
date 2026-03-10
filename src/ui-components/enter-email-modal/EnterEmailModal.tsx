@@ -1,13 +1,11 @@
-import React, {FC, useCallback, useContext} from 'react';
+import React, {FC, useCallback} from 'react';
 import Modal from "../modal/Modal";
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './EnterEmailModal.module.scss'
-import {AppContext} from "../../context/AppContext";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 const EnterEmailModal: FC = () => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component must be used within AppProvider");
-    const {authState} = context;
+    const {authState} = useAppContext();
 
     const {
         isEnterEmailModalOpened,

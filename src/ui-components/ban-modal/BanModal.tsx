@@ -5,15 +5,14 @@ import styles from './BanModal.module.scss'
 import {AppContext} from "../../context/AppContext";
 import {ReactComponent as SwitchModeSvg} from './images/ban-modal-switch-auth.svg';
 import {BanMode} from "../../utils/hooks/useBanActions";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface BanModalProps {
 
 }
 
 const BanModal: FC<BanModalProps> = () => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {banState, viewedUser} = context;
+    const {banState, viewedUser} = useAppContext();
     const {
         isBanModalOpened,
         handleCloseBanModal,

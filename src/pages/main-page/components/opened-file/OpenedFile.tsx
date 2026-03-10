@@ -14,6 +14,7 @@ import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 import {useFileLikes} from "../../../../utils/hooks/useFileLikes";
 import {RootState} from "../../../../store";
 import {useAuth} from "../../../../utils/hooks/useAuth";
+import {useAppContext} from "../../../../utils/hooks/useAppContext";
 
 interface OpenedFileProps {
     file?: UiFile | null
@@ -30,9 +31,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsFileTreeOpened
     }) => {
     const navigate = useNavigate()
-    const context = useContext(AppContext)
-    if (!context) throw new Error("Component can't be used without context")
-    const {viewedUser, fileState, authState, loggedInUser} = context
+    const {viewedUser, fileState, loggedInUser} = useAppContext();
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
     const files = useSelector(selectFileTree)

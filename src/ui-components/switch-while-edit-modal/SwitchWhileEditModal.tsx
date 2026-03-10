@@ -1,8 +1,8 @@
-import React, {FC, useCallback, useContext} from 'react';
+import React, {FC, useCallback} from 'react';
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './SwitchWhileEditModal.module.scss'
 import Modal from "../modal/Modal";
-import {AppContext} from "../../context/AppContext";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface SwitchWhileEditModalProps {
     contentBeforeEdition: string;
@@ -18,9 +18,7 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
         addedImagesWhileEditing,
         contentBeforeEdition,
     }) => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {fileState} = context;
+    const {fileState} = useAppContext();
 
     const {
         isTryToSwitchWhileEditing,

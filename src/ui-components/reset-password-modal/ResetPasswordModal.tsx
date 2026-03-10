@@ -1,18 +1,16 @@
-import React, {FC, useCallback, useContext, useEffect} from 'react';
+import React, {FC, useCallback, useEffect} from 'react';
 import Modal from "../modal/Modal";
-import {AppContext} from "../../context/AppContext";
 import styles from "./ResetPasswordModal.module.scss"
 import modalStyles from "../modal/ModalContent.module.scss"
 import {ReactComponent as CloseModalSvg} from "./images/reset-password-modal-close.svg"
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface ResetPasswordModalProps {
     resetToken: string | undefined;
 }
 
 const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component must be used within AppProvider");
-    const {authState} = context;
+    const {authState} = useAppContext();
 
     const {
         isResetPasswordModalOpened,

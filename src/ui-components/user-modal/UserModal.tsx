@@ -1,10 +1,10 @@
-import React, {FC, useCallback, useContext, useState} from 'react';
+import React, {FC, useCallback, useState} from 'react';
 import styles from './UserModal.module.scss'
 import Modal from "../modal/Modal";
 import {User} from "../../store/slices/userSlice";
-import {AppContext} from "../../context/AppContext";
 import {UserModalState} from "../../utils/hooks/useUserModalActions";
 import {useNavigate} from "react-router-dom";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface LoginModalProps {
     userModalState: UserModalState
@@ -15,9 +15,7 @@ const UserModal: FC<LoginModalProps> = (
         userModalState,
     }) => {
     const navigate = useNavigate();
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {loggedInUser} = context;
+    const {loggedInUser} = useAppContext();
     const [showCopyMessage, setShowCopyMessage] = useState(false);
 
     const {

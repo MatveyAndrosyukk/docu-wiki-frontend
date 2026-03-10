@@ -1,37 +1,32 @@
-import {useContext, useEffect} from "react";
-import {AuthContext} from "../../context/AuthProvider";
+import {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../store";
 import {fetchLoggedInUserByEmail} from "../../store/thunks/user/fetchLoggedInUserByEmail";
+import {useAuth} from "./useAuth";
 
 export default function useAuthBootstrap() {
-
-    const context = useContext(AuthContext);
     const dispatch = useDispatch<AppDispatch>();
+    const {setAuthStatus} = useAuth();
 
-    if(!context) throw new Error("AuthContext missing");
-
-    const {setAuthStatus} = context;
-
-    useEffect(()=>{
+    useEffect(() => {
 
         const token = localStorage.getItem("token");
         const email = localStorage.getItem("email");
 
-        if(!token || !email){
+        if (!token || !email) {
             setAuthStatus("unauthenticated");
             return;
         }
 
         dispatch(fetchLoggedInUserByEmail(email))
             .unwrap()
-            .then(()=>{
+            .then(() => {
                 setAuthStatus("authenticated");
             })
-            .catch(()=>{
+            .catch(() => {
                 localStorage.clear();
                 setAuthStatus("unauthenticated");
             });
 
-    },[]);
+    }, []);
 }

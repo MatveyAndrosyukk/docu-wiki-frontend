@@ -25,6 +25,7 @@ import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-util
 import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserOwner";
 import FileTreeSkeleton from "../../../../ui-components/FileTreeSkeleton";
 import {useAuth} from "../../../../utils/hooks/useAuth";
+import {useAppContext} from "../../../../utils/hooks/useAppContext";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -39,13 +40,11 @@ const FileTree: FC<FileTreeProps> = React.memo((
         setIsOpened,
     }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
     const {
         authState,
         fileState,
         banState
-    } = context;
+    } = useAppContext();
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);

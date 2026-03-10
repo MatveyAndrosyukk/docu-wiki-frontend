@@ -1,14 +1,12 @@
-import React, {FC, useContext} from 'react';
+import React, {FC} from 'react';
 import Modal from "../../ui-components/modal/Modal";
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './DeleteModal.module.scss'
 import {FileType} from "../../types/file";
-import {AppContext} from "../../context/AppContext";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 const DeleteModal: FC = () => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {fileState} = context;
+    const {fileState} = useAppContext();
 
     const {
         deleteModalState,
@@ -25,7 +23,8 @@ const DeleteModal: FC = () => {
                 <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
                     {deleteModalState.file?.type === FileType.Folder ? (
                         <>
-                            Delete folder <span className={styles['delete-modal__text-highlighted']}>"{deleteModalState.file.name}"
+                            Delete folder <span
+                            className={styles['delete-modal__text-highlighted']}>"{deleteModalState.file.name}"
                             </span> and all its contents?
                         </>
                     ) : (

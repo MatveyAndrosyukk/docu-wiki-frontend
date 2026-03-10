@@ -1,7 +1,6 @@
-import React, {useCallback, useContext} from 'react';
+import React, {useCallback} from 'react';
 import styles from './FileList.module.scss';
 import {useDispatch, useSelector} from 'react-redux';
-import {AppContext} from '../../../../../../context/AppContext';
 import useContextMenuActions from '../../../../../../utils/hooks/useContextMenuActions';
 import ContextMenu from '../../../../../../ui-components/context-menu/ContextMenu';
 import {TreeNode, useFlattenedTree} from '../../../../../../utils/hooks/useFlattenedTree';
@@ -10,6 +9,7 @@ import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../styles/Common.module.scss";
 import {useAuth} from "../../../../../../utils/hooks/useAuth";
+import {useAppContext} from "../../../../../../utils/hooks/useAppContext";
 
 interface FileListProps {
     emailParam: string | undefined;
@@ -19,13 +19,11 @@ interface FileListProps {
 const FileList: React.FC<FileListProps> = React.memo(
     ({emailParam, windowWidth}) => {
         const dispatch = useDispatch();
-        const context = useContext(AppContext);
-        if (!context) throw new Error('Context required');
         const {
             viewedUser,
             loggedInUser,
             fileState,
-        } = context;
+        } = useAppContext();
         const contextMenuAcState = useContextMenuActions();
         const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
         const files = useSelector(selectFileTree)

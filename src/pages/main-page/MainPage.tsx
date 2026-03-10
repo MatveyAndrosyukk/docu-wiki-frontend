@@ -21,6 +21,7 @@ import {selectOpenedFile} from "../../store/selectors/selectOpenedFile";
 import {selectFileTree} from "../../store/selectors/selectFileTree";
 import {clearServerFiles} from "../../store/slices/fileServerSlice";
 import {clearUiState} from "../../store/slices/fileUiSlice";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface MainPageProps {
     emailParam?: string | undefined;
@@ -29,9 +30,7 @@ interface MainPageProps {
 
 const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const dispatch = useDispatch<AppDispatch>();
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {authState} = context;
+    const {authState} = useAppContext();
     const files = useSelector(selectFileTree);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)

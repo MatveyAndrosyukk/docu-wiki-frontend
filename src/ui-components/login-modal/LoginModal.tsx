@@ -1,16 +1,14 @@
-import React, {FC, useCallback, useContext} from 'react';
+import React, {FC, useCallback} from 'react';
 import styles from './LoginModal.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
 import Modal from "../modal/Modal";
-import {AppContext} from "../../context/AppContext";
 import CustomGoogleButton from "../custom-google-button/CustomGoogleButton";
 import {ReactComponent as SwitchAuthSvg} from './images/login-modal-switch-auth.svg';
 import {useAuth} from "../../utils/hooks/useAuth";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 const LoginModal: FC = () => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component must be used within AppProvider");
-    const {authState} = context;
+    const {authState} = useAppContext();
     const {
         isLoginModalOpen,
         handleCloseAuthModal,
@@ -102,7 +100,7 @@ const LoginModal: FC = () => {
                                 onClick={handleAuthorize}
                             >
                                 {loginLoading ? (
-                                    <span className={styles['login-modal__loader']} />
+                                    <span className={styles['login-modal__loader']}/>
                                 ) : (
                                     getAuthorizationText()
                                 )}

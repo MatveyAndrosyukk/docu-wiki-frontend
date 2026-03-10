@@ -20,6 +20,7 @@ import {UiFile} from "../../../../../../store/types/UiFile";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../../../../store";
 import {addPendingImage, markImageError, removePendingImage} from "../../../../../../store/slices/fileUiSlice";
+import {useAppContext} from "../../../../../../utils/hooks/useAppContext";
 
 interface EditFileViewProps {
     file: UiFile;
@@ -39,9 +40,7 @@ const EditMode: React.FC<EditFileViewProps> = (
         isFileTreeOpened,
     }
 ) => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("Component can't be used without context");
-    const {fileState, loggedInUser} = context;
+    const {fileState, loggedInUser} = useAppContext();
     const dispatch = useDispatch<AppDispatch>();
     const [textareaContent, setTextareaContent] = useState(file.content ?? '');
     const textareaRef = useRef<HTMLTextAreaElement>(null);

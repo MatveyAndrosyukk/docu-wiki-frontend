@@ -4,6 +4,7 @@ import {FileType} from "../../types/file";
 import {AppContext} from "../../context/AppContext";
 import {ActionType} from "../../utils/supporting-hooks/useModalActions";
 import {UiFile} from "../../store/types/UiFile";
+import {useAppContext} from "../../utils/hooks/useAppContext";
 
 interface ContextMenuProps {
     clickX: number;
@@ -19,9 +20,8 @@ const ContextMenu: FC<ContextMenuProps> = (
         file,
         onCloseContextMenu,
     }) => {
-    const context = useContext(AppContext);
-    if (!context) throw new Error("MainPage must be used within AppProvider");
-    const {fileState, viewedUser} = context;
+
+    const {fileState, viewedUser} = useAppContext();
 
     const {
         copiedFile,
