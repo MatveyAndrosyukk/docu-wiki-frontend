@@ -25,7 +25,6 @@ const FileList: React.FC<FileListProps> = React.memo(
             viewedUser,
             loggedInUser,
             fileState,
-            authState
         } = context;
         const contextMenuAcState = useContextMenuActions();
         const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;

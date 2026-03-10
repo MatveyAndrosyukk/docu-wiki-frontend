@@ -12,12 +12,16 @@ import {useNavigate} from "react-router-dom";
 import {AppContext} from "../../../../context/AppContext";
 import useFileSearchActions from "../../../../utils/hooks/useFileSearchActions";
 import {useAuth} from "../../../../utils/hooks/useAuth";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../../store";
+import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 
 const Header: FC = () => {
     const navigate = useNavigate();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component must be used within AppProvider");
-    const {authState, loggedInUser} = context;
+    const {authState} = context;
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const fileSearch = useFileSearchActions();
     const userModalState = useUserModalActions(loggedInUser, authState);
     const {authStatus} = useAuth();

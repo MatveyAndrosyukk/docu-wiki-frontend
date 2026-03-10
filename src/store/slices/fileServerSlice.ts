@@ -19,8 +19,8 @@ const fileServerSlice = createSlice({
     name: "fileServer",
     initialState,
     reducers: {
-        clearServerFiles(state) {
-            state.files = [];
+        clearServerFiles() {
+            return initialState;
         },
         addTempRootFolder(
             state,
@@ -158,6 +158,7 @@ const fileServerSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
+                console.log('FILES FETCHED')
                 state.files = action.payload;
                 state.loading = false;
             })

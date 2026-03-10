@@ -4,7 +4,7 @@ import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch} from "../../store";
+import {AppDispatch, RootState} from "../../store";
 import EditModal from "../../ui-components/edit-modal/EditModal";
 import DeleteModal from "../../ui-components/delete-modal/DeleteModal";
 import {fetchFilesByEmail} from "../../store/thunks/files/fetchFilesByEmail";
@@ -12,7 +12,6 @@ import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByE
 import {clearLoggedInUser, clearViewedUser, User} from "../../store/slices/userSlice";
 import {AppContext} from "../../context/AppContext";
 import LoginModal from "../../ui-components/login-modal/LoginModal";
-import {fetchLoggedInUserByEmail} from "../../store/thunks/user/fetchLoggedInUserByEmail";
 import EnterEmailModal from "../../ui-components/enter-email-modal/EnterEmailModal";
 import ResetPasswordModal from "../../ui-components/reset-password-modal/ResetPasswordModal";
 import {isUserOwner} from "../../utils/functions/permissions-utils/isUserOwner";
@@ -32,12 +31,14 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const dispatch = useDispatch<AppDispatch>();
     const context = useContext(AppContext);
     if (!context) throw new Error("Component can't be used without context");
-    const {viewedUser, loggedInUser, authState} = context;
+    const {authState} = context;
     const files = useSelector(selectFileTree);
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const openedFile = useSelector(selectOpenedFile);
-    const authorizedUserEmail = loggedInUser?.email;
-    const currentUserEmail = emailParam || authorizedUserEmail;
+    const currentUserEmail = emailParam || (loggedInUser ? loggedInUser.email : null);
     const prevViewedUserRef = useRef<User | null>(null);
+    const prevLoggedInUserRef = useRef<User | null>(loggedInUser);
 
     const [isFileTreeOpened, setIsFileTreeOpened] = useState<boolean>(false);
 
@@ -75,11 +76,12 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
             dispatch(clearViewedUser());
             dispatch(clearLoggedInUser());
         }
-    }, [currentUserEmail, dispatch, authorizedUserEmail]);
+    }, [currentUserEmail, dispatch]);
 
     useEffect(() => {
         if (viewedUser) {
             const prevViewedUser = prevViewedUserRef.current;
+            const prevLoggedInUser = prevLoggedInUserRef.current;
 
             const isOnlyCounterOrViewBlockedChanged = prevViewedUser &&
                 prevViewedUser.email === viewedUser.email &&
@@ -101,9 +103,17 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
                 const isUserEditor = viewedUser.whoCanEdit.some(u => u.email === loggedInUser?.email);
                 const isUserEqualsLoggedIn = viewedUser.email === loggedInUser?.email;
 
-                if (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn)) {
+                const justLoggedOutFromOwnPage =
+                    !loggedInUser &&
+                    prevLoggedInUser &&
+                    prevLoggedInUser.email === viewedUser.email;
+
+                if (justLoggedOutFromOwnPage) {
                     dispatch(clearServerFiles());
-                    dispatch(clearUiState())
+                    dispatch(clearUiState());
+                } else if (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn)) {
+                    dispatch(clearServerFiles());
+                    dispatch(clearUiState());
                 } else {
                     dispatch(fetchFilesByEmail({
                         viewedUserEmail: viewedUser.email,
@@ -113,8 +123,9 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
             }
 
             prevViewedUserRef.current = viewedUser;
+            prevLoggedInUserRef.current = loggedInUser || null;
         }
-    }, [viewedUser, dispatch, loggedInUser?.email]);
+    }, [viewedUser, dispatch, loggedInUser]);
 
     useEffect(() => {
         if (openedFile) {

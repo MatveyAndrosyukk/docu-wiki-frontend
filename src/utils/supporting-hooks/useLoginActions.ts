@@ -6,6 +6,8 @@ import {jwtDecode} from "jwt-decode";
 import {clearUiState} from "../../store/slices/fileUiSlice";
 import {useAuth} from "../hooks/useAuth";
 import {fetchLoggedInUserByEmail} from "../../store/thunks/user/fetchLoggedInUserByEmail";
+import {clearServerFiles} from "../../store/slices/fileServerSlice";
+import {clearLoggedInUser} from "../../store/slices/userSlice";
 
 export interface LoginModalValue {
     login: string;
@@ -49,6 +51,9 @@ export default function useLoginActions(): LoginState {
     const handleLogout = useCallback(() => {
         localStorage.clear();
         dispatch(clearUiState());
+        dispatch(clearServerFiles());
+        dispatch(clearLoggedInUser());
+
         setAuthStatus("unauthenticated");
     }, [dispatch, setAuthStatus]);
 
@@ -88,7 +93,7 @@ export default function useLoginActions(): LoginState {
             setLoginLoading(false);
             throw error;
         }
-    }, [loginModalValue.login, loginModalValue.password, setAuthStatus]);
+    }, [dispatch, loginModalValue.login, loginModalValue.password, setAuthStatus]);
 
     return {
         loginLoading,

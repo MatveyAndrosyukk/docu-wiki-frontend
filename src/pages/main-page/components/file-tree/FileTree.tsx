@@ -192,13 +192,16 @@ const FileTree: FC<FileTreeProps> = React.memo((
                                 )}
                             </div>
                         )}
-                        {!isBanned && isUserCanView(viewedUser, loggedInUser) && (
-                            <div className={styles['file-tree__files']}>
-                                <FileList
-                                    windowWidth={windowWidth}
-                                    emailParam={emailParam}/>
-                            </div>
-                        )}
+                        {viewedUser &&
+                            !isBanned &&
+                            isUserCanView(viewedUser, loggedInUser) && (
+                                <div className={styles['file-tree__files']}>
+                                    <FileList
+                                        windowWidth={windowWidth}
+                                        emailParam={emailParam}
+                                    />
+                                </div>
+                            )}
                     </>
                 )}
             </div>
