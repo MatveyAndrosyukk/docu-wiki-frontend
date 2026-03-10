@@ -13,6 +13,7 @@ import {UiFile} from "../../../../store/types/UiFile";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 import {useFileLikes} from "../../../../utils/hooks/useFileLikes";
 import {RootState} from "../../../../store";
+import {useAuth} from "../../../../utils/hooks/useAuth";
 
 interface OpenedFileProps {
     file?: UiFile | null
@@ -39,16 +40,13 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const pendingImages = useSelector(
         (state: RootState) => state.fileUi.pendingImages
     );
+    const {authStatus} = useAuth();
 
     const {
         isEditing,
         setIsEditing,
         handleOpenDeleteModal
     } = fileState
-
-    const {
-        isLoggedIn,
-    } = authState
 
     const handleImageClick = useCallback((imageUrl: string) => {
         setOpenedImage(imageUrl)
@@ -100,7 +98,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 files,
                 isBurgerMenuOpened,
                 isEditing,
-                isLoggedIn,
+                isLoggedIn: authStatus === 'authenticated',
                 emailParam,
                 setIsEditing,
                 setIsBurgerMenuOpened,

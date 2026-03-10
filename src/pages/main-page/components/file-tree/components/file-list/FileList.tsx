@@ -9,6 +9,7 @@ import FileNode from './components/virtualized-row/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../styles/Common.module.scss";
+import {useAuth} from "../../../../../../utils/hooks/useAuth";
 
 interface FileListProps {
     emailParam: string | undefined;
@@ -29,8 +30,8 @@ const FileList: React.FC<FileListProps> = React.memo(
         const contextMenuAcState = useContextMenuActions();
         const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
         const files = useSelector(selectFileTree)
-
         const flattenedNodes = useFlattenedTree(files);
+        const {authStatus} = useAuth();
 
         const onFolderClick = useCallback(
             (id: number) => {
@@ -61,7 +62,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                             viewedUser={viewedUser}
                             loggedInUser={loggedInUser}
                             handleTryToOpenFile={fileState.handleTryToOpenFile}
-                            isLoggedIn={authState.isLoggedIn}
+                            isLoggedIn={authStatus === 'authenticated'}
                         />
                     ))}
                 </div>

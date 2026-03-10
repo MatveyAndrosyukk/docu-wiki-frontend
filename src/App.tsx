@@ -3,8 +3,11 @@ import './App.scss';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import MainPageWrapper from "./pages/main-page/MainPageWrapper";
 import VerifyPage from "./pages/verify-page/VerifyPage";
+import useAuthBootstrap from "./utils/hooks/useAuthBootstrap";
 
 function App() {
+    useAuthBootstrap();
+
     return (
         <Router>
             <Routes>

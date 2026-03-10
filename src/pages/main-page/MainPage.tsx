@@ -69,7 +69,6 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     useEffect(() => {
         if (currentUserEmail && currentUserEmail.trim() !== '') {
             dispatch(fetchViewedUserByEmail(currentUserEmail));
-            dispatch(fetchLoggedInUserByEmail(authorizedUserEmail))
         } else {
             dispatch(clearServerFiles());
             dispatch(clearUiState())

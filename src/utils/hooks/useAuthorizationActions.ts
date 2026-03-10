@@ -7,6 +7,7 @@ import useResetPasswordActions, {ResetPasswordState} from "../supporting-hooks/u
 import {jwtDecode} from "jwt-decode";
 import {performGoogleLoginAsync} from "../../services/performGoogleLoginAsync";
 import {CustomJwtPayload} from "../../types/customJWTPayload";
+import {useAuth} from "./useAuth";
 
 export type AuthorizationState = RegisterState & EmailModalState & ResetPasswordState & LoginState & {
     handleChangeEmailInput: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -25,6 +26,7 @@ export default function useAuthorizationActions(): AuthorizationState {
     const loginState = useLoginActions();
     const emailModalState = useEmailModalActions();
     const resetPasswordState = useResetPasswordActions();
+    const {setAuthStatus} = useAuth();
 
     const handleGoogleSuccess = useCallback((codeResponse: CodeResponse) => {
         const authorizationCode = codeResponse.code;
@@ -38,7 +40,7 @@ export default function useAuthorizationActions(): AuthorizationState {
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
 
-                loginState.setIsLoggedIn(true);
+                setAuthStatus('authenticated')
                 loginState.setIsLoginModalOpen(false);
             })
             .catch((error) => {

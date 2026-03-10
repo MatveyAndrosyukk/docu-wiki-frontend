@@ -11,6 +11,7 @@ import useUserModalActions from "../../../../utils/hooks/useUserModalActions";
 import {useNavigate} from "react-router-dom";
 import {AppContext} from "../../../../context/AppContext";
 import useFileSearchActions from "../../../../utils/hooks/useFileSearchActions";
+import {useAuth} from "../../../../utils/hooks/useAuth";
 
 const Header: FC = () => {
     const navigate = useNavigate();
@@ -19,13 +20,13 @@ const Header: FC = () => {
     const {authState, loggedInUser} = context;
     const fileSearch = useFileSearchActions();
     const userModalState = useUserModalActions(loggedInUser, authState);
+    const {authStatus} = useAuth();
 
     const {
         handleOpenUserModal,
     } = userModalState
 
     const {
-        isLoggedIn,
         handleLogout,
         handleOpenLoginModal
     } = authState;
@@ -66,7 +67,7 @@ const Header: FC = () => {
                 setBurgerOpen(false);
             }
         };
-        
+
         document.addEventListener('click', handleClickOutside);
         return () => {
             document.removeEventListener('click', handleClickOutside);
@@ -124,7 +125,7 @@ const Header: FC = () => {
                                         <div className={styles['header__burger-item']}>
                                             <UserSvg onClick={handleOpenUserModal}/>
                                         </div>
-                                        {isLoggedIn ? (
+                                        {authStatus === 'authenticated' ? (
                                             <div className={styles['header__burger-item']}>
                                                 <LogoutSvg onClick={handleLogout}/>
                                             </div>
@@ -140,8 +141,9 @@ const Header: FC = () => {
                                     <UserSvg
                                         onClick={handleOpenUserModal}/>
                                 </div>
-
-                                {isLoggedIn ? (
+                                {authStatus === 'loading' ? (
+                                    <div className={styles['header__auth-skeleton']} />
+                                ) : authStatus === 'authenticated' ? (
                                     <div
                                         className={styles['header__logout']}
                                         onClick={handleLogout}

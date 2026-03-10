@@ -4,6 +4,7 @@ import {AppDispatch} from "../../store";
 import {performLoginAsync} from "../../services/performLoginAsync";
 import {jwtDecode} from "jwt-decode";
 import {clearUiState} from "../../store/slices/fileUiSlice";
+import {useAuth} from "../hooks/useAuth";
 
 export interface LoginModalValue {
     login: string;
@@ -15,8 +16,6 @@ export interface LoginState {
     setLoginLoading: Dispatch<SetStateAction<boolean>>;
     loginError: string | null;
     setLoginError: Dispatch<SetStateAction<string | null>>;
-    isLoggedIn: boolean;
-    setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
     isLoginModalOpen: boolean;
     setIsLoginModalOpen: Dispatch<SetStateAction<boolean>>;
     loginModalValue: LoginModalValue;
@@ -34,25 +33,23 @@ export default function useLoginActions(): LoginState {
     const [loginLoading, setLoginLoading] = useState<boolean>(false);
     const [loginMessage, setLoginMessage] = useState<string | null>(null);
     const [loginError, setLoginError] = useState<string | null>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!localStorage.getItem('token'));
     const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
     const loginModalInputRef = useRef<HTMLInputElement>(null);
     const [loginModalValue, setLoginModalValue] = useState<LoginModalValue>({
         login: "",
         password: "",
     });
+    const {setAuthStatus} = useAuth();
 
     const handleOpenLoginModal = useCallback(() => {
         setIsLoginModalOpen(true);
     }, [setIsLoginModalOpen]);
 
     const handleLogout = useCallback(() => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('email');
-        localStorage.removeItem('roles');
+        localStorage.clear();
         dispatch(clearUiState());
-        setIsLoggedIn(false);
-    }, [dispatch, setIsLoggedIn]);
+        setAuthStatus("unauthenticated");
+    }, [dispatch, setAuthStatus]);
 
     const handleLogin = useCallback(async () => {
         const login = async () => {
@@ -73,7 +70,7 @@ export default function useLoginActions(): LoginState {
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
 
-                setIsLoggedIn(true);
+                setAuthStatus("authenticated");
             } catch (error) {
                 throw error;
             }
@@ -88,15 +85,13 @@ export default function useLoginActions(): LoginState {
             setLoginLoading(false);
             throw error;
         }
-    }, [loginModalValue.login, loginModalValue.password]);
+    }, [loginModalValue.login, loginModalValue.password, setAuthStatus]);
 
     return {
         loginLoading,
         setLoginLoading,
         loginError,
         setLoginError,
-        isLoggedIn,
-        setIsLoggedIn,
         isLoginModalOpen,
         setIsLoginModalOpen,
         loginModalValue,

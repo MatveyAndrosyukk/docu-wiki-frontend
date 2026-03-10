@@ -24,6 +24,7 @@ import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUse
 import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-utils/isUserEqualsLoggedIn";
 import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserOwner";
 import FileTreeSkeleton from "../../../../ui-components/FileTreeSkeleton";
+import {useAuth} from "../../../../utils/hooks/useAuth";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -52,11 +53,11 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
+    const {authStatus} = useAuth();
 
     const {setIsBanModalOpened} = banState;
 
     const {
-        isLoggedIn,
         setIsLoginModalOpen,
     } = authState;
 
@@ -112,7 +113,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
     }, [dispatch, viewedUser]);
 
     const handleCreateRootFolder = useCallback(() => {
-        if (isLoggedIn) {
+        if (authStatus === 'authenticated') {
             handleOpenModalByReason({
                 reason: ActionType.AddRootFolder,
                 id: null,
@@ -121,18 +122,18 @@ const FileTree: FC<FileTreeProps> = React.memo((
         } else {
             setIsLoginModalOpen(true);
         }
-    }, [isLoggedIn, handleOpenModalByReason, setIsLoginModalOpen]);
+    }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
 
     const isBanned = !!viewedUser?.banned;
 
     return (
         <div ref={fileTreeRef} className={fileTreeStyles}>
             <div className={styles['file-tree__content']}>
-                {(isViewedUserLoading || areFilesLoading) ? (
+                {(isViewedUserLoading || areFilesLoading || authStatus === 'loading') ? (
                     <FileTreeSkeleton/>
                 ) : (
                     <>
-                        {isUserEqualsLoggedIn(emailParam, isLoggedIn, viewedUser) && (
+                        {isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser) && (
                             <div className={styles['file-tree__header']}>
                                 <div className={styles['file-tree__top']}>
                                     <div className={styles['file-tree__user']}>
@@ -169,7 +170,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
                             </div>
                         )}
 
-                        {!isBanned && isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
+                        {!isBanned && isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser) && (
                             <div className={styles['file-tree__buttons']}>
                                 <div
                                     className={styles['file-tree__button-create']}
@@ -177,7 +178,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
                                 >
                                     Create a root folder
                                 </div>
-                                {isLoggedIn && (
+                                {authStatus === 'authenticated' && (
                                     <div
                                         className={styles['file-tree__button-block']}
                                         title={viewedUser?.isViewBlocked

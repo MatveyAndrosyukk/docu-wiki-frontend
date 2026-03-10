@@ -6,6 +6,7 @@ import {addUserWhoCanEdit} from "../../store/thunks/user/addUserWhoCanEdit";
 import {deleteUserWhoCanEdit} from "../../store/thunks/user/deleteUserWhoCanEdit";
 import {changeUserName} from "../../store/thunks/user/changeUserName";
 import {LoginState} from "../supporting-hooks/useLoginActions";
+import {useAuth} from "./useAuth";
 
 export interface UserModalState {
     isAddingEditor: boolean;
@@ -52,6 +53,7 @@ export default function useUserModalActions(user: User | null, loginState: Login
     const [editedNameError, setEditedNameError] = React.useState<string>('');
     const [addEditorError, setAddEditorError] = React.useState<string>('');
     const [changeNameError, setChangeNameError] = React.useState<string>('');
+    const {authStatus} = useAuth();
     useEffect(() => {
         setEditedName(user?.name || '');
     }, [user?.name]);
@@ -83,7 +85,7 @@ export default function useUserModalActions(user: User | null, loginState: Login
         setChangeNameError('');
     }, [setIsUserModalOpen, setUserModalValue, setAddEditorError, setChangeNameError]);
     const handleOpenUserModal = useCallback(() => {
-        if (!loginState.isLoggedIn) {
+        if (authStatus !== 'authenticated') {
             loginState.handleOpenLoginModal();
             return;
         }
