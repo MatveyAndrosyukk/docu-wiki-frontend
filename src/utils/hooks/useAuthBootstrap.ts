@@ -24,7 +24,6 @@ export default function useAuthBootstrap() {
                 setAuthStatus("authenticated");
             })
             .catch(() => {
-                localStorage.clear();
                 setAuthStatus("unauthenticated");
             });
 

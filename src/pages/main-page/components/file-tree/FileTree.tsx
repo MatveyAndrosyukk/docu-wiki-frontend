@@ -1,14 +1,4 @@
-import React, {
-    Dispatch,
-    FC,
-    SetStateAction,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from 'react';
+import React, {Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import styles from './FileTree.module.scss'
 import commonStyles from '../../../../styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
@@ -17,7 +7,6 @@ import FileList from "./components/file-list/FileList";
 import {AppDispatch, RootState} from "../../../../store";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleUserIsViewBlocked} from "../../../../store/thunks/user/toggleUserIsViewBlocked";
-import {AppContext} from "../../../../context/AppContext";
 import {ActionType} from "../../../../utils/supporting-hooks/useModalActions";
 import {isUserCanEdit} from "../../../../utils/functions/permissions-utils/isUserCanEdit";
 import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUserCanView";
@@ -40,11 +29,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
         setIsOpened,
     }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const {
-        authState,
-        fileState,
-        banState
-    } = useAppContext();
+    const {authState, fileState, banState} = useAppContext();
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);

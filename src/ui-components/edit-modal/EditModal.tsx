@@ -5,6 +5,7 @@ import modalStyles from '../modal/ModalContent.module.scss'
 import {FileType} from "../../types/file";
 import {ActionType} from "../../utils/supporting-hooks/useModalActions";
 import {useAppContext} from "../../utils/hooks/useAppContext";
+import {ReactComponent as ArrowIcon} from './images/arrow.svg'
 
 const EditModal: FC = () => {
     const {fileState} = useAppContext();
@@ -70,25 +71,41 @@ const EditModal: FC = () => {
 
                     )
                 }
-                <input
-                    ref={modalInputRef}
-                    type='text'
-                    className={styles['edit-modal__input']}
-                    placeholder={"Enter the title"}
-                    value={modalValue}
-                    onChange={(e) => setModalValue(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            if (lengthError) return;
+                <div className={styles['edit-modal__input-wrapper']}>
+                    <input
+                        ref={modalInputRef}
+                        type='text'
+                        className={styles['edit-modal__input']}
+                        placeholder={"Enter the title"}
+                        value={modalValue}
+                        onChange={(e) => setModalValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (lengthError) return;
+                                handleConfirmModalByReason({
+                                    title: modalValue,
+                                    id: modalOpenState.id,
+                                    reason: modalOpenState.reason as ActionType
+                                });
+                            }
+                        }}
+                    />
+
+                    <button
+                        className={styles['edit-modal__submit']}
+                        disabled={!modalValue.trim() || !!modalError}
+                        onClick={() => {
                             handleConfirmModalByReason({
                                 title: modalValue,
                                 id: modalOpenState.id,
                                 reason: modalOpenState.reason as ActionType
                             });
-                        }
-                    }}
-                />
+                        }}
+                    >
+                        <ArrowIcon/>
+                    </button>
+                </div>
             </div>
         </div>
     </Modal>

@@ -1,5 +1,5 @@
 import { TreeNode } from "../../../../../../../../utils/hooks/useFlattenedTree";
-import React from "react";
+import React, {useRef} from "react";
 import styles from "../../FileList.module.scss"
 import { isUserCanEdit } from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
 import { FileStatus, FileType } from "../../../../../../../../types/file";
@@ -37,6 +37,31 @@ const FileNode: React.FC<Props> = React.memo(
      }) => {
         const { file, depth, isLastChild, hasNextOnLevel } = node;
         const openedFile = useSelector(selectOpenedFile)
+        const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+
+        const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+            if (!isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser)) return;
+
+            const touch = e.touches[0];
+
+            longPressTimer.current = setTimeout(() => {
+                contextMenuState.handleOpenContextMenu(
+                    {
+                        preventDefault: () => {},
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    } as any,
+                    file
+                );
+            }, 600);
+        };
+
+        const cancelLongPress = () => {
+            if (longPressTimer.current) {
+                clearTimeout(longPressTimer.current);
+                longPressTimer.current = null;
+            }
+        };
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
@@ -80,8 +105,11 @@ const FileNode: React.FC<Props> = React.memo(
                     {file.type === FileType.Folder ? (
                         <div
                             className={styles['file-list__node-folder']}
-                            onContextMenu={openContextMenuHandler}
-                            onClick={() => onFolderClick(file.id)}
+                            onContextMenu={!file.isPending ? openContextMenuHandler : undefined}
+                            onClick={!file.isPending ? () => onFolderClick(file.id) : undefined}
+                            onTouchStart={!file.isPending ? handleTouchStart : undefined}
+                            onTouchEnd={cancelLongPress}
+                            onTouchMove={cancelLongPress}
                         >
                             {file.status === FileStatus.Opened ? (
                                 <OpenedSvg style={{ marginRight: 8 }} />
@@ -95,6 +123,9 @@ const FileNode: React.FC<Props> = React.memo(
                             className={styles['file-list__node-file']}
                             onContextMenu={!file.isPending ? openContextMenuHandler : undefined}
                             onClick={!file.isPending ? () => handleTryToOpenFile(file.id) : undefined}
+                            onTouchStart={!file.isPending ? handleTouchStart : undefined}
+                            onTouchEnd={cancelLongPress}
+                            onTouchMove={cancelLongPress}
                         >
                             {file.isPending ? (
                                 <FileLoader />

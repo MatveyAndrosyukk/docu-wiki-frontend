@@ -19,11 +19,7 @@ interface FileListProps {
 const FileList: React.FC<FileListProps> = React.memo(
     ({emailParam, windowWidth}) => {
         const dispatch = useDispatch();
-        const {
-            viewedUser,
-            loggedInUser,
-            fileState,
-        } = useAppContext();
+        const {viewedUser, loggedInUser, fileState} = useAppContext();
         const contextMenuAcState = useContextMenuActions();
         const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
         const files = useSelector(selectFileTree)
