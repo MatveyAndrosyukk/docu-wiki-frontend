@@ -36,6 +36,8 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const isViewedUserLoading = useSelector((state: RootState) => state.user.isViewedUserLoading);
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
+    const [notificationId, setNotificationId] = useState(0);
+    const notificationTimer = useRef<NodeJS.Timeout | null>(null);
     const fileTreeRef = useRef<HTMLDivElement>(null);
     const {authStatus} = useAuth();
 
@@ -84,8 +86,14 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const blockViewHandler = useCallback(async () => {
         if (!viewedUser?.email) return;
 
+        if (notificationTimer.current) {
+            clearTimeout(notificationTimer.current);
+        }
+
+        setNotificationId(prev => prev + 1);
         setShowBlockMessage(true);
-        setTimeout(() => {
+
+        notificationTimer.current = setTimeout(() => {
             setShowBlockMessage(false);
         }, 3000);
 
@@ -149,7 +157,9 @@ const FileTree: FC<FileTreeProps> = React.memo((
                         )}
 
                         {showBlockMessage && (
-                            <div className={commonStyles['common__notification']}>
+                            <div
+                                key={notificationId}
+                                className={commonStyles['common__notification']}>
                                 You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
                             </div>
                         )}
