@@ -19,12 +19,16 @@ interface FileListProps {
 const FileList: React.FC<FileListProps> = React.memo(
     ({emailParam, windowWidth}) => {
         const dispatch = useDispatch();
+
         const {viewedUser, loggedInUser, fileState} = useAppContext();
-        const contextMenuAcState = useContextMenuActions();
-        const {contextMenuState, handleCloseContextMenu} = contextMenuAcState;
-        const files = useSelector(selectFileTree)
-        const flattenedNodes = useFlattenedTree(files);
         const {authStatus} = useAuth();
+
+        const files = useSelector(selectFileTree)
+
+        const contextMenuState = useContextMenuActions();
+        const {state, handleCloseContextMenu} = contextMenuState;
+
+        const flattenedNodes = useFlattenedTree(files);
 
         const onFolderClick = useCallback(
             (id: number) => {
@@ -51,7 +55,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                             node={node}
                             emailParam={emailParam}
                             onFolderClick={onFolderClick}
-                            contextMenuState={contextMenuAcState}
+                            contextMenuState={contextMenuState}
                             viewedUser={viewedUser}
                             loggedInUser={loggedInUser}
                             handleTryToOpenFile={fileState.handleTryToOpenFile}
@@ -60,11 +64,11 @@ const FileList: React.FC<FileListProps> = React.memo(
                     ))}
                 </div>
 
-                {contextMenuState.visible && contextMenuState.file && (
+                {state.visible && state.file && (
                     <ContextMenu
-                        clickX={contextMenuState.clickX}
-                        clickY={contextMenuState.clickY}
-                        file={contextMenuState.file}
+                        clickX={state.clickX}
+                        clickY={state.clickY}
+                        file={state.file}
                         onCloseContextMenu={handleCloseContextMenu}
                     />
                 )}

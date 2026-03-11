@@ -9,14 +9,14 @@ export interface OpenedContextMenuState {
 }
 
 export interface ContextMenuState {
-    contextMenuState: OpenedContextMenuState;
-    setContextMenuState: Dispatch<SetStateAction<OpenedContextMenuState>>;
+    state: OpenedContextMenuState;
+    setState: Dispatch<SetStateAction<OpenedContextMenuState>>;
     handleOpenContextMenu: (event: React.MouseEvent, file: UiFile) => void;
     handleCloseContextMenu: () => void;
 }
 
 export default function useContextMenuActions(): ContextMenuState {
-    const [contextMenuState, setContextMenuState] = React.useState<OpenedContextMenuState>({
+    const [state, setState] = React.useState<OpenedContextMenuState>({
         visible: false,
         clickX: 0,
         clickY: 0,
@@ -25,17 +25,17 @@ export default function useContextMenuActions(): ContextMenuState {
 
     const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: UiFile) => {
         event.preventDefault();
-        setContextMenuState({
+        setState({
             visible: true,
             clickX: getAdjustedX(event.clientX),
             clickY: event.clientY,
             file,
         });
-    }, [setContextMenuState]);
+    }, [setState]);
 
     const handleCloseContextMenu = useCallback(() => {
-        setContextMenuState(prev => ({...prev, visible: false}));
-    }, [setContextMenuState]);
+        setState(prev => ({...prev, visible: false}));
+    }, [setState]);
 
     const getAdjustedX = (clientX: number) => {
         const width = window.innerWidth;
@@ -50,8 +50,8 @@ export default function useContextMenuActions(): ContextMenuState {
     };
 
     return {
-        contextMenuState,
-        setContextMenuState,
+        state,
+        setState,
         handleOpenContextMenu,
         handleCloseContextMenu,
     }
