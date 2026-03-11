@@ -17,7 +17,7 @@ import {useAuth} from "../../../../utils/hooks/useAuth";
 import {useAppContext} from "../../../../utils/hooks/useAppContext";
 import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
 import {useNotification} from "../../../../utils/hooks/useNotification";
-import {useClickOutside} from "../../../../utils/hooks/useClickOutside";
+import {useDblClickOutside} from "../../../../utils/hooks/useDblClickOutside";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -47,7 +47,7 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
 
         const notification = useNotification();
 
-        useClickOutside(
+        useDblClickOutside(
             fileTreeRef,
             () => setIsOpened(false),
             isOpened && windowWidth < 1270

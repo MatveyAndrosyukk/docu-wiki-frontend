@@ -1,4 +1,4 @@
-import React, {FC, useContext, useEffect, useRef, useState} from 'react';
+import React, {FC, useRef, useState} from 'react';
 import styles from './Header.module.scss';
 import {ReactComponent as LogoSvg} from './images/header-logo.svg';
 import {ReactComponent as SearchSvg} from './images/header-search.svg';
@@ -9,74 +9,44 @@ import SearchInput from "./components/search-input/SearchInput";
 import UserModal from '../../../../ui-components/user-modal/UserModal';
 import useUserModalActions from "../../../../utils/hooks/useUserModalActions";
 import {useNavigate} from "react-router-dom";
-import {AppContext} from "../../../../context/AppContext";
 import useFileSearchActions from "../../../../utils/hooks/useFileSearchActions";
 import {useAuth} from "../../../../utils/hooks/useAuth";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useAppContext} from "../../../../utils/hooks/useAppContext";
+import {useClickOutside} from "../../../../utils/hooks/useClickOutside";
+import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
 
 const Header: FC = () => {
+    const [burgerOpen, setBurgerOpen] = useState(false);
+
     const navigate = useNavigate();
+
     const {authState} = useAppContext();
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
-    const fileSearch = useFileSearchActions();
-    const userModalState = useUserModalActions(loggedInUser, authState);
     const {authStatus} = useAuth();
 
-    const {
-        handleOpenUserModal,
-    } = userModalState
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
 
-    const {
-        handleLogout,
-        handleOpenLoginModal
-    } = authState;
+    const userModalState = useUserModalActions(loggedInUser, authState);
+    const fileSearch = useFileSearchActions();
+    const width = useWindowWidth();
+    const {handleOpenUserModal} = userModalState
+    const {handleLogout, handleOpenLoginModal} = authState;
+    const {searchType, handleSwitchSearchType, handleOpenPathToSelectedFile} = fileSearch;
 
-    const {
-        searchType,
-        handleSwitchSearchType,
-        handleOpenPathToSelectedFile
-    } = fileSearch;
+    const isMobile = width < 740;
 
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 740);
-    const [burgerOpen, setBurgerOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
     const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
 
+    useClickOutside(
+        menuRef,
+        () => setBurgerOpen(false),
+        burgerOpen,
+        burgerButtonRef
+    );
 
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 740);
-            if (window.innerWidth >= 740) {
-                setBurgerOpen(false);
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            const target = event.target as Node;
-            if (
-                burgerOpen &&
-                menuRef.current &&
-                !menuRef.current.contains(target) &&
-                burgerButtonRef.current &&
-                !burgerButtonRef.current.contains(target)
-            ) {
-                setBurgerOpen(false);
-            }
-        };
-
-        document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, [burgerOpen]);
-
-    const handleBurgerToggle = () => {
+    const handleToggleBurgerMenu = () => {
         setBurgerOpen(!burgerOpen);
     };
 
@@ -114,7 +84,7 @@ const Header: FC = () => {
                             <div className={styles['header__burger-container']}>
                                 <button
                                     className={styles['header__burger-button']}
-                                    onClick={handleBurgerToggle}
+                                    onClick={handleToggleBurgerMenu}
                                     aria-label="Toggle menu"
                                     ref={burgerButtonRef}
                                 >
@@ -144,7 +114,7 @@ const Header: FC = () => {
                                         onClick={handleOpenUserModal}/>
                                 </div>
                                 {authStatus === 'loading' ? (
-                                    <div className={styles['header__auth-skeleton']} />
+                                    <div className={styles['header__auth-skeleton']}/>
                                 ) : authStatus === 'authenticated' ? (
                                     <div
                                         className={styles['header__logout']}

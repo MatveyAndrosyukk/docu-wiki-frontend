@@ -30,7 +30,7 @@ const FileList: React.FC<FileListProps> = React.memo(
 
         const flattenedNodes = useFlattenedTree(files);
 
-        const onFolderClick = useCallback(
+        const handleFolderClick = useCallback(
             (id: number) => {
                 dispatch(toggleFolder({id, tree: files}));
             },
@@ -54,7 +54,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                             key={node.file.id}
                             node={node}
                             emailParam={emailParam}
-                            onFolderClick={onFolderClick}
+                            onFolderClick={handleFolderClick}
                             contextMenuState={contextMenuState}
                             viewedUser={viewedUser}
                             loggedInUser={loggedInUser}

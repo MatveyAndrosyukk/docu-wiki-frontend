@@ -1,23 +1,28 @@
 import {RefObject, useEffect} from "react";
 
 export const useClickOutside = (
-    ref: RefObject<HTMLDivElement | null>,
+    ref: RefObject<HTMLElement | null>,
     handler: () => void,
-    enabled: boolean
+    enabled: boolean,
+    excludeRef?: RefObject<HTMLElement | null>
 ) => {
     useEffect(() => {
         if (!enabled) return;
 
         const listener = (event: MouseEvent) => {
-            if (!ref.current || ref.current.contains(event.target as Node)) {
-                return;
-            }
+            const target = event.target as Node;
+
+            if (!ref.current || ref.current.contains(target)) return;
+
+            if (excludeRef?.current && excludeRef.current.contains(target)) return;
 
             handler();
         };
 
-        document.addEventListener("dblclick", listener);
+        document.addEventListener("click", listener);
 
-        return () => document.removeEventListener("dblclick", listener);
-    }, [ref, handler, enabled]);
+        return () => {
+            document.removeEventListener("click", listener);
+        };
+    }, [ref, handler, enabled, excludeRef]);
 };
