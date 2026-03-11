@@ -158,7 +158,6 @@ const fileServerSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchFilesByEmail.fulfilled, (state, action) => {
-                console.log('FILES FETCHED')
                 state.files = action.payload;
                 state.loading = false;
             })

@@ -1,4 +1,4 @@
-import React, {Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Dispatch, FC, SetStateAction, useCallback, useMemo, useRef} from 'react';
 import styles from './FileTree.module.scss'
 import commonStyles from '../../../../styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
@@ -15,6 +15,9 @@ import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserO
 import FileTreeSkeleton from "../../../../ui-components/FileTreeSkeleton";
 import {useAuth} from "../../../../utils/hooks/useAuth";
 import {useAppContext} from "../../../../utils/hooks/useAppContext";
+import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
+import {useNotification} from "../../../../utils/hooks/useNotification";
+import {useClickOutside} from "../../../../utils/hooks/useClickOutside";
 
 interface FileTreeProps {
     emailParam: string | undefined;
@@ -22,206 +25,189 @@ interface FileTreeProps {
     setIsOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-const FileTree: FC<FileTreeProps> = React.memo((
-    {
-        emailParam,
-        isOpened,
-        setIsOpened,
-    }) => {
-    const dispatch = useDispatch<AppDispatch>();
-    const {authState, fileState, banState} = useAppContext();
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
-    const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);
-    const isViewedUserLoading = useSelector((state: RootState) => state.user.isViewedUserLoading);
-    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-    const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
-    const [notificationId, setNotificationId] = useState(0);
-    const notificationTimer = useRef<NodeJS.Timeout | null>(null);
-    const [isClosingNotification, setIsClosingNotification] = useState(false);
-    const fileTreeRef = useRef<HTMLDivElement>(null);
-    const {authStatus} = useAuth();
+const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpened}) => {
 
-    const {setIsBanModalOpened} = banState;
+        const dispatch = useDispatch<AppDispatch>();
 
-    const {
-        setIsLoginModalOpen,
-    } = authState;
+        const {authState, fileState, banState} = useAppContext();
+        const {authStatus} = useAuth();
 
-    const {handleOpenModalByReason} = fileState;
+        const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
+        const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
+        const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);
+        const isViewedUserLoading = useSelector((state: RootState) => state.user.isViewedUserLoading);
 
-    useEffect(() => {
-        if (window.innerWidth < 1270) {
-            const handleClickOutsideFileTree = (event: MouseEvent) => {
-                if (fileTreeRef.current && !fileTreeRef.current.contains(event.target as Node)) {
-                    setIsOpened(false);
-                }
-            };
+        const {setIsBanModalOpened} = banState;
+        const {setIsLoginModalOpen} = authState;
+        const {handleOpenModalByReason} = fileState;
 
-            if (isOpened) {
-                document.addEventListener('dblclick', handleClickOutsideFileTree);
+        const fileTreeRef = useRef<HTMLDivElement>(null);
+
+        const windowWidth = useWindowWidth();
+
+        const notification = useNotification();
+
+        useClickOutside(
+            fileTreeRef,
+            () => setIsOpened(false),
+            isOpened && windowWidth < 1270
+        );
+
+        const fileTreeStyles = useMemo(() => {
+            if (!isOpened) return styles['file-tree-closed'];
+
+            if (windowWidth < 1270) {
+                return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
             }
 
-            return () => {
-                document.removeEventListener('dblclick', handleClickOutsideFileTree);
-            };
-        }
-    }, [isOpened, setIsOpened]);
-
-    useEffect(() => {
-        const onResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-    }, []);
-
-    const fileTreeStyles = useMemo(() => {
-        if (isOpened && windowWidth > 1270) {
             return styles['file-tree'];
-        } else if (isOpened && windowWidth < 1270) {
-            return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
-        } else {
-            return styles['file-tree-closed'];
-        }
-    }, [isOpened, windowWidth]);
+        }, [isOpened, windowWidth]);
 
-    const closeNotification = () => {
-        if (notificationTimer.current) {
-            clearTimeout(notificationTimer.current);
-        }
+        const blockViewHandler = useCallback(async () => {
+            if (!viewedUser?.email) return;
 
-        setIsClosingNotification(true);
+            notification.show();
 
-        setTimeout(() => {
-            setShowBlockMessage(false);
-            setIsClosingNotification(false);
-        }, 350);
-    };
+            try {
+                await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
+            } catch (error) {
+                console.error(error);
+            }
 
-    const blockViewHandler = useCallback(async () => {
-        if (!viewedUser?.email) return;
+        }, [dispatch, viewedUser, notification]);
 
-        if (notificationTimer.current) {
-            clearTimeout(notificationTimer.current);
-        }
+        const handleCreateRootFolder = useCallback(() => {
 
-        setNotificationId(prev => prev + 1);
-        setShowBlockMessage(true);
+            if (authStatus === 'authenticated') {
+                handleOpenModalByReason({
+                    reason: ActionType.AddRootFolder,
+                    id: null,
+                    title: "Add root folder",
+                });
+            } else {
+                setIsLoginModalOpen(true);
+            }
 
-        notificationTimer.current = setTimeout(() => {
-            closeNotification();
-        }, 3000);
+        }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
 
-        try {
-            await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
-        } catch (error) {
-            console.error('Failed to toggle view block:', error);
-        }
-    }, [dispatch, viewedUser]);
+        const isBanned = !!viewedUser?.banned;
 
-    const handleCreateRootFolder = useCallback(() => {
-        if (authStatus === 'authenticated') {
-            handleOpenModalByReason({
-                reason: ActionType.AddRootFolder,
-                id: null,
-                title: "Add root folder",
-            });
-        } else {
-            setIsLoginModalOpen(true);
-        }
-    }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
+        return (
+            <div ref={fileTreeRef} className={fileTreeStyles}>
 
-    const isBanned = !!viewedUser?.banned;
+                {notification.visible && (
+                    <div
+                        key={notification.id}
+                        onClick={notification.close}
+                        className={`${commonStyles['common__notification']} ${
+                            notification.closing
+                                ? commonStyles['common__notification--closing']
+                                : ''
+                        }`}
+                    >
+                        You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view
+                    </div>
+                )}
 
-    return (
-        <div ref={fileTreeRef} className={fileTreeStyles}>
-            <div className={styles['file-tree__content']}>
-                {(isViewedUserLoading || areFilesLoading || authStatus === 'loading') ? (
-                    <FileTreeSkeleton/>
-                ) : (
-                    <>
-                        {isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser) && (
-                            <div className={styles['file-tree__header']}>
-                                <div className={styles['file-tree__top']}>
-                                    <div className={styles['file-tree__user']}>
-                                        {viewedUser?.email}
-                                    </div>
-                                    {isUserOwner(loggedInUser) && (
-                                        <div
-                                            className={styles['file-tree__ban']}
-                                            onClick={() => setIsBanModalOpened(true)}
-                                        >
-                                            <BanSvg/>
+                <div className={styles['file-tree__content']}>
+
+                    {(isViewedUserLoading || areFilesLoading || authStatus === 'loading')
+                        ? <FileTreeSkeleton/>
+                        : (
+                            <>
+                                {isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser) && (
+                                    <div className={styles['file-tree__header']}>
+                                        <div className={styles['file-tree__top']}>
+                                            <div className={styles['file-tree__user']}>
+                                                {viewedUser?.email}
+                                            </div>
+
+                                            {isUserOwner(loggedInUser) && (
+                                                <div
+                                                    className={styles['file-tree__ban']}
+                                                    onClick={() => setIsBanModalOpened(true)}
+                                                >
+                                                    <BanSvg/>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                                <div className={styles['file-tree__line']}></div>
-                            </div>
-                        )}
 
-                        {isBanned ? (
-                            <div className={styles['file-tree__view']}>
-                                This user has been banned
-                            </div>
-                        ) : (
-                            !isUserCanView(viewedUser, loggedInUser) && (
-                                <div className={styles['file-tree__view']}>
-                                    User blocked his files for view
-                                </div>
-                            )
-                        )}
-
-                        {showBlockMessage && (
-                            <div
-                                key={notificationId}
-                                onClick={closeNotification}
-                                className={`${commonStyles['common__notification']} ${
-                                    isClosingNotification ? commonStyles['common__notification--closing'] : ''
-                                }`}
-                            >
-                                You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
-                            </div>
-                        )}
-
-                        {!isBanned && isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser) && (
-                            <div className={styles['file-tree__buttons']}>
-                                <div
-                                    className={styles['file-tree__button-create']}
-                                    onClick={handleCreateRootFolder}
-                                >
-                                    Create a root folder
-                                </div>
-                                {authStatus === 'authenticated' && (
-                                    <div
-                                        className={styles['file-tree__button-block']}
-                                        title={viewedUser?.isViewBlocked
-                                            ? 'Unblock view for other users'
-                                            : 'Block view for other users'}
-                                        onClick={blockViewHandler}
-                                        style={{background: viewedUser?.isViewBlocked ? '#191A1A' : '#202222'}}
-                                    >
-                                        <LockSvg/>
+                                        <div className={styles['file-tree__line']}/>
                                     </div>
                                 )}
-                            </div>
-                        )}
-                        {viewedUser &&
-                            !isBanned &&
-                            isUserCanView(viewedUser, loggedInUser) && (
-                                <div className={styles['file-tree__files']}>
-                                    <FileList
-                                        windowWidth={windowWidth}
-                                        emailParam={emailParam}
-                                    />
-                                </div>
-                            )}
-                    </>
-                )}
+
+                                {isBanned
+                                    ? (
+                                        <div className={styles['file-tree__view']}>
+                                            This user has been banned
+                                        </div>
+                                    )
+                                    : (
+                                        !isUserCanView(viewedUser, loggedInUser) && (
+                                            <div className={styles['file-tree__view']}>
+                                                User blocked his files for view
+                                            </div>
+                                        )
+                                    )
+                                }
+
+                                {!isBanned && isUserCanEdit(
+                                    authStatus === 'authenticated',
+                                    emailParam,
+                                    viewedUser,
+                                    loggedInUser
+                                ) && (
+                                    <div className={styles['file-tree__buttons']}>
+
+                                        <div
+                                            className={styles['file-tree__button-create']}
+                                            onClick={handleCreateRootFolder}
+                                        >
+                                            Create a root folder
+                                        </div>
+
+                                        {authStatus === 'authenticated' && (
+                                            <div
+                                                className={styles['file-tree__button-block']}
+                                                title={viewedUser?.isViewBlocked
+                                                    ? 'Unblock view for other users'
+                                                    : 'Block view for other users'}
+                                                onClick={blockViewHandler}
+                                                style={{
+                                                    background: viewedUser?.isViewBlocked
+                                                        ? '#191A1A'
+                                                        : '#202222'
+                                                }}
+                                            >
+                                                <LockSvg/>
+                                            </div>
+                                        )}
+
+                                    </div>
+                                )}
+
+                                {viewedUser &&
+                                    !isBanned &&
+                                    isUserCanView(viewedUser, loggedInUser) && (
+                                        <div className={styles['file-tree__files']}>
+                                            <FileList
+                                                windowWidth={windowWidth}
+                                                emailParam={emailParam}
+                                            />
+                                        </div>
+                                    )
+                                }
+                            </>
+                        )
+                    }
+
+                </div>
             </div>
-        </div>
-    );
-}, (prev, next) => {
-    return prev.isOpened === next.isOpened &&
+        );
+
+    }, (prev, next) =>
+        prev.isOpened === next.isOpened &&
         prev.emailParam === next.emailParam
-});
+);
 
 export default FileTree;
