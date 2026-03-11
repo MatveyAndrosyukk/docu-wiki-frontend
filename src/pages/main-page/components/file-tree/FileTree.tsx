@@ -38,6 +38,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
     const [showBlockMessage, setShowBlockMessage] = useState<boolean>(false);
     const [notificationId, setNotificationId] = useState(0);
     const notificationTimer = useRef<NodeJS.Timeout | null>(null);
+    const [isClosingNotification, setIsClosingNotification] = useState(false);
     const fileTreeRef = useRef<HTMLDivElement>(null);
     const {authStatus} = useAuth();
 
@@ -83,6 +84,19 @@ const FileTree: FC<FileTreeProps> = React.memo((
         }
     }, [isOpened, windowWidth]);
 
+    const closeNotification = () => {
+        if (notificationTimer.current) {
+            clearTimeout(notificationTimer.current);
+        }
+
+        setIsClosingNotification(true);
+
+        setTimeout(() => {
+            setShowBlockMessage(false);
+            setIsClosingNotification(false);
+        }, 350);
+    };
+
     const blockViewHandler = useCallback(async () => {
         if (!viewedUser?.email) return;
 
@@ -94,7 +108,7 @@ const FileTree: FC<FileTreeProps> = React.memo((
         setShowBlockMessage(true);
 
         notificationTimer.current = setTimeout(() => {
-            setShowBlockMessage(false);
+            closeNotification();
         }, 3000);
 
         try {
@@ -159,7 +173,11 @@ const FileTree: FC<FileTreeProps> = React.memo((
                         {showBlockMessage && (
                             <div
                                 key={notificationId}
-                                className={commonStyles['common__notification']}>
+                                onClick={closeNotification}
+                                className={`${commonStyles['common__notification']} ${
+                                    isClosingNotification ? commonStyles['common__notification--closing'] : ''
+                                }`}
+                            >
                                 You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view of other people
                             </div>
                         )}
