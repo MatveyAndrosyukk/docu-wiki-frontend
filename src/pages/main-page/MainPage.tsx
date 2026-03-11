@@ -1,16 +1,12 @@
-import React, {FC, useContext, useEffect, useRef, useState} from 'react';
+import React, {FC, useMemo} from 'react';
 import Header from "./components/header/Header";
 import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../store";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 import EditModal from "../../ui-components/edit-modal/EditModal";
 import DeleteModal from "../../ui-components/delete-modal/DeleteModal";
-import {fetchFilesByEmail} from "../../store/thunks/files/fetchFilesByEmail";
-import {fetchViewedUserByEmail} from "../../store/thunks/user/fetchViewedUserByEmail";
-import {clearLoggedInUser, clearViewedUser, User} from "../../store/slices/userSlice";
-import {AppContext} from "../../context/AppContext";
 import LoginModal from "../../ui-components/login-modal/LoginModal";
 import EnterEmailModal from "../../ui-components/enter-email-modal/EnterEmailModal";
 import ResetPasswordModal from "../../ui-components/reset-password-modal/ResetPasswordModal";
@@ -19,9 +15,12 @@ import BanModal from "../../ui-components/ban-modal/BanModal";
 import findPathToFile from "../../utils/functions/findFilePath";
 import {selectOpenedFile} from "../../store/selectors/selectOpenedFile";
 import {selectFileTree} from "../../store/selectors/selectFileTree";
-import {clearServerFiles} from "../../store/slices/fileServerSlice";
-import {clearUiState} from "../../store/slices/fileUiSlice";
 import {useAppContext} from "../../utils/hooks/useAppContext";
+import {useResponsiveFileTree} from "../../utils/hooks/useResponsiveFileTree";
+import {useResetPasswordModal} from "../../utils/hooks/useResetPasswordModal";
+import {useDocumentTitle} from "../../utils/hooks/useDocumentTitle";
+import {useViewedUserLoader} from "../../utils/hooks/useViewedUserLoader";
+import {useFetchFilesForViewedUser} from "../../utils/hooks/useFetchFilesForViewedUser";
 
 interface MainPageProps {
     emailParam?: string | undefined;
@@ -29,134 +28,60 @@ interface MainPageProps {
 }
 
 const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
-    const dispatch = useDispatch<AppDispatch>();
     const {authState} = useAppContext();
+
     const files = useSelector(selectFileTree);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const openedFile = useSelector(selectOpenedFile);
+
+    const {setIsResetPasswordModalOpened} = authState
+
     const currentUserEmail = emailParam || (loggedInUser ? loggedInUser.email : null);
-    const prevViewedUserRef = useRef<User | null>(null);
-    const prevLoggedInUserRef = useRef<User | null>(loggedInUser);
 
-    const [isFileTreeOpened, setIsFileTreeOpened] = useState<boolean>(false);
+    const title = useMemo(() => {
 
-    const {
-        setIsResetPasswordModalOpened,
-    } = authState
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1270) {
-                setIsFileTreeOpened(false);
-            } else {
-                setIsFileTreeOpened(true);
-            }
-        }
-
-        window.addEventListener('resize', handleResize)
-        handleResize();
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    useEffect(() => {
-        if (resetToken) {
-            setIsResetPasswordModalOpened(true);
-        }
-    }, [resetToken, setIsResetPasswordModalOpened]);
-
-    useEffect(() => {
-        if (currentUserEmail && currentUserEmail.trim() !== '') {
-            dispatch(fetchViewedUserByEmail(currentUserEmail));
-        } else {
-            dispatch(clearServerFiles());
-            dispatch(clearUiState())
-            dispatch(clearViewedUser());
-            dispatch(clearLoggedInUser());
-        }
-    }, [currentUserEmail, dispatch]);
-
-    useEffect(() => {
-        if (viewedUser) {
-            const prevViewedUser = prevViewedUserRef.current;
-            const prevLoggedInUser = prevLoggedInUserRef.current;
-
-            const isOnlyCounterOrViewBlockedChanged = prevViewedUser &&
-                prevViewedUser.email === viewedUser.email &&
-                JSON.stringify({
-                    ...prevViewedUser,
-                    isViewBlocked: undefined,
-                    amountOfFiles: undefined
-                }) === JSON.stringify({
-                    ...viewedUser,
-                    isViewBlocked: undefined,
-                    amountOfFiles: undefined
-                }) &&
-                (
-                    prevViewedUser.isViewBlocked !== viewedUser.isViewBlocked ||
-                    prevViewedUser.amountOfFiles !== viewedUser.amountOfFiles
-                );
-
-            if (!isOnlyCounterOrViewBlockedChanged) {
-                const isUserEditor = viewedUser.whoCanEdit.some(u => u.email === loggedInUser?.email);
-                const isUserEqualsLoggedIn = viewedUser.email === loggedInUser?.email;
-
-                const justLoggedOutFromOwnPage =
-                    !loggedInUser &&
-                    prevLoggedInUser &&
-                    prevLoggedInUser.email === viewedUser.email;
-
-                if (justLoggedOutFromOwnPage) {
-                    dispatch(clearServerFiles());
-                    dispatch(clearUiState());
-                } else if (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn)) {
-                    dispatch(clearServerFiles());
-                    dispatch(clearUiState());
-                } else {
-                    dispatch(fetchFilesByEmail({
-                        viewedUserEmail: viewedUser.email,
-                        loggedInUserEmail: loggedInUser?.email
-                    }));
-                }
-            }
-
-            prevViewedUserRef.current = viewedUser;
-            prevLoggedInUserRef.current = loggedInUser || null;
-        }
-    }, [viewedUser, dispatch, loggedInUser]);
-
-    useEffect(() => {
         if (openedFile) {
-            document.title = findPathToFile(files, openedFile.id)?.join('/') as string
-        } else {
-            if (loggedInUser){
-                document.title = "Docuwiki Workspace"
-            } else {
-                document.title = "Docuwiki Studio"
-            }
+            return findPathToFile(files, openedFile.id)?.join('/');
         }
-    }, [files, loggedInUser, openedFile]);
+
+        if (loggedInUser) {
+            return "Docuwiki Workspace";
+        }
+
+        return "Docuwiki Studio";
+
+    }, [openedFile, files, loggedInUser]);
+
+    const {isOpened, setIsOpened} = useResponsiveFileTree();
+
+    useResetPasswordModal(resetToken, setIsResetPasswordModalOpened);
+
+    useDocumentTitle(title || "Docuwiki Studio");
+
+    useViewedUserLoader(currentUserEmail);
+
+    useFetchFilesForViewedUser(viewedUser, loggedInUser);
 
     return (
         <div className={styles['main']}>
             <Header/>
             <div className={styles['container']}>
                 <FileTree
-                    isOpened={isFileTreeOpened}
-                    setIsOpened={setIsFileTreeOpened}
+                    isOpened={isOpened}
+                    setIsOpened={setIsOpened}
                     emailParam={emailParam}
                 />
                 <OpenedFile
-                    isFileTreeOpened={isFileTreeOpened}
-                    setIsFileTreeOpened={setIsFileTreeOpened}
+                    isFileTreeOpened={isOpened}
+                    setIsFileTreeOpened={setIsOpened}
                     emailParam={emailParam}
                     file={openedFile}/>
             </div>
-            {(isFileTreeOpened && window.innerWidth < 1270) && (
+            {(isOpened && window.innerWidth < 1270) && (
                 <div
                     className={styles['overlay']}
-                    onClick={() => setIsFileTreeOpened(false)}
+                    onClick={() => setIsOpened(false)}
                 />
             )}
             <EditModal/>
