@@ -14,8 +14,8 @@ import {useAuth} from "../../../../utils/hooks/useAuth";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useAppContext} from "../../../../utils/hooks/useAppContext";
-import {useClickOutside} from "../../../../utils/hooks/useClickOutside";
 import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
+import {useElementOutsideEvent} from "../../../../utils/hooks/useElementOutsideEvent";
 
 const Header: FC = () => {
     const [burgerOpen, setBurgerOpen] = useState(false);
@@ -39,8 +39,9 @@ const Header: FC = () => {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
 
-    useClickOutside(
+    useElementOutsideEvent(
         menuRef,
+        'click',
         () => setBurgerOpen(false),
         burgerOpen,
         burgerButtonRef

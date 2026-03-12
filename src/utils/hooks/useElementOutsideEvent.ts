@@ -1,9 +1,12 @@
 import {RefObject, useEffect} from "react";
 
-export const useClickOutside = (
+type EventType = "click" | "dblclick" | "mousedown" | "mouseup";
+
+export const useElementOutsideEvent = (
     ref: RefObject<HTMLElement | null>,
+    eventType: EventType,
     handler: () => void,
-    enabled: boolean,
+    enabled: boolean = true,
     excludeRef?: RefObject<HTMLElement | null>
 ) => {
     useEffect(() => {
@@ -13,16 +16,15 @@ export const useClickOutside = (
             const target = event.target as Node;
 
             if (!ref.current || ref.current.contains(target)) return;
-
             if (excludeRef?.current && excludeRef.current.contains(target)) return;
 
             handler();
         };
 
-        document.addEventListener("click", listener);
+        document.addEventListener(eventType, listener);
 
         return () => {
-            document.removeEventListener("click", listener);
+            document.removeEventListener(eventType, listener);
         };
-    }, [ref, handler, enabled, excludeRef]);
+    }, [ref, eventType, handler, enabled, excludeRef]);
 };
