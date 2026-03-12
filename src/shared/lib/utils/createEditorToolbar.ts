@@ -1,13 +1,13 @@
-import {ReactComponent as BoldImage} from "../images/edit-file-view__bold.svg";
-import {ReactComponent as ItalicImage} from "../images/edit-file-view__italic.svg";
-import {ReactComponent as UnderlinedImage} from "../images/edit-file-view__underlined.svg";
-import {ReactComponent as TerminalImage} from "../images/edit-file-view__terminal.svg";
-import {ReactComponent as CodeImage} from "../images/edit-file-view__code.svg";
-import {ReactComponent as CodeLineImage} from "../images/edit-file-view__codeLine.svg";
-import {ReactComponent as PointImage} from "../images/edit-file-view__point.svg";
-import {ReactComponent as LineImage} from "../images/edit-file-view__line.svg";
-import {ReactComponent as LinkImage} from "../images/edit-file-view__link.svg";
-import {ReactComponent as ImgImage} from "../images/edit-file-view__image.svg";
+import {ReactComponent as BoldImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__bold.svg";
+import {ReactComponent as ItalicImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__italic.svg";
+import {ReactComponent as UnderlinedImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__underlined.svg";
+import {ReactComponent as TerminalImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__terminal.svg";
+import {ReactComponent as CodeImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__code.svg";
+import {ReactComponent as CodeLineImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__codeLine.svg";
+import {ReactComponent as PointImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__point.svg";
+import {ReactComponent as LineImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__line.svg";
+import {ReactComponent as LinkImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__link.svg";
+import {ReactComponent as ImgImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__image.svg";
 
 export const createEditorToolbar = (
     wrapSelection: (start: string, end: string) => void,

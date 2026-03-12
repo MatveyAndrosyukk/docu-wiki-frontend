@@ -1,7 +1,7 @@
 import styles from '../../../pages/main-page/components/opened-file/OpenedFile.module.scss'
 import React, {ReactNode} from "react";
-import CodeBlock from "../../../pages/main-page/components/opened-file/components/code-block/CodeBlock";
-import TerminalBlock from "../../../pages/main-page/components/opened-file/components/terminal-block/TerminalBlock";
+import CodeBlock from "../../ui/code-block/CodeBlock";
+import TerminalBlock from "../../ui/terminal-block/TerminalBlock";
 
 function parseInline(
     text: string,

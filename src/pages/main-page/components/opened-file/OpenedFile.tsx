@@ -1,11 +1,11 @@
 import React, {Dispatch, SetStateAction, useCallback, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
-import emptyStyles from './components/empty-file/EmplyFile.module.scss'
+import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
 import {parseFileTextToHTML} from '../../../../shared/lib/utils/parseFile'
-import EditMode from './components/edit-file-view/EditMode'
+import EditMode from './components/edit-mode/EditMode'
 import {useNavigate} from "react-router-dom";
-import EmptyFile from "./components/empty-file/EmptyFile";
+import EmptyFile from "../../../../shared/ui/empty-file/EmptyFile";
 import OpenedFileHeader from "./components/opened-file-header/OpenedFileHeader";
 import {useSelector} from "react-redux";
 import {UiFile} from "../../../../store/types/UiFile";

@@ -11,7 +11,7 @@ import {useEditorTextarea} from "../../../../../../shared/lib/hooks/useEditorTex
 import {useEditorPreview} from "../../../../../../shared/lib/hooks/useEditorPreview";
 import {useEditorValidation} from "../../../../../../shared/lib/hooks/useEditorValidation";
 import {useEditorImages} from "../../../../../../shared/lib/hooks/useEditorImages";
-import {createEditorToolbar} from "./utils/editorToolbarConfig";
+import {createEditorToolbar} from "../../../../../../shared/lib/utils/createEditorToolbar";
 import EditorToolbar from "../../../../../../shared/ui/editor-toolbar/EditorToolbar";
 
 interface EditFileViewProps {

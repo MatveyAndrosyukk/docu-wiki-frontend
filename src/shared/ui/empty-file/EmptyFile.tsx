@@ -1,7 +1,7 @@
 import React, {Dispatch, SetStateAction} from 'react';
-import styles from "../../OpenedFile.module.scss";
+import styles from "../../../pages/main-page/components/opened-file/OpenedFile.module.scss";
 import emptyStyles from "./EmplyFile.module.scss";
-import {ReactComponent as BurgerSvg} from '../../images/empty-file-burger.svg'
+import {ReactComponent as BurgerSvg} from '../../../pages/main-page/components/opened-file/images/empty-file-burger.svg'
 
 interface EmptyFileProps {
     isFileTreeOpened: boolean;
