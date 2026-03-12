@@ -1,9 +1,10 @@
-import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import React, {FC, useCallback, useMemo, useState} from 'react';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {darcula} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './CodeBlock.module.scss';
 import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
 import {getLanguage} from "../../../../../../utils/functions/getLanguage";
+import {useDebounce} from "../../../../../../utils/hooks/useDebounce";
 
 interface CodeBlockProps {
     code: string;
@@ -16,18 +17,14 @@ const CodeBlock: FC<CodeBlockProps> = (
         isFileTreeOpened
     }) => {
     const [isCodeExpanded, setIsCodeExpanded] = useState(false);
-    const [debouncedCode, setDebouncedCode] = useState(code);
 
-    useEffect(() => {
-        const timeout = setTimeout(() => setDebouncedCode(code), 300);
-        return () => clearTimeout(timeout);
-    }, [code]);
+    const debouncedCode = useDebounce(code, 300);
+
+    const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
 
     const maxHeight = isCodeExpanded
         ? 'none'
         : (isFileTreeOpened ? '21em' : '22em');
-
-    const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
 
     const handleExpandCode = useCallback(() => {
         setIsCodeExpanded(prev => !prev);

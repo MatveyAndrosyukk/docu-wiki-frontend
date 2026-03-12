@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import styles from './EditMode.module.scss';
 import {ReactComponent as BoldImage} from './images/edit-file-view__bold.svg'
 import {ReactComponent as ItalicImage} from './images/edit-file-view__italic.svg'
@@ -12,7 +12,6 @@ import {ReactComponent as LinkImage} from './images/edit-file-view__link.svg'
 import {ReactComponent as ImgImage} from './images/edit-file-view__image.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
 import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
-import {AppContext} from "../../../../../../context/AppContext";
 import extractImagesName from "../../../../../../utils/functions/extractImageNames";
 import {isUserAdminOrOwner} from "../../../../../../utils/functions/permissions-utils/isUserAdminOrOwner";
 import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue";

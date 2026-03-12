@@ -1,14 +1,15 @@
-import React, {Dispatch, SetStateAction, useEffect, useMemo} from 'react';
-import styles from "../OpenedFile.module.scss";
-import {isUserCanEdit} from "../../../../../utils/functions/permissions-utils/isUserCanEdit";
-import {ReactComponent as HeartBtn} from '../images/opened-file-heart.svg'
-import {ReactComponent as LikedHeartBtn} from '../images/opened-file-red-heart.svg'
-import {ReactComponent as EditFileSvg} from '../images/opened-file-edit.svg'
-import {ReactComponent as DeleteFileSvg} from '../images/opened-file-delete.svg'
-import {ReactComponent as OpenButtonsSvg} from '../images/opened-file-open.svg'
-import {User} from "../../../../../store/slices/userSlice";
-import findPathToFile from "../../../../../utils/functions/findFilePath";
-import {UiFile} from "../../../../../store/types/UiFile";
+import React, {Dispatch, SetStateAction, useMemo} from 'react';
+import styles from "../../OpenedFile.module.scss";
+import {isUserCanEdit} from "../../../../../../utils/functions/permissions-utils/isUserCanEdit";
+import {ReactComponent as HeartBtn} from '../../images/opened-file-heart.svg'
+import {ReactComponent as LikedHeartBtn} from '../../images/opened-file-red-heart.svg'
+import {ReactComponent as EditFileSvg} from '../../images/opened-file-edit.svg'
+import {ReactComponent as DeleteFileSvg} from '../../images/opened-file-delete.svg'
+import {ReactComponent as OpenButtonsSvg} from '../../images/opened-file-open.svg'
+import {User} from "../../../../../../store/slices/userSlice";
+import findPathToFile from "../../../../../../utils/functions/findFilePath";
+import {UiFile} from "../../../../../../store/types/UiFile";
+import {useWindowWidth} from "../../../../../../utils/hooks/useWindowWidth";
 
 interface OpenedFileHeaderProps {
     file: UiFile;
@@ -49,27 +50,11 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
         onOpenDeleteModal,
     }
 ) => {
-    const [isMobile, setIsMobile] = React.useState(false)
+    const width = useWindowWidth();
 
-    useEffect(() => {
-        if (window.innerWidth <= 435) {
-            setIsMobile(true)
-        }
+    const isMobile = width < 435;
 
-        const handleResize = () => {
-            if (window.innerWidth <= 435) {
-                setIsMobile(true)
-            } else {
-                setIsMobile(false)
-            }
-        }
-
-        window.addEventListener('resize', handleResize)
-
-        return () => window.removeEventListener('resize', handleResize)
-    }, []);
-
-    const likesClass = useMemo(() => {
+    const likesStyle = useMemo(() => {
         const likesCount = file?.likes?.toString().length || 1;
         return likesCount === 1 ? 'one-digit' :
             likesCount === 2 ? 'two-digit' :
@@ -83,7 +68,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
             <div className={styles['header__left-side']}>
                 <div className={styles['header__likes']}>
                     <div
-                        className={`${styles['header__likes-amount']} ${styles[likesClass]}`}>{likes}</div>
+                        className={`${styles['header__likes-amount']} ${styles[likesStyle]}`}>{likes}</div>
                     {
                         isLiked ?
                             <LikedHeartBtn onClick={() => onTryToLikeFile()}/> :

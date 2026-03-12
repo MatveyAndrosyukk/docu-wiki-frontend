@@ -1,13 +1,12 @@
-import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from './components/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
 import {parseFileTextToHTML} from '../../../../utils/functions/parseFile'
 import EditMode from './components/edit-file-view/EditMode'
-import {AppContext} from '../../../../context/AppContext'
 import {useNavigate} from "react-router-dom";
 import EmptyFile from "./components/empty-file/EmptyFile";
-import OpenedFileHeader from "./opened-file-header/OpenedFileHeader";
+import OpenedFileHeader from "./components/opened-file-header/OpenedFileHeader";
 import {useSelector} from "react-redux";
 import {UiFile} from "../../../../store/types/UiFile";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
@@ -31,23 +30,22 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsFileTreeOpened
     }) => {
     const navigate = useNavigate()
-    const {viewedUser, fileState, loggedInUser} = useAppContext();
+
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
-    const files = useSelector(selectFileTree)
+
+    const {viewedUser, fileState, loggedInUser} = useAppContext();
+    const {authStatus} = useAuth();
     const {isLiked, likes, toggleLike} = useFileLikes({fileId: file?.id as number});
+
+    const files = useSelector(selectFileTree)
     const pendingImages = useSelector(
         (state: RootState) => state.fileUi.pendingImages
     );
-    const {authStatus} = useAuth();
 
-    const {
-        isEditing,
-        setIsEditing,
-        handleOpenDeleteModal
-    } = fileState
+    const {isEditing, setIsEditing, handleOpenDeleteModal} = fileState
 
-    const handleImageClick = useCallback((imageUrl: string) => {
+    const handleOpenImage = useCallback((imageUrl: string) => {
         setOpenedImage(imageUrl)
     }, []);
 
@@ -61,8 +59,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const contentElements = useMemo(() => {
         if (!file?.content) return [];
-        return parseFileTextToHTML(file.content, handleImageClick, isFileTreeOpened, pendingImages);
-    }, [file?.content, handleImageClick, isFileTreeOpened, pendingImages]);
+        return parseFileTextToHTML(file.content, handleOpenImage, isFileTreeOpened, pendingImages);
+    }, [file?.content, handleOpenImage, isFileTreeOpened, pendingImages]);
 
     const handleGoToUsersPage = useCallback((user: string | null) => {
         return navigate(`/${encodeURIComponent(user as string)}`)
@@ -120,7 +118,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 <EditMode
                     file={file}
                     parseFileTextToHTML={parseFileTextToHTMLMemo}
-                    onImageClick={handleImageClick}
+                    onImageClick={handleOpenImage}
                     isFileTreeOpened={isFileTreeOpened}
                 />
             ) : (
