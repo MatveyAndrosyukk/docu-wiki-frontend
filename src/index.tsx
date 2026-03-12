@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client';
 import App from './App'
 import {Provider} from "react-redux";
 import {store} from './store';
-import {AppProvider} from "./context/AppContext";
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import './shared/assets/styles/Fonts.module.scss'
 import {AuthProvider} from "./context/AuthProvider";
+import {AppProvider} from "./context/AppProvider";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement

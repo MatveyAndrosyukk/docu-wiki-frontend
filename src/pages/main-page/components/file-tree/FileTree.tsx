@@ -1,6 +1,6 @@
 import React, {Dispatch, FC, SetStateAction, useCallback, useMemo, useRef} from 'react';
 import styles from './FileTree.module.scss'
-import commonStyles from '../../../../assets/styles/Common.module.scss'
+import commonStyles from '../../../../shared/assets/styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
 import {ReactComponent as BanSvg} from './images/fileTree-ban.svg'
 import FileList from "./components/file-list/FileList";
