@@ -1,25 +1,18 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import styles from './EditMode.module.scss';
-import {ReactComponent as BoldImage} from './images/edit-file-view__bold.svg'
-import {ReactComponent as ItalicImage} from './images/edit-file-view__italic.svg'
-import {ReactComponent as UnderlinedImage} from './images/edit-file-view__underlined.svg'
-import {ReactComponent as TerminalImage} from './images/edit-file-view__terminal.svg'
-import {ReactComponent as CodeImage} from './images/edit-file-view__code.svg'
-import {ReactComponent as CodeLineImage} from './images/edit-file-view__codeLine.svg'
-import {ReactComponent as PointImage} from './images/edit-file-view__point.svg'
-import {ReactComponent as LineImage} from './images/edit-file-view__line.svg'
-import {ReactComponent as LinkImage} from './images/edit-file-view__link.svg'
-import {ReactComponent as ImgImage} from './images/edit-file-view__image.svg'
 import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
-import {uploadImageAsync} from "../../../../../../services/uploadImageAsync";
 import extractImagesName from "../../../../../../utils/functions/extractImageNames";
-import {isUserAdminOrOwner} from "../../../../../../utils/functions/permissions-utils/isUserAdminOrOwner";
 import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue";
 import {UiFile} from "../../../../../../store/types/UiFile";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../../../../../store";
-import {addPendingImage, markImageError, removePendingImage} from "../../../../../../store/slices/fileUiSlice";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../../../../store";
 import {useAppContext} from "../../../../../../utils/hooks/useAppContext";
+import {useEditorTextarea} from "../../../../../../utils/hooks/useEditorTextarea";
+import {useEditorPreview} from "../../../../../../utils/hooks/useEditorPreview";
+import {useEditorValidation} from "../../../../../../utils/hooks/useEditorValidation";
+import {useEditorImages} from "../../../../../../utils/hooks/useEditorImages";
+import {createEditorToolbar} from "./utils/editorToolbarConfig";
+import EditorToolbar from "../../../../../../ui-components/editor-toolbar/EditorToolbar";
 
 interface EditFileViewProps {
     file: UiFile;
@@ -40,21 +33,9 @@ const EditMode: React.FC<EditFileViewProps> = (
     }
 ) => {
     const {fileState, loggedInUser} = useAppContext();
-    const dispatch = useDispatch<AppDispatch>();
-    const [textareaContent, setTextareaContent] = useState(file.content ?? '');
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [addedImagesWhileEditing, setAddedImagesWhileEditing] = useState<string[]>([]);
-    const [amountOfImagesInTextArea, setAmountOfImagesInTextArea] = useState<string[]>([]);
-    const [previewContent, setPreviewContent] = useState<React.ReactNode>([]);
-    const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
     const isSaving = useSelector(
         (state: RootState) => state.fileUi.isSaving
     );
-
-    useEffect(() => {
-        setPreviewContent(parseFileTextToHTML(debouncedTextareaContent, onImageClick, isFileTreeOpened));
-    }, [debouncedTextareaContent, onImageClick, parseFileTextToHTML, isFileTreeOpened]);
 
     const {
         contentError,
@@ -64,39 +45,35 @@ const EditMode: React.FC<EditFileViewProps> = (
         handleCancelEditedFileChanges,
     } = fileState
 
-    useEffect(() => {
-        setAddedImagesWhileEditing(extractImagesName(file.content ?? ''));
-    }, [file.content]);
 
-    useEffect(() => {
-        const images = extractImagesName(debouncedTextareaContent);
-        setAmountOfImagesInTextArea(images);
-    }, [debouncedTextareaContent]);
+    const {
+        textareaRef, textareaContent, setTextareaContent,
+        pasteTag, wrapSelection, handleChangeTextareaContent
+    } = useEditorTextarea(
+        file.content ?? '',
+        setIsFileContentChanged
+    );
 
-    useEffect(() => {
-        setTextareaContent(file.content ?? '');
-        setIsFileContentChanged(false);
-    }, [file.content, setIsFileContentChanged]);
+    const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
 
-    useEffect(() => {
-        textareaRef.current?.focus();
-    }, []);
+    const amountOfImagesInTextArea = useMemo(
+        () => extractImagesName(debouncedTextareaContent),
+        [debouncedTextareaContent]
+    );
 
-    useEffect(() => {
-        const currentLength = textareaContent.length;
-        const imagesLength = amountOfImagesInTextArea.length;
+    const previewContent = useEditorPreview(
+        debouncedTextareaContent,
+        parseFileTextToHTML,
+        onImageClick,
+        isFileTreeOpened
+    );
 
-        if (currentLength > 65000 && !isUserAdminOrOwner(loggedInUser)) {
-            setContentError(`Your note is too long (${currentLength}/65000).`);
-            return;
-        }
-
-        if (imagesLength > 5 && !isUserAdminOrOwner(loggedInUser)) {
-            setContentError(`You have inserted too many pictures (${imagesLength}/5).`);
-        } else {
-            setContentError('');
-        }
-    }, [textareaContent.length, amountOfImagesInTextArea.length, loggedInUser, setContentError]);
+    useEditorValidation(
+        textareaContent,
+        amountOfImagesInTextArea,
+        loggedInUser,
+        setContentError
+    );
 
     const replaceImageTag = useCallback(
         (tempName: string, realName: string) => {
@@ -107,7 +84,27 @@ const EditMode: React.FC<EditFileViewProps> = (
                 )
             );
         },
-        []
+        [setTextareaContent]
+    );
+
+    const {
+        fileInputRef,
+        addedImagesWhileEditing,
+        setAddedImagesWhileEditing,
+        handleOpenFileDialog,
+        changeFileHandler
+    } = useEditorImages({
+        fileId: file.id,
+        pasteTag,
+        replaceImageTag,
+        contentError,
+        initialContent: file.content ?? '',
+    });
+
+    const toolbar = createEditorToolbar(
+        wrapSelection,
+        pasteTag,
+        handleOpenFileDialog
     );
 
     const handleSaveEdition = useCallback((
@@ -127,7 +124,7 @@ const EditMode: React.FC<EditFileViewProps> = (
                 console.error('Save failed:', error);
             }
         }
-        , [file, handleSaveEditedFileChanges, loggedInUser?.email]);
+        , [file, handleSaveEditedFileChanges, loggedInUser?.email, setAddedImagesWhileEditing]);
 
     const handleCancelEdition = useCallback(async (
         addedImages: string[],
@@ -139,187 +136,13 @@ const EditMode: React.FC<EditFileViewProps> = (
         } catch (error) {
             console.error('Cancel failed:', error);
         }
-    }, [handleCancelEditedFileChanges])
-
-    const pasteTag = useCallback((tag: string) => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
-
-        const {selectionStart, selectionEnd, value} = textarea;
-        if (selectionStart === null || selectionEnd === null) return;
-
-        const prevScrollTop = textarea.scrollTop;
-
-        const before = value.substring(0, selectionStart);
-        const after = value.substring(selectionEnd);
-
-        const newText = before + tag + after;
-        setTextareaContent(newText);
-        setIsFileContentChanged(true);
-
-        const cursorStart = selectionStart;
-        const cursorEnd = cursorStart + tag.length;
-
-        setTimeout(() => {
-            if (textarea) {
-                textarea.focus();
-                textarea.setSelectionRange(cursorStart, cursorEnd);
-                textarea.scrollTop = prevScrollTop;
-            }
-        }, 0);
-    }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
-
-    const handleSelectImage = useCallback(async (image: File) => {
-        if (contentError.includes("You have inserted too many pictures")) return;
-
-        const tempName = `temp-${Date.now()}`;
-
-        dispatch(addPendingImage({
-            fileId: file.id,
-            imageName: tempName,
-        }));
-
-        pasteTag(`[image/${tempName}]`);
-
-        try {
-            // 3️⃣ загрузка
-            const data = await uploadImageAsync(image);
-
-            replaceImageTag(tempName, data.fileName);
-
-            dispatch(removePendingImage(tempName));
-
-        } catch (error) {
-            dispatch(markImageError(tempName));
-        }
-    }, [
-        contentError,
-        dispatch,
-        file.id,
-        pasteTag,
-        replaceImageTag
-    ]);
-
-    const handleOpenFileDialog = useCallback(() => {
-        fileInputRef.current?.click();
-    }, [fileInputRef]);
-
-    const changeFileHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0) {
-            const file = files[0];
-            handleSelectImage(file).then(() => {
-                e.target.value = "";
-            });
-        }
-    }, [handleSelectImage]);
-
-    const handleChangeTextareaContent = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTextareaContent(e.target.value);
-        setIsFileContentChanged(e.target.value !== file.content);
-    }, [file.content, setIsFileContentChanged]);
-
-    const wrapSelection = useCallback((tagStart: string, tagEnd: string) => {
-        const textarea = textareaRef.current;
-        if (!textarea) return;
-
-        const {selectionStart, selectionEnd, value} = textarea;
-        if (selectionStart === null || selectionEnd === null) return;
-
-        const prevScrollTop = textarea.scrollTop;
-
-        const before = value.substring(0, selectionStart);
-        const selected = value.substring(selectionStart, selectionEnd);
-        const after = value.substring(selectionEnd);
-
-        const newText = before + tagStart + selected + tagEnd + after;
-        setTextareaContent(newText);
-        setIsFileContentChanged(true);
-
-        const cursorStart = selectionStart + tagStart.length;
-        const cursorEnd = cursorStart + selected.length;
-
-        setTimeout(() => {
-            if (textarea) {
-                textarea.focus();
-                textarea.setSelectionRange(cursorStart, cursorEnd);
-                textarea.scrollTop = prevScrollTop;
-            }
-        }, 0);
-    }, [setTextareaContent, setIsFileContentChanged, textareaRef]);
+    }, [handleCancelEditedFileChanges, setAddedImagesWhileEditing])
 
     return (
         <div className={styles['edit-mode']}>
             <div className={styles['edit-mode__header']}>
                 <div className={styles['header__edit-buttons']}>
-                    <div
-                        title='Bold'
-                        onClick={() => {
-                            wrapSelection('[`b`]', '[`/b`]')
-                        }}>
-                        <BoldImage style={{width: '10.45px', height: '12.57px'}}/>
-                    </div>
-                    <div
-                        title='Italic'
-                        onClick={() => {
-                            wrapSelection('[`i`]', '[`/i`]')
-                        }}>
-                        <ItalicImage style={{width: '9px', height: '10.83px'}}/>
-                    </div>
-                    <div
-                        title='Underlined'
-                        onClick={() => {
-                            wrapSelection('[`u`]', '[`/u`]')
-                        }}>
-                        <UnderlinedImage style={{width: '10.45px', height: '12.57px'}}/>
-                    </div>
-                    <div
-                        title='Point'
-                        onClick={() => {
-                            wrapSelection('[`p`]\n', '\n[`/p`]')
-                        }}>
-                        <PointImage style={{width: '4px', height: '4px'}}/>
-                    </div>
-                    <div
-                        title='Link'
-                        onClick={() => {
-                            wrapSelection('[`l to="https://example.com"`]', '[`/l`]')
-                        }}>
-                        <LinkImage style={{width: '14px', height: '14px'}}/>
-                    </div>
-                    <div
-                        title='Code'
-                        onClick={() => {
-                            wrapSelection('[`c`]\n', '\n[`/c`]')
-                        }}>
-                        <CodeImage style={{width: '16.32px', height: '14.57px'}}/>
-                    </div>
-                    <div
-                        title='Code line'
-                        onClick={() => {
-                            wrapSelection('[`lc`]', '[`/lc`]')
-                        }}>
-                        <CodeLineImage style={{width: '16px', height: '16px'}}/>
-                    </div>
-                    <div
-                        title='Terminal'
-                        onClick={() => {
-                            wrapSelection('[`t`]\n', '\n[`/t`]')
-                        }}>
-                        <TerminalImage style={{width: '14.25px', height: '12.67px'}}/>
-                    </div>
-                    <div
-                        title='Line'
-                        onClick={() => {
-                            pasteTag('[`l`]')
-                        }}>
-                        <LineImage style={{width: '14.25px', height: '1.81px'}}/>
-                    </div>
-                    <div
-                        title='Image'
-                        onClick={handleOpenFileDialog}>
-                        <ImgImage/>
-                    </div>
+                    <EditorToolbar toolbar={toolbar}/>
                     <input
                         type="file"
                         accept="image/*"
