@@ -7,7 +7,7 @@ import {TreeNode, useFlattenedTree} from '../../../../../../shared/lib/hooks/use
 import FileNode from './components/virtualized-row/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
-import commonStyles from "../../../../../../assets/styles/Common.module.scss";
+import commonStyles from "../../../../../../shared/assets/styles/Common.module.scss";
 import {useAuth} from "../../../../../../shared/lib/hooks/useAuth";
 import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
 import {RootState} from "../../../../../../store";
