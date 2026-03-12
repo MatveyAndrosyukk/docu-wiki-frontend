@@ -1,9 +1,9 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import API_BASE_URL from "../../../config/api-config";
 import {File} from "../../../types/file";
 import {revertFileLike, toggleFileLikeOptimistic} from "../../slices/fileServerSlice";
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
+import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 export interface ChangeFileLikesPayload {
     id: number;

@@ -2,7 +2,7 @@ import React, {Dispatch, SetStateAction, useCallback, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from './components/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
-import {parseFileTextToHTML} from '../../../../utils/functions/parseFile'
+import {parseFileTextToHTML} from '../../../../shared/lib/utils/parseFile'
 import EditMode from './components/edit-file-view/EditMode'
 import {useNavigate} from "react-router-dom";
 import EmptyFile from "./components/empty-file/EmptyFile";
@@ -10,10 +10,10 @@ import OpenedFileHeader from "./components/opened-file-header/OpenedFileHeader";
 import {useSelector} from "react-redux";
 import {UiFile} from "../../../../store/types/UiFile";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
-import {useFileLikes} from "../../../../utils/hooks/useFileLikes";
+import {useFileLikes} from "../../../../shared/lib/hooks/useFileLikes";
 import {RootState} from "../../../../store";
-import {useAuth} from "../../../../utils/hooks/useAuth";
-import {useAppContext} from "../../../../utils/hooks/useAppContext";
+import {useAuth} from "../../../../shared/lib/hooks/useAuth";
+import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
 
 interface OpenedFileProps {
     file?: UiFile | null
@@ -34,11 +34,13 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
 
-    const {viewedUser, fileState, loggedInUser} = useAppContext();
+    const {fileState} = useAppContext();
     const {authStatus} = useAuth();
     const {isLiked, likes, toggleLike} = useFileLikes({fileId: file?.id as number});
 
     const files = useSelector(selectFileTree)
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
     const pendingImages = useSelector(
         (state: RootState) => state.fileUi.pendingImages
     );

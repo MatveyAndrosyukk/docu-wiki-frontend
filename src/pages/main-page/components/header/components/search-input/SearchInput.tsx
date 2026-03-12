@@ -6,10 +6,10 @@ import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {useSelector} from "react-redux";
 import {ReactComponent as FileIcon} from './images/search-input-file.svg'
 import {ReactComponent as FolderIcon} from './images/search-input-folder.svg'
-import {useWindowWidth} from "../../../../../../utils/hooks/useWindowWidth";
-import {useFileSearch} from "../../../../../../utils/hooks/useFileSearch";
-import {useElementOutsideEvent} from "../../../../../../utils/hooks/useElementOutsideEvent";
-import {useSelectPlaceholderText} from "../../../../../../utils/hooks/useSelectPlaceholderText";
+import {useWindowWidth} from "../../../../../../shared/lib/hooks/useWindowWidth";
+import {useFileSearch} from "../../../../../../shared/lib/hooks/useFileSearch";
+import {useElementOutsideEvent} from "../../../../../../shared/lib/hooks/useElementOutsideEvent";
+import {useSelectPlaceholderText} from "../../../../../../shared/lib/hooks/useSelectPlaceholderText";
 
 interface SearchProps {
     onClick: (id: number) => void;

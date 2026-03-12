@@ -1,15 +1,15 @@
 import React, {Dispatch, SetStateAction, useMemo} from 'react';
 import styles from "../../OpenedFile.module.scss";
-import {isUserCanEdit} from "../../../../../../utils/functions/permissions-utils/isUserCanEdit";
+import {isUserCanEdit} from "../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {ReactComponent as HeartBtn} from '../../images/opened-file-heart.svg'
 import {ReactComponent as LikedHeartBtn} from '../../images/opened-file-red-heart.svg'
 import {ReactComponent as EditFileSvg} from '../../images/opened-file-edit.svg'
 import {ReactComponent as DeleteFileSvg} from '../../images/opened-file-delete.svg'
 import {ReactComponent as OpenButtonsSvg} from '../../images/opened-file-open.svg'
 import {User} from "../../../../../../store/slices/userSlice";
-import findPathToFile from "../../../../../../utils/functions/findFilePath";
+import findPathToFile from "../../../../../../shared/lib/utils/findFilePath";
 import {UiFile} from "../../../../../../store/types/UiFile";
-import {useWindowWidth} from "../../../../../../utils/hooks/useWindowWidth";
+import {useWindowWidth} from "../../../../../../shared/lib/hooks/useWindowWidth";
 
 interface OpenedFileHeaderProps {
     file: UiFile;

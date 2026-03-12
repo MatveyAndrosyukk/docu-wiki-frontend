@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import API_BASE_URL from "../../../config/api-config";
 import {ServerFile} from "../../types/ServerFile";
+import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 interface GetFilesForUserDto {
     viewedUserEmail: string;

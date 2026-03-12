@@ -1,18 +1,18 @@
 import React, {useCallback, useMemo} from 'react';
 import styles from './EditMode.module.scss';
-import SwitchWhileEditModal from "../../../../../../ui-components/switch-while-edit-modal/SwitchWhileEditModal";
-import extractImagesName from "../../../../../../utils/functions/extractImageNames";
-import {useDebouncedValue} from "../../../../../../utils/hooks/useDebouncedValue";
+import SwitchWhileEditModal from "../../../../../../shared/ui/modal-windows/switch-while-edit-modal/SwitchWhileEditModal";
+import extractImagesName from "../../../../../../shared/lib/utils/extractImageNames";
+import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebouncedValue";
 import {UiFile} from "../../../../../../store/types/UiFile";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store";
-import {useAppContext} from "../../../../../../utils/hooks/useAppContext";
-import {useEditorTextarea} from "../../../../../../utils/hooks/useEditorTextarea";
-import {useEditorPreview} from "../../../../../../utils/hooks/useEditorPreview";
-import {useEditorValidation} from "../../../../../../utils/hooks/useEditorValidation";
-import {useEditorImages} from "../../../../../../utils/hooks/useEditorImages";
+import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
+import {useEditorTextarea} from "../../../../../../shared/lib/hooks/useEditorTextarea";
+import {useEditorPreview} from "../../../../../../shared/lib/hooks/useEditorPreview";
+import {useEditorValidation} from "../../../../../../shared/lib/hooks/useEditorValidation";
+import {useEditorImages} from "../../../../../../shared/lib/hooks/useEditorImages";
 import {createEditorToolbar} from "./utils/editorToolbarConfig";
-import EditorToolbar from "../../../../../../ui-components/editor-toolbar/EditorToolbar";
+import EditorToolbar from "../../../../../../shared/ui/editor-toolbar/EditorToolbar";
 
 interface EditFileViewProps {
     file: UiFile;
@@ -32,7 +32,9 @@ const EditMode: React.FC<EditFileViewProps> = (
         isFileTreeOpened,
     }
 ) => {
-    const {fileState, loggedInUser} = useAppContext();
+    const {fileState} = useAppContext();
+    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
+
     const isSaving = useSelector(
         (state: RootState) => state.fileUi.isSaving
     );

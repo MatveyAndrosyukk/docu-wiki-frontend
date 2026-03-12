@@ -1,23 +1,23 @@
 import React, {Dispatch, FC, SetStateAction, useCallback, useMemo, useRef} from 'react';
 import styles from './FileTree.module.scss'
-import commonStyles from '../../../../styles/Common.module.scss'
+import commonStyles from '../../../../assets/styles/Common.module.scss'
 import {ReactComponent as LockSvg} from './images/fileTree-lock.svg'
 import {ReactComponent as BanSvg} from './images/fileTree-ban.svg'
 import FileList from "./components/file-list/FileList";
 import {AppDispatch, RootState} from "../../../../store";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleUserIsViewBlocked} from "../../../../store/thunks/user/toggleUserIsViewBlocked";
-import {ActionType} from "../../../../utils/supporting-hooks/useModalActions";
-import {isUserCanEdit} from "../../../../utils/functions/permissions-utils/isUserCanEdit";
-import {isUserCanView} from "../../../../utils/functions/permissions-utils/isUserCanView";
-import {isUserEqualsLoggedIn} from "../../../../utils/functions/permissions-utils/isUserEqualsLoggedIn";
-import {isUserOwner} from "../../../../utils/functions/permissions-utils/isUserOwner";
-import FileTreeSkeleton from "../../../../ui-components/FileTreeSkeleton";
-import {useAuth} from "../../../../utils/hooks/useAuth";
-import {useAppContext} from "../../../../utils/hooks/useAppContext";
-import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
-import {useNotification} from "../../../../utils/hooks/useNotification";
-import {useElementOutsideEvent} from "../../../../utils/hooks/useElementOutsideEvent";
+import {ActionType} from "../../../../shared/lib/hooks/useModalActions";
+import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
+import {isUserCanView} from "../../../../shared/lib/utils/permissions-utils/isUserCanView";
+import {isUserEqualsLoggedIn} from "../../../../shared/lib/utils/permissions-utils/isUserEqualsLoggedIn";
+import {isUserOwner} from "../../../../shared/lib/utils/permissions-utils/isUserOwner";
+import FileTreeSkeleton from "../../../../shared/ui/file-tree-skeleton/FileTreeSkeleton";
+import {useAuth} from "../../../../shared/lib/hooks/useAuth";
+import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
+import {useNotification} from "../../../../shared/lib/hooks/useNotification";
+import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 
 interface FileTreeProps {
     emailParam: string | undefined;

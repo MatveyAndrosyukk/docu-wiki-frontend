@@ -1,10 +1,10 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import API_BASE_URL from "../../../config/api-config";
 import {ServerFile} from "../../types/ServerFile";
 import {optimisticUpdateFileContent, revertFileContent} from "../../slices/fileServerSlice";
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
 import {setSaving} from "../../slices/fileUiSlice";
+import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 interface ChangeFileContentPayload {
     id: number;

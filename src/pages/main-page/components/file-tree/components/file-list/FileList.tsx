@@ -1,15 +1,16 @@
 import React, {useCallback} from 'react';
 import styles from './FileList.module.scss';
 import {useDispatch, useSelector} from 'react-redux';
-import useContextMenuActions from '../../../../../../utils/hooks/useContextMenuActions';
-import ContextMenu from '../../../../../../ui-components/context-menu/ContextMenu';
-import {TreeNode, useFlattenedTree} from '../../../../../../utils/hooks/useFlattenedTree';
+import useContextMenuActions from '../../../../../../shared/lib/hooks/useContextMenuActions';
+import ContextMenu from '../../../../../../shared/ui/context-menu/ContextMenu';
+import {TreeNode, useFlattenedTree} from '../../../../../../shared/lib/hooks/useFlattenedTree';
 import FileNode from './components/virtualized-row/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
-import commonStyles from "../../../../../../styles/Common.module.scss";
-import {useAuth} from "../../../../../../utils/hooks/useAuth";
-import {useAppContext} from "../../../../../../utils/hooks/useAppContext";
+import commonStyles from "../../../../../../assets/styles/Common.module.scss";
+import {useAuth} from "../../../../../../shared/lib/hooks/useAuth";
+import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
+import {RootState} from "../../../../../../store";
 
 interface FileListProps {
     emailParam: string | undefined;
@@ -20,10 +21,12 @@ const FileList: React.FC<FileListProps> = React.memo(
     ({emailParam, windowWidth}) => {
         const dispatch = useDispatch();
 
-        const {viewedUser, loggedInUser, fileState} = useAppContext();
+        const {fileState} = useAppContext();
         const {authStatus} = useAuth();
 
         const files = useSelector(selectFileTree)
+        const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
+        const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
 
         const contextMenuState = useContextMenuActions();
         const {state, handleCloseContextMenu} = contextMenuState;

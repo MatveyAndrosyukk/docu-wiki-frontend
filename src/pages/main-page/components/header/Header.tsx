@@ -6,16 +6,16 @@ import {ReactComponent as SwapSvg} from './images/header-swap.svg';
 import {ReactComponent as UserSvg} from './images/header-user.svg';
 import {ReactComponent as LogoutSvg} from './images/header-logout.svg';
 import SearchInput from "./components/search-input/SearchInput";
-import UserModal from '../../../../ui-components/user-modal/UserModal';
-import useUserModalActions from "../../../../utils/hooks/useUserModalActions";
+import UserModal from '../../../../shared/ui/modal-windows/user-modal/UserModal';
+import useUserModalActions from "../../../../shared/lib/hooks/useUserModalActions";
 import {useNavigate} from "react-router-dom";
-import useFileSearchActions from "../../../../utils/hooks/useFileSearchActions";
-import {useAuth} from "../../../../utils/hooks/useAuth";
+import useFileSearchActions from "../../../../shared/lib/hooks/useFileSearchActions";
+import {useAuth} from "../../../../shared/lib/hooks/useAuth";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
-import {useAppContext} from "../../../../utils/hooks/useAppContext";
-import {useWindowWidth} from "../../../../utils/hooks/useWindowWidth";
-import {useElementOutsideEvent} from "../../../../utils/hooks/useElementOutsideEvent";
+import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
+import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 
 const Header: FC = () => {
     const [burgerOpen, setBurgerOpen] = useState(false);

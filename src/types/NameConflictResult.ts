@@ -1,4 +1,4 @@
-import {ActionType} from "../utils/supporting-hooks/useModalActions";
+import {ActionType} from "../shared/lib/hooks/useModalActions";
 
 export type NameConflictResult =
     | { hasConflict: false }

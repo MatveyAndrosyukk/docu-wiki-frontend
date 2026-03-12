@@ -3,8 +3,8 @@ import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {darcula} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './CodeBlock.module.scss';
 import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
-import {getLanguage} from "../../../../../../utils/functions/getLanguage";
-import {useDebounce} from "../../../../../../utils/hooks/useDebounce";
+import {getLanguage} from "../../../../../../shared/lib/utils/getLanguage";
+import {useDebounce} from "../../../../../../shared/lib/hooks/useDebounce";
 
 interface CodeBlockProps {
     code: string;

@@ -1,7 +1,7 @@
-import {TreeNode} from "../../../../../../../../utils/hooks/useFlattenedTree";
+import {TreeNode} from "../../../../../../../../shared/lib/hooks/useFlattenedTree";
 import React, {useRef} from "react";
 import styles from "../../FileList.module.scss"
-import {isUserCanEdit} from "../../../../../../../../utils/functions/permissions-utils/isUserCanEdit";
+import {isUserCanEdit} from "../../../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {FileStatus, FileType} from "../../../../../../../../types/file";
 import {ReactComponent as ChildLineSvg} from '../../images/file-list-child-line.svg';
 import {ReactComponent as LastChildLineSvg} from '../../images/file-list-last-child-line.svg';
@@ -9,7 +9,7 @@ import {ReactComponent as OpenedSvg} from '../../images/file-list-opened.svg';
 import {ReactComponent as ClosedSvg} from '../../images/file-list-closed.svg';
 import {ReactComponent as FileImg} from '../../images/file-list-file.svg';
 import {User} from "../../../../../../../../store/slices/userSlice";
-import FileLoader from "../../../../../../../../ui-components/file-loader/FileLoader";
+import FileLoader from "../../../../../../../../shared/ui/file-loader/FileLoader";
 import {useSelector} from "react-redux";
 import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
 

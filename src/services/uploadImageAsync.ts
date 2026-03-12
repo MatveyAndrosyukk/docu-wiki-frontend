@@ -1,4 +1,5 @@
-import API_BASE_URL from "../config/api-config";
+import API_BASE_URL from "../shared/assets/config/api-config";
+
 
 export async function uploadImageAsync(file: File): Promise<{ fileName: string }> {
     const token = localStorage.getItem("token");

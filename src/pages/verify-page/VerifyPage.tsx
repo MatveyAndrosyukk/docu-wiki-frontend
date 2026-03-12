@@ -2,7 +2,7 @@ import React, {FC, useContext, useEffect} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {AppContext} from "../../context/AppContext";
 import {performVerificationAsync} from "../../services/performVerificationAsync";
-import {useAppContext} from "../../utils/hooks/useAppContext";
+import {useAppContext} from "../../shared/lib/hooks/useAppContext";
 
 const VerifyPage: FC = () => {
     const [searchParams] = useSearchParams();

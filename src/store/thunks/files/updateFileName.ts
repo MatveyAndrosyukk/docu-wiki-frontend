@@ -1,10 +1,10 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import API_BASE_URL from "../../../config/api-config";
 import {ServerFile} from "../../types/ServerFile";
 import {fetchFilesByEmail} from "./fetchFilesByEmail";
 import {optimisticUpdateFileName, revertFileName} from "../../slices/fileServerSlice";
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
+import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 interface ChangeFileNamePayload {
     id: number;

@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {User} from "../../slices/userSlice";
-import API_BASE_URL from "../../../config/api-config";
+import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
     'user/fetchViewedUserByEmail',

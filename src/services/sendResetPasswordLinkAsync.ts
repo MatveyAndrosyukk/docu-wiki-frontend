@@ -1,4 +1,5 @@
-import API_BASE_URL from "../config/api-config";
+import API_BASE_URL from "../shared/assets/config/api-config";
+
 
 export async function sendResetPasswordLinkAsync(email: string) {
     const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
