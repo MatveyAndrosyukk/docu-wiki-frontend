@@ -33,12 +33,13 @@ export interface EditFileViewState {
 }
 
 export default function useEditFileActions(): EditFileViewState {
-    const dispatch = useDispatch<AppDispatch>();
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isFileContentChanged, setIsFileContentChanged] = useState<boolean>(false);
     const [isTryToSwitchWhileEditing, setIsTryToSwitchWhileEditing] = useState<boolean>(false);
     const [switchedFileId, setSwitchedFileId] = useState<number | null>(null);
     const [contentError, setContentError] = useState<string>('');
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleTryToOpenFile = useCallback((targetFileId: number) => {
         if (isEditing && isFileContentChanged) {

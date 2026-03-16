@@ -9,8 +9,9 @@ interface UseFileLikesProps {
 }
 
 export const useFileLikes = ({fileId}: UseFileLikesProps) => {
-    const dispatch = useDispatch<AppDispatch>();
     const [isLiking, setIsLiking] = useState(false);
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const file = useSelector((state: RootState) =>
         findFileById(state.fileServer.files, fileId)

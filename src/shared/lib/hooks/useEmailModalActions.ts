@@ -21,9 +21,10 @@ export default function useEmailModalActions(): EmailModalState {
     const [isEnterEmailModalOpened, setIsEnterEmailModalOpened] = useState(false);
     const [emailModalMessage, setEmailModalMessage] = useState<string>('');
     const [emailModalError, setEmailModalError] = useState<string>('');
-    const emailModalInputRef = useRef<HTMLInputElement>(null)
     const [emailModalValue, setEmailModalValue] = useState<string>('');
     const [emailModalLoading, setEmailModalLoading] = useState(false);
+
+    const emailModalInputRef = useRef<HTMLInputElement>(null)
 
     const handleSendChangePasswordLink = useCallback(async () => {
         setEmailModalError('');

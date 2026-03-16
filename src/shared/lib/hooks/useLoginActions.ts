@@ -32,16 +32,20 @@ export interface LoginState {
 }
 
 export default function useLoginActions(): LoginState {
-    const dispatch = useDispatch<AppDispatch>();
     const [loginLoading, setLoginLoading] = useState<boolean>(false);
     const [loginMessage, setLoginMessage] = useState<string | null>(null);
     const [loginError, setLoginError] = useState<string | null>(null);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
-    const loginModalInputRef = useRef<HTMLInputElement>(null);
     const [loginModalValue, setLoginModalValue] = useState<LoginModalValue>({
         login: "",
         password: "",
     });
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+
+    const loginModalInputRef = useRef<HTMLInputElement>(null);
+
+    const dispatch = useDispatch<AppDispatch>();
+
+
     const {setAuthStatus} = useAuth();
 
     const handleOpenLoginModal = useCallback(() => {

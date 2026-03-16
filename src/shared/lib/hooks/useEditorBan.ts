@@ -1,5 +1,4 @@
 import {ChangeEvent, Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
-import {User} from "../../../store/slices/userSlice";
 import {banUserByReasonAsync} from "../../../services/banUserByReasonAsync";
 import {unbanUserByReasonAsync} from "../../../services/unbanUserAsync";
 import {useSelector} from "react-redux";
@@ -34,13 +33,15 @@ export interface BanState {
 
 export default function useEditorBan(): BanState {
     const [isBanModalOpened, setIsBanModalOpened] = useState<boolean>(false);
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-    const banModalInputRef = useRef<HTMLInputElement>(null);
     const [banModalValue, setBanModalValue] = useState<string>('')
     const [banModalLoading, setBanModalLoading] = useState<boolean>(false);
     const [banModalError, setBanModalError] = useState<string>('')
     const [banModalMessage, setBanModalMessage] = useState<string>('')
     const [banModalMode, setBanModalMode] = useState<BanMode>(BanMode.ban);
+
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
+
+    const banModalInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isBanModalOpened && banModalInputRef.current) {

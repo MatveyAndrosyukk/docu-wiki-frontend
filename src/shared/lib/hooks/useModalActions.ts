@@ -52,22 +52,25 @@ export type ModalActionsState = CopyPasteState & {
 }
 
 export default function useModalActions(): ModalActionsState {
-    const dispatch = useDispatch<AppDispatch>();
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-    const files = useSelector(selectFileTree);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [modalValue, setModalValue] = useState<string>('');
+    const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
     const [modalError, setModalError] = useState<string>('');
     const [modalOpenState, setModalOpenState] = useState<ModalOpenState>({reason: null, id: null, title: null});
     const [isLimitError, setIsLimitError] = useState<boolean>(false);
-    const modalInputRef = useRef<HTMLInputElement>(null);
-    const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
+
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
+    const files = useSelector(selectFileTree);
     const totalFiles = useSelector(
         (state: RootState) => state.user.viewedUser?.amountOfFiles ?? 0
     );
     const loggedInUserEmail = useSelector(
         (state: RootState) => state.user.loggedInUser?.email
     );
+
+    const dispatch = useDispatch<AppDispatch>();
+
+    const modalInputRef = useRef<HTMLInputElement>(null);
 
     const filesLimit = 20;
 

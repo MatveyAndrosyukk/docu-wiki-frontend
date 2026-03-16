@@ -9,7 +9,6 @@ export const useEditorValidation = (
 ) => {
 
     useEffect(() => {
-
         const length = content.length;
         const imagesLength = images.length;
 

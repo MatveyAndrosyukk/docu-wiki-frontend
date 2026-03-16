@@ -40,7 +40,6 @@ export interface UserModalState {
 }
 
 export default function useUserModalActions(user: User | null, loginState: LoginState): UserModalState {
-    const dispatch = useDispatch<AppDispatch>();
     const [isAddingEditor, setIsAddingEditor] = React.useState(false);
     const [isChangingName, setIsChangingName] = React.useState<boolean>(false);
     const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
@@ -53,10 +52,15 @@ export default function useUserModalActions(user: User | null, loginState: Login
     const [editedNameError, setEditedNameError] = React.useState<string>('');
     const [addEditorError, setAddEditorError] = React.useState<string>('');
     const [changeNameError, setChangeNameError] = React.useState<string>('');
+
     const {authStatus} = useAuth();
+
+    const dispatch = useDispatch<AppDispatch>();
+
     useEffect(() => {
         setEditedName(user?.name || '');
     }, [user?.name]);
+    
     useEffect(() => {
         if (isEditingName && nameInputRef.current) {
             nameInputRef.current.focus();
@@ -64,6 +68,7 @@ export default function useUserModalActions(user: User | null, loginState: Login
             nameInputRef.current.disabled = false;
         }
     }, [isEditingName]);
+    
     useEffect(() => {
         if (editedName.length > 25) {
             setEditedNameError('Username is too long');
@@ -73,24 +78,28 @@ export default function useUserModalActions(user: User | null, loginState: Login
             setEditedNameError('');
         }
     }, [editedName]);
+    
     useEffect(() => {
         if (userModalValue.trim() === '' && user?.whoCanEdit) {
             setUsersWhoCanEdit([...user?.whoCanEdit].reverse());
         }
     }, [userModalValue, user?.whoCanEdit]);
+    
     const handleCloseUserModal = useCallback(() => {
         setIsUserModalOpen(false);
         setUserModalValue('');
         setAddEditorError('');
         setChangeNameError('');
     }, [setIsUserModalOpen, setUserModalValue, setAddEditorError, setChangeNameError]);
+    
     const handleOpenUserModal = useCallback(() => {
         if (authStatus !== 'authenticated') {
             loginState.handleOpenLoginModal();
             return;
         }
         setIsUserModalOpen(true);
-    }, [loginState, setIsUserModalOpen]);
+    }, [authStatus, loginState]);
+    
     const handleAddUserWhoCanEdit = useCallback(() => {
         if (!userModalValue.trim()) return;
         const currentUserEmail = localStorage.getItem('email');
@@ -103,11 +112,13 @@ export default function useUserModalActions(user: User | null, loginState: Login
             setUserModalValue('');
         }).catch((e) => setAddEditorError(e.message)).finally(() => setIsAddingEditor(false));
     }, [dispatch, userModalValue]);
+
     const handleDeleteUserWhoCanEdit = useCallback((targetEmail: string, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.stopPropagation();
         const currentUserEmail = localStorage.getItem('email');
         dispatch(deleteUserWhoCanEdit({userEmail: currentUserEmail as string, whoCanEditEmail: targetEmail,}));
     }, [dispatch]);
+
     const handleConfirmNameEdition = useCallback(() => {
         if (editedName === user?.name) {
             setIsEditingName(false);
@@ -118,6 +129,7 @@ export default function useUserModalActions(user: User | null, loginState: Login
             setIsEditingName(false);
         }).catch(() => setEditedNameError('Username already exists')).finally(() => setIsChangingName(false));
     }, [dispatch, editedName, user?.email, user?.name]);
+
     const handleKeyDownWhileEditing = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             if (editedNameError) {
@@ -130,12 +142,14 @@ export default function useUserModalActions(user: User | null, loginState: Login
             setEditedName(user?.name || '');
         }
     }, [editedNameError, handleConfirmNameEdition, user?.name]);
+
     const handleBlurNameAfterEdition = useCallback(() => {
         if (isChangingName) return;
         setIsEditingName(false);
         setChangeNameError('');
         setEditedName(user?.name || user?.email || '');
     }, [isChangingName, user?.name, user?.email]);
+
     return {
         isAddingEditor,
         setIsAddingEditor,

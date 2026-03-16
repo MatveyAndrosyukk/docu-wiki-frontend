@@ -4,9 +4,9 @@ export const useEditorTextarea = (
     initialContent: string,
     setIsFileContentChanged: (v: boolean) => void
 ) => {
+    const [textareaContent, setTextareaContent] = useState(initialContent);
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [textareaContent, setTextareaContent] = useState(initialContent);
 
     useEffect(() => {
         setTextareaContent(initialContent);

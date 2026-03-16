@@ -6,7 +6,6 @@ export const useEditorPreview = (
     onImageClick: any,
     isFileTreeOpened: boolean
 ) => {
-
     const [previewContent, setPreviewContent] = useState<ReactNode>([]);
 
     useEffect(() => {

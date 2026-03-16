@@ -13,20 +13,20 @@ interface Params {
     initialContent: string
 }
 
-export const useEditorImages = ({
-                                    fileId,
-                                    pasteTag,
-                                    replaceImageTag,
-                                    contentError,
-                                    initialContent,
-                                }: Params) => {
+export const useEditorImages = (
+    {
+        fileId,
+        pasteTag,
+        replaceImageTag,
+        contentError,
+        initialContent
+    }: Params) => {
+    const [addedImagesWhileEditing, setAddedImagesWhileEditing] =
+        useState<string[]>(() => extractImagesName(initialContent));
 
     const dispatch = useDispatch<AppDispatch>();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const [addedImagesWhileEditing, setAddedImagesWhileEditing] =
-        useState<string[]>(() => extractImagesName(initialContent));
 
     const handleOpenFileDialog = useCallback(() => {
         fileInputRef.current?.click();

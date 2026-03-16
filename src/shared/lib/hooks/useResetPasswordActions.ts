@@ -34,6 +34,7 @@ export default function useResetPasswordActions(): ResetPasswordState {
     const [resetPasswordError, setResetPasswordError] = useState<string>('');
     const [resetPasswordMessage, setResetPasswordMessage] = useState<string>('');
     const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+
     const newPasswordInputRef = useRef<HTMLInputElement>(null);
 
     const handleChangePassword = useCallback(async (resetToken: string | undefined) => {

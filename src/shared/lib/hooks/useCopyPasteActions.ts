@@ -12,7 +12,6 @@ export interface CopyPasteState {
 export default function useCopyPasteActions(
     openModalByReason: (modalState: ModalOpenState) => void
 ): CopyPasteState {
-
     const [copiedFile, setCopiedFile] = useState<UiFile | null>(null);
 
     const handleCopyFile = useCallback((file: UiFile) => {

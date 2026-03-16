@@ -4,7 +4,7 @@ import {darcula} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './CodeBlock.module.scss';
 import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
 import {getLanguage} from "../../lib/utils/getLanguage";
-import {useDebounce} from "../../lib/hooks/useDebounce";
+import {useDebouncedValue} from "../../lib/hooks/useDebouncedValue";
 
 interface CodeBlockProps {
     code: string;
@@ -18,7 +18,7 @@ const CodeBlock: FC<CodeBlockProps> = (
     }) => {
     const [isCodeExpanded, setIsCodeExpanded] = useState(false);
 
-    const debouncedCode = useDebounce(code, 300);
+    const debouncedCode = useDebouncedValue(code, 300);
 
     const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
 
