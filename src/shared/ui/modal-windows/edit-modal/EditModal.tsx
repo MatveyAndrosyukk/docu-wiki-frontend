@@ -24,13 +24,19 @@ const EditModal: FC = () => {
         handleConfirmModalByReason,
     } = fileState;
 
-    const errorMessage = modalError
-        ? modalError
-        : isNameConflictReason()
-            ? copiedFile?.type === FileType.Folder
-                ? "Folder with this name exists"
-                : "File with this name exists"
-            : "";
+    const isNameConflict = isNameConflictReason();
+
+    const conflictMessage =
+        copiedFile?.type === FileType.Folder
+            ? "Folder with this name exists"
+            : "File with this name exists";
+
+    const errorMessage = modalError || (isNameConflict ? conflictMessage : "");
+
+    const errorClassName = `${modalStyles['modal__error']}
+     ${styles['edit-modal__error']}
+      ${!errorMessage ? modalStyles['modal__hidden'] : ''}
+`;
 
     useEffect(() => {
         if (modalValue.length >= 20) {
@@ -60,13 +66,7 @@ const EditModal: FC = () => {
                         {modalOpenState.title}
                     </div>
 
-                    <p
-                        className={`
-                        ${modalStyles['modal__error']} 
-                        ${styles['edit-modal__error']} 
-                        ${!errorMessage ? modalStyles['modal__hidden'] : ''}
-                    `}
-                    >
+                    <p className={errorClassName}>
                         {errorMessage || "placeholder"}
                     </p>
 
@@ -78,13 +78,11 @@ const EditModal: FC = () => {
                             className={styles['edit-modal__input']}
                             placeholder="Enter the title"
                             value={modalValue}
-                            onChange={(e) => setModalValue(e.target.value)}
+                            onChange={(e) => setModalValue(e.currentTarget.value)}
                             onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    if (modalError) return;
-                                    handleConfirm();
-                                }
+                                if (e.key !== 'Enter') return;
+                                e.preventDefault();
+                                if (!modalError) handleConfirm();
                             }}
                         />
 
