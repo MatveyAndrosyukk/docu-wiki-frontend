@@ -88,63 +88,53 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     return (
         <div className={styles['opened-file']}>
-            <OpenedFileHeader {...{
-                file,
-                isLiked,
-                likes,
-                viewedUser,
-                loggedInUser,
-                files,
-                isBurgerMenuOpened,
-                isEditing,
-                isLoggedIn: authStatus === 'authenticated',
-                emailParam,
-                setIsEditing,
-                setIsBurgerMenuOpened,
-                onTryToLikeFile: toggleLike,
-                onOpenEditionMode: handleOpenEditionMode,
-                onDeleteFile: handleDeleteFile,
-                onOpenDeleteModal: handleOpenDeleteModal
-            }}/>
+            {/* Заголовок файла */}
+            <OpenedFileHeader
+                file={file}
+                isLiked={isLiked}
+                likes={likes}
+                viewedUser={viewedUser}
+                loggedInUser={loggedInUser}
+                files={files}
+                isBurgerMenuOpened={isBurgerMenuOpened}
+                isEditing={isEditing}
+                isLoggedIn={authStatus === 'authenticated'}
+                emailParam={emailParam}
+                setIsEditing={setIsEditing}
+                setIsBurgerMenuOpened={setIsBurgerMenuOpened}
+                onTryToLikeFile={toggleLike}
+                onOpenEditionMode={handleOpenEditionMode}
+                onDeleteFile={handleDeleteFile}
+                onOpenDeleteModal={handleOpenDeleteModal}
+            />
+
             {openedImage && (
                 <div className={styles['opened-image__background']} onClick={() => setOpenedImage(null)}>
-                    <img
-                        src={openedImage}
-                        alt="Opened"
-                        className={styles['opened-image__image']}
-                        onClick={e => e.stopPropagation()}
-                    />
+                    <img src={openedImage} alt="Opened" className={styles['opened-image__image']} onClick={e => e.stopPropagation()} />
                 </div>
             )}
-            {isEditing ? (
-                <EditMode
-                    file={file}
-                    parseFileTextToHTML={parseFileTextToHTMLMemo}
-                    onImageClick={handleOpenImage}
-                    isFileTreeOpened={isFileTreeOpened}
-                />
-            ) : (
-                <div className={styles['opened-file__content']}>{contentElements}</div>
-            )}
+
+            {isEditing
+                ? <EditMode file={file} parseFileTextToHTML={parseFileTextToHTMLMemo} onImageClick={handleOpenImage} isFileTreeOpened={isFileTreeOpened} />
+                : <div className={styles['opened-file__content']}>{contentElements}</div>
+            }
+
             <div className={styles['opened-file__footer']}>
                 Last edited by:
-                <span
-                    onClick={() => handleGoToUsersPage(file.lastEditor as string)}
-                    className={styles['footer__editor']}>
-                            {file.lastEditor}
-                        </span>
+                <span onClick={() => handleGoToUsersPage(file.lastEditor as string)} className={styles['footer__editor']}>
+                    {file.lastEditor}
+                </span>
             </div>
+
             <div
-                style={{display: isFileTreeOpened ? 'none' : 'flex'}}
+                style={{ display: isFileTreeOpened ? 'none' : 'flex' }}
                 className={emptyStyles['file-tree']}
-                onClick={(event) => {
-                    event.stopPropagation()
-                    setIsFileTreeOpened(!isFileTreeOpened)
-                }}>
-                <BurgerSvg className={emptyStyles['file-tree-image']}/>
+                onClick={e => { e.stopPropagation(); setIsFileTreeOpened(!isFileTreeOpened); }}
+            >
+                <BurgerSvg className={emptyStyles['file-tree-image']} />
             </div>
         </div>
-    )
+    );
 }
 
 export default OpenedFile
