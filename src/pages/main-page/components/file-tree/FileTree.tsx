@@ -92,6 +92,10 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
         }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
 
         const isBanned = !!viewedUser?.banned;
+        const canView = isUserCanView(viewedUser, loggedInUser);
+        const canEdit = !isBanned && isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser);
+        const showHeader = isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser);
+
 
         return (
             <div ref={fileTreeRef} className={fileTreeStyles}>
@@ -100,23 +104,18 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
                     <div
                         key={notification.id}
                         onClick={notification.close}
-                        className={`${commonStyles['common__notification']} ${
-                            notification.closing
-                                ? commonStyles['common__notification--closing']
-                                : ''
-                        }`}
+                        className={`${commonStyles.common__notification} ${notification.closing ? commonStyles['common__notification--closing'] : ''}`}
                     >
                         You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view
                     </div>
                 )}
 
                 <div className={styles['file-tree__content']}>
-
                     {(isViewedUserLoading || areFilesLoading || authStatus === 'loading')
                         ? <FileTreeSkeleton/>
                         : (
                             <>
-                                {isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser) && (
+                                {showHeader && (
                                     <div className={styles['file-tree__header']}>
                                         <div className={styles['file-tree__top']}>
                                             <div className={styles['file-tree__user']}>
@@ -137,27 +136,11 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
                                     </div>
                                 )}
 
-                                {isBanned
-                                    ? (
-                                        <div className={styles['file-tree__view']}>
-                                            This user has been banned
-                                        </div>
-                                    )
-                                    : (
-                                        !isUserCanView(viewedUser, loggedInUser) && (
-                                            <div className={styles['file-tree__view']}>
-                                                User blocked his files for view
-                                            </div>
-                                        )
-                                    )
-                                }
+                                {isBanned && <div className={styles['file-tree__view']}>This user has been banned</div>}
+                                {!isBanned && !canView &&
+                                    <div className={styles['file-tree__view']}>User blocked his files for view</div>}
 
-                                {!isBanned && isUserCanEdit(
-                                    authStatus === 'authenticated',
-                                    emailParam,
-                                    viewedUser,
-                                    loggedInUser
-                                ) && (
+                                {canEdit && (
                                     <div className={styles['file-tree__buttons']}>
 
                                         <div
@@ -187,16 +170,11 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
                                     </div>
                                 )}
 
-                                {viewedUser &&
-                                    !isBanned &&
-                                    isUserCanView(viewedUser, loggedInUser) && (
-                                        <div className={styles['file-tree__files']}>
-                                            <FileList
-                                                windowWidth={windowWidth}
-                                                emailParam={emailParam}
-                                            />
-                                        </div>
-                                    )
+                                {viewedUser && !isBanned && canView && (
+                                    <div className={styles['file-tree__files']}>
+                                        <FileList windowWidth={windowWidth} emailParam={emailParam}/>
+                                    </div>
+                                )
                                 }
                             </>
                         )
