@@ -26,15 +26,19 @@ export default function useContextMenuActions(): ContextMenuState {
 
     const menuRef = useRef<HTMLUListElement>(null);
 
-    const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: UiFile) => {
-        event.preventDefault();
-        setState({
-            visible: true,
-            clickX: getAdjustedX(event.clientX),
-            clickY: event.clientY,
-            file,
-        });
-    }, [setState]);
+    const handleOpenContextMenu = useCallback(
+        (event: React.MouseEvent | { clientX: number; clientY: number; preventDefault?: () => void }, file: UiFile) => {
+            if ('preventDefault' in event) event.preventDefault?.();
+
+            setState({
+                visible: true,
+                clickX: getAdjustedX(event.clientX),
+                clickY: event.clientY,
+                file,
+            });
+        },
+        [setState]
+    );
 
     const handleCloseContextMenu = useCallback(() => {
         setState(prev => ({...prev, visible: false}));

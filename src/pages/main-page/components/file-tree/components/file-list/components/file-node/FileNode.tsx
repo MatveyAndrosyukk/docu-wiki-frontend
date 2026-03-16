@@ -12,12 +12,13 @@ import {User} from "../../../../../../../../store/slices/userSlice";
 import FileLoader from "../../../../../../../../shared/ui/file-loader/FileLoader";
 import {useSelector} from "react-redux";
 import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
+import {ContextMenuState} from "../../../../../../../../shared/lib/hooks/useContextMenuActions";
 
 interface Props {
     node: TreeNode;
     emailParam: string | undefined;
     onFolderClick: (id: number) => void;
-    contextMenuState: any;
+    contextMenuState: ContextMenuState;
     isLoggedIn: boolean;
     handleTryToOpenFile: (id: number) => void;
     viewedUser: User | null;
@@ -48,9 +49,7 @@ const FileNode: React.FC<Props> = React.memo(
 
                     if (!isLastLevel && !hasNextOnLevel[levelIndex]) {
                         return (
-                            <span className={styles['file-list__node-line']} key={levelIndex}>
-                                {/* пустое место */}
-                            </span>
+                            <span className={styles['file-list__node-line']} key={levelIndex}></span>
                         );
                     }
 
@@ -109,13 +108,7 @@ const FileNode: React.FC<Props> = React.memo(
                     {linesBlock}
 
                     <div
-                        className={isFolder ? styles['file-list__node-folder'] : styles['file-list__node-file']}
-                        onContextMenu={contextMenuHandler}
-                        onClick={!file.isPending ? clickHandler : undefined}
-                        onTouchStart={touchStartHandler}
-                        onTouchEnd={cancelLongPress}
-                        onTouchMove={cancelLongPress}
-                    >
+                        className={isFolder ? styles['file-list__node-folder'] : styles['file-list__node-file']}>
                         {file.isPending ? (
                             <FileLoader/>
                         ) : (
@@ -132,6 +125,11 @@ const FileNode: React.FC<Props> = React.memo(
                                             ? styles['file-list__node-text--opened']
                                             : ''
                                     }`}
+                                    onContextMenu={contextMenuHandler}
+                                    onClick={!file.isPending ? clickHandler : undefined}
+                                    onTouchStart={touchStartHandler}
+                                    onTouchEnd={cancelLongPress}
+                                    onTouchMove={cancelLongPress}
                                 >
                                     {file.name}
                                 </span>

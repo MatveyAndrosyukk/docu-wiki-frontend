@@ -17,6 +17,12 @@
     height: 27px;
     padding: 4px 0;
 
+    &-text {
+      &:hover {
+        font-weight: bold;
+      }
+    }
+
     &-text--opened {
       font-weight: bold !important;
     }
@@ -64,10 +70,6 @@
       cursor: pointer;
       flex: 1;
 
-      &:hover {
-        font-weight: bold;
-      }
-
       img {
         margin-right: 8px;
         margin-top: 2px;
@@ -80,10 +82,6 @@
       cursor: pointer;
       height: 27px;
       flex: 1;
-
-      &:hover {
-        font-weight: bold;
-      }
     }
 
     &-image {

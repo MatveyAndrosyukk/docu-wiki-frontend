@@ -28,7 +28,8 @@ const FileList: React.FC<FileListProps> = React.memo(
         const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
         const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
 
-        const {state, handleCloseContextMenu, menuRef} = useContextMenuActions();
+        const contextMenu = useContextMenuActions();
+        const {state, handleCloseContextMenu, menuRef} = contextMenu;
 
         const flattenedNodes = useFlattenedTree(files);
 
@@ -56,7 +57,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                             node={node}
                             emailParam={emailParam}
                             onFolderClick={handleFolderClick}
-                            contextMenuState={{ state, handleCloseContextMenu, menuRef }}
+                            contextMenuState={contextMenu}
                             viewedUser={viewedUser}
                             loggedInUser={loggedInUser}
                             handleTryToOpenFile={fileState.handleTryToOpenFile}
