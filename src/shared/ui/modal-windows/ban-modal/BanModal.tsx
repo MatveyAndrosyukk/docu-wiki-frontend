@@ -32,6 +32,18 @@ const BanModal: FC<BanModalProps> = () => {
         getButtonText
     } = banState
 
+    const messageClass =
+        banModalMessage
+            ? modalStyles.modal__message
+            : banModalError
+                ? modalStyles.modal__error
+                : `${modalStyles.modal__message} ${modalStyles.hidden}`;
+
+    const isBanMode = banModalMode === BanMode.ban;
+
+    const isButtonDisabled =
+        isBanMode && (banModalLoading || !banModalValue.trim());
+
     return (
         <Modal
             isOpen={isBanModalOpened}
@@ -39,27 +51,20 @@ const BanModal: FC<BanModalProps> = () => {
         >
             <div className={`${['modalStyles.modal__overlay']} ${styles['ban-modal__overlay']}`}>
                 <div className={`${modalStyles['modal__form']} ${styles['ban-modal__form']}`}>
-                    <div className={`${modalStyles['modal__header']}`}>
-                        {banModalMode === BanMode.ban ?
-                            <p className={`${modalStyles['modal__title']} ${styles['ban-modal__title']}`}>
-                                Ban user <span className={`${styles['ban-modal__user']}`}>{viewedUser?.email}</span>
-                            </p> :
-                            <p className={`${modalStyles['modal__title']} ${styles['ban-modal__title']}`}>
-                                Unban user <span className={`${styles['ban-modal__user']}`}>{viewedUser?.email}</span>
-                            </p>}
-                        <p className={
-                            banModalMessage ? modalStyles.modal__message
-                                : banModalError
-                                    ? modalStyles.modal__error
-                                    : `${modalStyles.modal__message} ${modalStyles.hidden}`
-                        }>
-                            {banModalMessage || banModalError}</p>
+                    <div className={modalStyles['modal__header']}>
+                        <p className={`${modalStyles['modal__title']} ${styles['ban-modal__title']}`}>
+                            {banModalMode === BanMode.ban ? 'Ban user' : 'Unban user'}{' '}
+                            <span className={styles['ban-modal__user']}>{viewedUser?.email}</span>
+                        </p>
+                        <p className={messageClass}>
+                            {banModalMessage || banModalError}
+                        </p>
                         <SwitchModeSvg
-                            className={`${styles['ban-modal__switch']}`}
-                            onClick={() => handleSwitchBanMode()}/>
+                            className={styles['ban-modal__switch']}
+                            onClick={handleSwitchBanMode}/>
                     </div>
                     <div className={`${styles['ban-modal__body']}`}>
-                        {banModalMode === BanMode.ban &&
+                        {isBanMode &&
                             <input
                                 ref={banModalInputRef}
                                 type='text'
@@ -71,7 +76,7 @@ const BanModal: FC<BanModalProps> = () => {
                             />}
                         <button
                             className={`${modalStyles['modal__button']} ${styles['ban-modal__button-button']}`}
-                            disabled={banModalMode === BanMode.ban && (banModalLoading || !banModalValue.trim())}
+                            disabled={isButtonDisabled}
                             onClick={handleBanOrUnbanUser}>
                             {getButtonText()}
                         </button>
