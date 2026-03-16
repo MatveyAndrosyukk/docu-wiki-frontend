@@ -37,30 +37,18 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
 
     const {setIsResetPasswordModalOpened} = authState
 
-    const currentUserEmail = emailParam || (loggedInUser ? loggedInUser.email : null);
+    const currentUserEmail = emailParam ?? loggedInUser?.email ?? null;
 
     const title = useMemo(() => {
-
-        if (openedFile) {
-            return findPathToFile(files, openedFile.id)?.join('/');
-        }
-
-        if (loggedInUser) {
-            return "Docuwiki Workspace";
-        }
-
-        return "Docuwiki Studio";
-
+        if (openedFile) return findPathToFile(files, openedFile.id)?.join('/') ?? '';
+        return loggedInUser ? "Docuwiki Workspace" : "Docuwiki Studio";
     }, [openedFile, files, loggedInUser]);
 
     const {isOpened, setIsOpened} = useResponsiveFileTree();
 
     useResetPasswordModal(resetToken, setIsResetPasswordModalOpened);
-
     useDocumentTitle(title || "Docuwiki Studio");
-
     useViewedUserLoader(currentUserEmail);
-
     useFetchFilesForViewedUser(viewedUser, loggedInUser);
 
     return (
@@ -78,18 +66,17 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
                     emailParam={emailParam}
                     file={openedFile}/>
             </div>
-            {(isOpened && window.innerWidth < 1270) && (
-                <div
-                    className={styles['overlay']}
-                    onClick={() => setIsOpened(false)}
-                />
+
+            {isOpened && window.innerWidth < 1270 && (
+                <div className={styles.overlay} onClick={() => setIsOpened(false)} />
             )}
+
             <EditModal/>
             <DeleteModal/>
             <LoginModal/>
             <EnterEmailModal/>
             <ResetPasswordModal resetToken={resetToken}/>
-            {isUserOwner(loggedInUser) && <BanModal/>}
+            {isUserOwner(loggedInUser) && <BanModal />}
         </div>
     );
 };
