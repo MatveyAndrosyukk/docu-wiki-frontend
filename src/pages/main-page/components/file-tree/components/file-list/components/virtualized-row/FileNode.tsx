@@ -98,54 +98,46 @@ const FileNode: React.FC<Props> = React.memo(
             }
         };
 
+        const isFolder = file.type === FileType.Folder;
+        const clickHandler = isFolder ? () => onFolderClick(file.id) : () => handleTryToOpenFile(file.id);
+        const contextMenuHandler = !file.isPending ? handleOpenContextMenu : undefined;
+        const touchStartHandler = !file.isPending ? handleTouchStart : undefined;
+
         return (
-            <div
-                className={styles['file-list__node']}
-                key={file.id}
-            >
+            <div className={styles['file-list__node']} key={file.id}>
                 <div className={styles['file-list__node-container']}>
                     {linesBlock}
-                    {file.type === FileType.Folder ? (
-                        <div
-                            className={styles['file-list__node-folder']}
-                            onContextMenu={!file.isPending ? handleOpenContextMenu : undefined}
-                            onClick={!file.isPending ? () => onFolderClick(file.id) : undefined}
-                            onTouchStart={!file.isPending ? handleTouchStart : undefined}
-                            onTouchEnd={cancelLongPress}
-                            onTouchMove={cancelLongPress}
-                        >
-                            {file.status === FileStatus.Opened ? (
-                                <OpenedSvg style={{marginRight: 8}}/>
-                            ) : (
-                                <ClosedSvg style={{marginRight: 8}}/>
-                            )}
-                            {file.isPending ? <FileLoader/> : <span>{file.name}</span>}
-                        </div>
-                    ) : (
-                        <div
-                            className={styles['file-list__node-file']}
-                            onContextMenu={!file.isPending ? handleOpenContextMenu : undefined}
-                            onClick={!file.isPending ? () => handleTryToOpenFile(file.id) : undefined}
-                            onTouchStart={!file.isPending ? handleTouchStart : undefined}
-                            onTouchEnd={cancelLongPress}
-                            onTouchMove={cancelLongPress}
-                        >
-                            {file.isPending ? (
-                                <FileLoader/>
-                            ) : (
-                                <>
-                                    <FileImg className={styles['file-list__node-image']}/>
-                                    <span
-                                        className={`${styles['file-list__node-text']} ${
-                                            file.id === openedFile?.id ? styles['file-list__node-text--opened'] : ''
-                                        }`}
-                                    >
-                                        {file.name}
-                                    </span>
-                                </>
-                            )}
-                        </div>
-                    )}
+
+                    <div
+                        className={isFolder ? styles['file-list__node-folder'] : styles['file-list__node-file']}
+                        onContextMenu={contextMenuHandler}
+                        onClick={!file.isPending ? clickHandler : undefined}
+                        onTouchStart={touchStartHandler}
+                        onTouchEnd={cancelLongPress}
+                        onTouchMove={cancelLongPress}
+                    >
+                        {file.isPending ? (
+                            <FileLoader/>
+                        ) : (
+                            <>
+                                {isFolder ? (
+                                    file.status === FileStatus.Opened
+                                        ? <OpenedSvg style={{marginRight: 8}}/>
+                                        : <ClosedSvg style={{marginRight: 8}}/>
+                                ) : <FileImg className={styles['file-list__node-image']}/>}
+
+                                <span
+                                    className={`${styles['file-list__node-text']} ${
+                                        !isFolder && file.id === openedFile?.id
+                                            ? styles['file-list__node-text--opened']
+                                            : ''
+                                    }`}
+                                >
+                                    {file.name}
+                                </span>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         );
