@@ -60,13 +60,11 @@ const Header: FC = () => {
             <div className={styles['header__container']}>
                 <div className={styles['header__content']}>
                     <div className={styles['header__left']}>
-                        <div
-                            className={styles['header__logo']}
-                            onClick={handleRedirectToMainPage}
-                        >
+                        <div className={styles['header__logo']} onClick={handleRedirectToMainPage}>
                             <LogoSvg/>
                         </div>
                     </div>
+
                     <div className={styles['header__right']}>
                         <div className={styles['header__search']}>
                             <div className={styles['header__search-input']}>
@@ -76,25 +74,21 @@ const Header: FC = () => {
                                 />
                                 <SearchSvg className={styles['header__search-icon']}/>
                             </div>
-                            <SwapSvg
-                                className={styles['header__search-swap']}
-                                onClick={handleSwitchSearchType}/>
+                            <SwapSvg className={styles['header__search-swap']} onClick={handleSwitchSearchType}/>
                         </div>
 
                         {isMobile ? (
                             <div className={styles['header__burger-container']}>
                                 <button
+                                    ref={burgerButtonRef}
                                     className={styles['header__burger-button']}
                                     onClick={handleToggleBurgerMenu}
                                     aria-label="Toggle menu"
-                                    ref={burgerButtonRef}
                                 >
                                     &#9776;
                                 </button>
                                 {burgerOpen && (
-                                    <div
-                                        ref={menuRef}
-                                        className={styles['header__burger-menu']}>
+                                    <div ref={menuRef} className={styles['header__burger-menu']}>
                                         <div className={styles['header__burger-item']}>
                                             <UserSvg onClick={handleOpenUserModal}/>
                                         </div>
@@ -109,26 +103,16 @@ const Header: FC = () => {
                                 )}
                             </div>
                         ) : (
-                            <div className={`${styles['header__buttons']}`}>
-                                <div className={styles['header__user']}>
-                                    <UserSvg
-                                        onClick={handleOpenUserModal}/>
-                                </div>
+                            <div className={styles['header__buttons']}>
+                                <UserSvg className={styles['header__user']} onClick={handleOpenUserModal}/>
                                 {authStatus === 'loading' ? (
                                     <div className={styles['header__auth-skeleton']}/>
-                                ) : authStatus === 'authenticated' ? (
-                                    <div
-                                        className={styles['header__logout']}
-                                        onClick={handleLogout}
-                                    >
-                                        Logout
-                                    </div>
                                 ) : (
                                     <div
-                                        className={styles['header__login']}
-                                        onClick={handleOpenLoginModal}
+                                        className={authStatus === 'authenticated' ? styles['header__logout'] : styles['header__login']}
+                                        onClick={authStatus === 'authenticated' ? handleLogout : handleOpenLoginModal}
                                     >
-                                        Login
+                                        {authStatus === 'authenticated' ? 'Logout' : 'Login'}
                                     </div>
                                 )}
                             </div>
@@ -136,6 +120,7 @@ const Header: FC = () => {
                     </div>
                 </div>
             </div>
+
             <UserModal userModalState={userModalState}/>
         </div>
     );

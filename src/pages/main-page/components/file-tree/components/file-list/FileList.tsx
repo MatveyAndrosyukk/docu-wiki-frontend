@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import useContextMenuActions from '../../../../../../shared/lib/hooks/useContextMenuActions';
 import ContextMenu from '../../../../../../shared/ui/context-menu/ContextMenu';
 import {TreeNode, useFlattenedTree} from '../../../../../../shared/lib/hooks/useFlattenedTree';
-import FileNode from './components/virtualized-row/FileNode';
+import FileNode from './components/file-node/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../shared/assets/styles/Common.module.scss";
