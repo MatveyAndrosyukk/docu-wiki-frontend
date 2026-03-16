@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback} from "react";
+import React, {Dispatch, RefObject, SetStateAction, useCallback, useRef} from "react";
 import {UiFile} from "../../../store/types/UiFile";
 
 export interface OpenedContextMenuState {
@@ -13,6 +13,7 @@ export interface ContextMenuState {
     setState: Dispatch<SetStateAction<OpenedContextMenuState>>;
     handleOpenContextMenu: (event: React.MouseEvent, file: UiFile) => void;
     handleCloseContextMenu: () => void;
+    menuRef: RefObject<HTMLUListElement | null>;
 }
 
 export default function useContextMenuActions(): ContextMenuState {
@@ -22,6 +23,8 @@ export default function useContextMenuActions(): ContextMenuState {
         clickY: 0,
         file: null
     });
+
+    const menuRef = useRef<HTMLUListElement>(null);
 
     const handleOpenContextMenu = useCallback((event: React.MouseEvent, file: UiFile) => {
         event.preventDefault();
@@ -54,5 +57,6 @@ export default function useContextMenuActions(): ContextMenuState {
         setState,
         handleOpenContextMenu,
         handleCloseContextMenu,
+        menuRef,
     }
 }

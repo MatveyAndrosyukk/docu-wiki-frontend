@@ -29,7 +29,7 @@ const FileList: React.FC<FileListProps> = React.memo(
         const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
 
         const contextMenuState = useContextMenuActions();
-        const {state, handleCloseContextMenu} = contextMenuState;
+        const {state, handleCloseContextMenu, menuRef} = contextMenuState;
 
         const flattenedNodes = useFlattenedTree(files);
 
@@ -73,6 +73,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                         clickY={state.clickY}
                         file={state.file}
                         onCloseContextMenu={handleCloseContextMenu}
+                        menuRef={menuRef}
                     />
                 )}
             </div>

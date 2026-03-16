@@ -6,12 +6,14 @@ import {UiFile} from "../../../store/types/UiFile";
 import {useAppContext} from "../../lib/hooks/useAppContext";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
+import {useElementOutsideEvent} from "../../lib/hooks/useElementOutsideEvent";
 
 interface ContextMenuProps {
     clickX: number;
     clickY: number;
     file: UiFile;
     onCloseContextMenu: () => void;
+    menuRef: React.RefObject<HTMLUListElement | null>;
 }
 
 const ContextMenu: FC<ContextMenuProps> = (
@@ -20,6 +22,7 @@ const ContextMenu: FC<ContextMenuProps> = (
         clickY,
         file,
         onCloseContextMenu,
+        menuRef,
     }) => {
 
     const {fileState} = useAppContext();
@@ -34,16 +37,18 @@ const ContextMenu: FC<ContextMenuProps> = (
         handleOpenDeleteModal,
     } = fileState;
 
-    useEffect(() => {
-        const handleClickOutside = () => onCloseContextMenu();
-        window.addEventListener('click', handleClickOutside);
-        return () => window.removeEventListener('click', handleClickOutside);
-    }, [onCloseContextMenu]);
+    useElementOutsideEvent(
+        menuRef,
+        "click",
+        onCloseContextMenu
+    );
 
     return (
         <div>
             <ul className={styles['context-menu']}
-                style={{top: clickY, left: clickX}}>
+                style={{top: clickY, left: clickX}}
+                ref={menuRef}
+                onClick={onCloseContextMenu}>
                 {file.type === FileType.Folder && (
                     <>
                         {copiedFile && (
