@@ -88,7 +88,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     return (
         <div className={styles['opened-file']}>
-            {/* Заголовок файла */}
             <OpenedFileHeader
                 file={file}
                 isLiked={isLiked}

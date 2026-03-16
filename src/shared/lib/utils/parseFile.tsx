@@ -113,6 +113,7 @@ function parseInline(
                         src={imageUrl}
                         alt={fileName}
                         onClick={() => onImageClick(imageUrl)}
+                        loading="lazy"
                     />
                 );
             }
