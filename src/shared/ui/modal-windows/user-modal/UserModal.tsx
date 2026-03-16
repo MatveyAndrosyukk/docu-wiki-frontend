@@ -1,22 +1,18 @@
-import React, {FC, useCallback} from 'react';
-import styles from './UserModal.module.scss'
+import React, { FC, useCallback } from 'react';
+import styles from './UserModal.module.scss';
 import Modal from "../modal/Modal";
-import {User} from "../../../../store/slices/userSlice";
-import {UserModalState} from "../../../lib/hooks/useUserModalActions";
-import {useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../../store";
+import { User } from "../../../../store/slices/userSlice";
+import { UserModalState } from "../../../lib/hooks/useUserModalActions";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store";
 
-interface LoginModalProps {
+interface UserModalProps {
     userModalState: UserModalState
 }
 
-const UserModal: FC<LoginModalProps> = (
-    {
-        userModalState,
-    }) => {
+const UserModal: FC<UserModalProps> = ({ userModalState }) => {
     const navigate = useNavigate();
-
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
 
     const {
@@ -40,25 +36,22 @@ const UserModal: FC<LoginModalProps> = (
         handleAddUserWhoCanEdit,
         handleDeleteUserWhoCanEdit,
         handleCloseUserModal,
-    } = userModalState
+    } = userModalState;
 
     const handleGoToUsersPage = useCallback((user: User) => {
         navigate(`/${encodeURIComponent(user.email)}`);
-        setUserModalValue('')
+        setUserModalValue('');
         setIsUserModalOpen(false);
-    }, [navigate, setIsUserModalOpen, setUserModalValue])
+    }, [navigate, setIsUserModalOpen, setUserModalValue]);
 
     if (!isUserModalOpen) return null;
 
     return (
-        <Modal
-            isOpen={isUserModalOpen}
-            onClose={handleCloseUserModal}
-        >
+        <Modal isOpen={isUserModalOpen} onClose={handleCloseUserModal}>
             <div className={styles.userModal}>
+
                 <div className={styles.section}>
                     <div className={styles.sectionTitle}>Profile</div>
-
                     <div className={styles.profileBlock}>
                         <div className={styles.profileNameRow}>
                             {isEditingName ? (
@@ -79,26 +72,19 @@ const UserModal: FC<LoginModalProps> = (
                                     {loggedInUser?.name}
                                 </div>
                             )}
-
-                            {isChangingName && <div className={styles.loaderSmall}/>}
+                            {isChangingName && <div className={styles.loaderSmall} />}
                         </div>
 
-                        <div className={styles.profileEmail}>
-                            {loggedInUser?.email}
-                        </div>
+                        <div className={styles.profileEmail}>{loggedInUser?.email}</div>
 
+                        {/* сохраняем пространство для ошибок, чтобы не прыгала модалка */}
                         <div className={styles.errorContainer}>
-                            {editedNameError && (
-                                <div className={styles.errorText}>
-                                    <div className={styles.errorText}>{editedNameError}</div>
-                                </div>
-                            )}
+                            {editedNameError && <div className={styles.errorText}>{editedNameError}</div>}
                         </div>
-
                     </div>
                 </div>
 
-                <div className={styles.divider}/>
+                <div className={styles.divider} />
 
                 <div className={styles.section}>
                     <div className={styles.sectionTitle}>Promote access</div>
@@ -112,26 +98,17 @@ const UserModal: FC<LoginModalProps> = (
                                 value={userModalValue}
                                 onChange={(e) => setUserModalValue(e.target.value)}
                             />
-
                             <button
                                 className={styles.primaryButton}
                                 disabled={!userModalValue.trim() || isAddingEditor}
                                 onClick={handleAddUserWhoCanEdit}
                             >
-                                {isAddingEditor ? (
-                                    <div className={styles.loaderSmall}/>
-                                ) : (
-                                    'Promote'
-                                )}
+                                {isAddingEditor ? <div className={styles.loaderSmall} /> : 'Promote'}
                             </button>
                         </div>
 
                         <div className={styles.errorContainer}>
-                            {addEditorError && (
-                                <div className={styles.errorText}>
-                                    {addEditorError}
-                                </div>
-                            )}
+                            {addEditorError && <div className={styles.errorText}>{addEditorError}</div>}
                         </div>
                     </div>
 
@@ -139,10 +116,10 @@ const UserModal: FC<LoginModalProps> = (
                         {isAddingEditor && (
                             <div className={styles.editorSkeletonCard}>
                                 <div className={styles.editorSkeletonLeft}>
-                                    <div className={styles.skeletonName}/>
-                                    <div className={styles.skeletonEmail}/>
+                                    <div className={styles.skeletonName} />
+                                    <div className={styles.skeletonEmail} />
                                 </div>
-                                <div className={styles.skeletonButton}/>
+                                <div className={styles.skeletonButton} />
                             </div>
                         )}
 
@@ -153,12 +130,8 @@ const UserModal: FC<LoginModalProps> = (
                                 onClick={() => handleGoToUsersPage(user)}
                             >
                                 <div>
-                                    <div className={styles.editorName}>
-                                        {user.name}
-                                    </div>
-                                    <div className={styles.editorEmail}>
-                                        {user.email}
-                                    </div>
+                                    <div className={styles.editorName}>{user.name}</div>
+                                    <div className={styles.editorEmail}>{user.email}</div>
                                 </div>
 
                                 <button
@@ -175,7 +148,7 @@ const UserModal: FC<LoginModalProps> = (
                 </div>
             </div>
         </Modal>
-    )
+    );
 };
 
 export default UserModal;
