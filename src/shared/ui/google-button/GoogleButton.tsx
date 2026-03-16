@@ -6,10 +6,7 @@ import {useAppContext} from "../../lib/hooks/useAppContext";
 const GoogleButton = () => {
     const {authState} = useAppContext();
 
-    const {
-        handleGoogleSuccess,
-        handleGoogleError
-    } = authState;
+    const {handleGoogleSuccess, handleGoogleError} = authState;
 
     const handleGoogleAuthResult = useGoogleLogin({
         flow: 'auth-code',

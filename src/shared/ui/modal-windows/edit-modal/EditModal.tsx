@@ -9,7 +9,6 @@ import {ReactComponent as ArrowIcon} from './images/arrow.svg'
 
 const EditModal: FC = () => {
     const {fileState} = useAppContext();
-    const [lengthError] = React.useState('');
 
     const {
         modalValue,
@@ -25,6 +24,14 @@ const EditModal: FC = () => {
         handleConfirmModalByReason,
     } = fileState;
 
+    const errorMessage = modalError
+        ? modalError
+        : isNameConflictReason()
+            ? copiedFile?.type === FileType.Folder
+                ? "Folder with this name exists"
+                : "File with this name exists"
+            : "";
+
     useEffect(() => {
         if (modalValue.length >= 20) {
             setModalError('Name is too long');
@@ -33,82 +40,68 @@ const EditModal: FC = () => {
         }
     }, [modalValue, setModalError]);
 
-    return <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-    >
-        <div
-            className={modalStyles['modal__overlay']}
+    const handleConfirm = () => {
+        handleConfirmModalByReason({
+            title: modalValue,
+            id: modalOpenState.id,
+            reason: modalOpenState.reason as ActionType
+        });
+    };
+
+    return (
+        <Modal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
         >
-            <div className={modalStyles['modal__form']}>
-                <div className={`${styles['edit-modal__title']} ${modalStyles['modal__title']}`}>
-                    {modalOpenState.title}
-                </div>
-                {isNameConflictReason() ?
-                    modalError ? (
-                        <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
-                            {modalError}
-                        </p>
-                    ) : (
-                        <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
-                            {copiedFile?.type === FileType.Folder
-                                ? "Folder with this name exists"
-                                : "File with this name exists"}
-                        </p>
-                    ) :
-                    (
-                        modalError ? (
-                            <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']}`}>
-                                {modalError}
-                            </p>
-                        ) : (
-                            <p className={`${modalStyles['modal__error']} ${styles['edit-modal__error']} ${modalStyles['modal__hidden']}`}>
-                                {copiedFile?.type === FileType.Folder
-                                    ? "Folder with this name exists"
-                                    : "File with this name exists"}
-                            </p>
-                        )
+            <div className={modalStyles['modal__overlay']}>
+                <div className={modalStyles['modal__form']}>
 
-                    )
-                }
-                <div className={styles['edit-modal__input-wrapper']}>
-                    <input
-                        ref={modalInputRef}
-                        type='text'
-                        className={styles['edit-modal__input']}
-                        placeholder={"Enter the title"}
-                        value={modalValue}
-                        onChange={(e) => setModalValue(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (lengthError) return;
-                                handleConfirmModalByReason({
-                                    title: modalValue,
-                                    id: modalOpenState.id,
-                                    reason: modalOpenState.reason as ActionType
-                                });
-                            }
-                        }}
-                    />
+                    <div className={`${styles['edit-modal__title']} ${modalStyles['modal__title']}`}>
+                        {modalOpenState.title}
+                    </div>
 
-                    <button
-                        className={styles['edit-modal__submit']}
-                        disabled={!modalValue.trim() || !!modalError}
-                        onClick={() => {
-                            handleConfirmModalByReason({
-                                title: modalValue,
-                                id: modalOpenState.id,
-                                reason: modalOpenState.reason as ActionType
-                            });
-                        }}
+                    <p
+                        className={`
+                        ${modalStyles['modal__error']} 
+                        ${styles['edit-modal__error']} 
+                        ${!errorMessage ? modalStyles['modal__hidden'] : ''}
+                    `}
                     >
-                        <ArrowIcon/>
-                    </button>
+                        {errorMessage || "placeholder"}
+                    </p>
+
+                    <div className={styles['edit-modal__input-wrapper']}>
+
+                        <input
+                            ref={modalInputRef}
+                            type="text"
+                            className={styles['edit-modal__input']}
+                            placeholder="Enter the title"
+                            value={modalValue}
+                            onChange={(e) => setModalValue(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    if (modalError) return;
+                                    handleConfirm();
+                                }
+                            }}
+                        />
+
+                        <button
+                            className={styles['edit-modal__submit']}
+                            disabled={!modalValue.trim() || !!modalError}
+                            onClick={handleConfirm}
+                        >
+                            <ArrowIcon/>
+                        </button>
+
+                    </div>
+
                 </div>
             </div>
-        </div>
-    </Modal>
+        </Modal>
+    );
 };
 
 export default EditModal;
