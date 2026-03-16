@@ -14,46 +14,49 @@ const DeleteModal: FC = () => {
         handleConfirmDeleteFile,
     } = fileState;
 
-    return (<Modal isOpen={deleteModalState.open}
-                   onClose={handleCancelDeleteFile}>
-        <div
-            className={`${modalStyles['modal__overlay']} ${styles['delete-modal__overlay']}`}
-        >
-            <div className={modalStyles['modal__form']}>
-                <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
-                    {deleteModalState.file?.type === FileType.Folder ? (
-                        <>
-                            Delete folder <span
-                            className={styles['delete-modal__text-highlighted']}>"{deleteModalState.file.name}"
-                            </span> and all its contents?
-                        </>
-                    ) : (
-                        <>
-                            Delete file{" "}
+    const file = deleteModalState.file;
+    const isFolder = file?.type === FileType.Folder;
+
+    const deleteText = isFolder
+        ? 'Delete folder'
+        : 'Delete file';
+
+    const deleteEnding = isFolder
+        ? 'and all its contents?'
+        : '?';
+
+    return (
+        <Modal isOpen={deleteModalState.open}
+               onClose={handleCancelDeleteFile}>
+            <div
+                className={`${modalStyles['modal__overlay']} ${styles['delete-modal__overlay']}`}
+            >
+                <div className={modalStyles['modal__form']}>
+                    <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
+                        <p className={`${modalStyles['modal__text']} ${styles['delete-modal__text']}`}>
+                            {deleteText}{' '}
                             <span className={styles['delete-modal__text-highlighted']}>
-                                "{deleteModalState.file?.name}"
-                            </span>
-                            ?
-                        </>
-                    )}
-                </p>
-                <div className={modalStyles['modal__buttons']}>
-                    <button
-                        className={styles['delete-modal__buttons-delete']}
-                        onClick={handleConfirmDeleteFile}
-                    >
-                        OK
-                    </button>
-                    <button
-                        className={styles['delete-modal__buttons-cancel']}
-                        onClick={handleCancelDeleteFile}
-                    >
-                        Cancel
-                    </button>
+                            "{file?.name}"</span>{' '}
+                            {deleteEnding}
+                        </p>
+                    </p>
+                    <div className={modalStyles['modal__buttons']}>
+                        <button
+                            className={styles['delete-modal__buttons-delete']}
+                            onClick={handleConfirmDeleteFile}
+                        >
+                            OK
+                        </button>
+                        <button
+                            className={styles['delete-modal__buttons-cancel']}
+                            onClick={handleCancelDeleteFile}
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </Modal>);
+        </Modal>);
 }
 
 export default DeleteModal;
