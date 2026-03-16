@@ -28,8 +28,7 @@ const FileList: React.FC<FileListProps> = React.memo(
         const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
         const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
 
-        const contextMenuState = useContextMenuActions();
-        const {state, handleCloseContextMenu, menuRef} = contextMenuState;
+        const {state, handleCloseContextMenu, menuRef} = useContextMenuActions();
 
         const flattenedNodes = useFlattenedTree(files);
 
@@ -40,11 +39,10 @@ const FileList: React.FC<FileListProps> = React.memo(
             [dispatch, files],
         );
 
+        const maxHeight = windowWidth < 1270 ? '300px' : '81vh';
+
         return (
-            <div
-                className={styles['file-list']}
-                style={{maxHeight: windowWidth < 1270 ? '300px' : '81vh'}}
-            >
+            <div className={styles['file-list']} style={{maxHeight}}>
                 {fileState.isLimitError && (
                     <div className={commonStyles['common__notification']}>
                         You can't create more than 20 files without premium :(
@@ -58,7 +56,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                             node={node}
                             emailParam={emailParam}
                             onFolderClick={handleFolderClick}
-                            contextMenuState={contextMenuState}
+                            contextMenuState={{ state, handleCloseContextMenu, menuRef }}
                             viewedUser={viewedUser}
                             loggedInUser={loggedInUser}
                             handleTryToOpenFile={fileState.handleTryToOpenFile}
