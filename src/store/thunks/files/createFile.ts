@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {ServerFile} from "../../types/ServerFile";
 import {CreateFilePayload} from "../../../types/CreateFilePayload";
-import API_BASE_URL from "../../../shared/assets/config/api-config";
+import {apiFetch} from "../../../shared/lib/services/apiFetch";
 
 export const createFile = createAsyncThunk<
     ServerFile,
@@ -9,13 +9,10 @@ export const createFile = createAsyncThunk<
 >(
     'fileTree/createFile',
     async (body) => {
-        const token = localStorage.getItem('token');
-
-        const response = await fetch(`${API_BASE_URL}/files`, {
+        const response = await apiFetch(`/files`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify(body)
         });

@@ -3,7 +3,7 @@ import {File} from "../../../types/file";
 import {revertFileLike, toggleFileLikeOptimistic} from "../../slices/fileServerSlice";
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
-import API_BASE_URL from "../../../shared/assets/config/api-config";
+import {apiFetch} from "../../../shared/lib/services/apiFetch";
 
 export interface ChangeFileLikesPayload {
     id: number;
@@ -30,13 +30,10 @@ export const toggleFileLikes = createAsyncThunk<
         dispatch(toggleFileLikeOptimistic({fileId: id}));
 
         try {
-            const token = localStorage.getItem('token');
-
-            const response = await fetch(`${API_BASE_URL}/files/like`, {
+            const response = await apiFetch(`/files/like`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({id, email}),
             });

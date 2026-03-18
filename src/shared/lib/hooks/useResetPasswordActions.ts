@@ -1,5 +1,5 @@
 import {ChangeEvent, Dispatch, Ref, SetStateAction, useCallback, useRef, useState} from "react";
-import {resetPasswordAsync} from "../../../services/resetPasswordAsync";
+import {resetPasswordAsync} from "../services/resetPasswordAsync";
 
 export interface ResetPasswordValueState {
     newPassword: string,

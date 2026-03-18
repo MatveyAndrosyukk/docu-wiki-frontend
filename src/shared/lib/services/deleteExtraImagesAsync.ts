@@ -1,4 +1,4 @@
-import API_BASE_URL from "../shared/assets/config/api-config";
+import {apiFetch} from "./apiFetch";
 
 
 export async function deleteExtraImagesAsync(extraImages: string[]) {
@@ -6,21 +6,17 @@ export async function deleteExtraImagesAsync(extraImages: string[]) {
         return {deleted: 0};
     }
 
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${API_BASE_URL}/images/delete`, {
+    const response = await apiFetch(`/images/delete`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({delete_urls: extraImages}),
-    })
+    });
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        const message = errorData?.message || 'Failed to delete images';
-        throw new Error(message);
+        throw new Error(errorData?.message || 'Failed to delete images');
     }
 
     return await response.json();

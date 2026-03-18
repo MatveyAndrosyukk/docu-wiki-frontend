@@ -1,5 +1,5 @@
 import {ChangeEvent, Dispatch, Ref, SetStateAction, useCallback, useRef, useState} from "react";
-import {sendResetPasswordLinkAsync} from "../../../services/sendResetPasswordLinkAsync";
+import {sendResetPasswordLinkAsync} from "../services/sendResetPasswordLinkAsync";
 
 export type EmailModalState = {
     isEnterEmailModalOpened: boolean;

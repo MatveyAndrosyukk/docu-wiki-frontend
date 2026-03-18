@@ -3,7 +3,7 @@ import {removeFileOptimistic, restoreFile} from "../../slices/fileServerSlice";
 import {mapUiFileToServerFile} from "../../mappers/mapUiFileToServerFile";
 import {AppDispatch, RootState} from "../../index";
 import {UiFile} from "../../types/UiFile";
-import API_BASE_URL from "../../../shared/assets/config/api-config";
+import {apiFetch} from "../../../shared/lib/services/apiFetch";
 
 interface DeleteFilePayload {
     file: UiFile;
@@ -17,21 +17,20 @@ export const deleteFileById = createAsyncThunk<
 >(
     'fileTree/deleteFileById',
     async ({file, email}, {dispatch}) => {
-        const token = localStorage.getItem('token');
-
         dispatch(removeFileOptimistic(file.id));
 
         try {
-            const response = await fetch(`${API_BASE_URL}/files`, {
+            const response = await apiFetch(`/files`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({id: file.id, email}),
             });
 
-            if (!response.ok) throw new Error('Failed to delete file on server');
+            if (!response.ok) {
+                throw new Error('Failed to delete file on server');
+            }
 
             return await response.json();
         } catch (error) {

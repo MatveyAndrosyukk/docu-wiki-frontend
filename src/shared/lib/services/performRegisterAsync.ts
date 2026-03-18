@@ -1,4 +1,4 @@
-import API_BASE_URL from "../shared/assets/config/api-config";
+import API_BASE_URL from "../../assets/config/api-config";
 
 
 interface RegisterResponse {

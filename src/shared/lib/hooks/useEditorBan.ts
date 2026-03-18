@@ -1,6 +1,6 @@
 import {ChangeEvent, Dispatch, Ref, SetStateAction, useCallback, useEffect, useRef, useState} from "react";
-import {banUserByReasonAsync} from "../../../services/banUserByReasonAsync";
-import {unbanUserByReasonAsync} from "../../../services/unbanUserAsync";
+import {banUserByReasonAsync} from "../services/banUserByReasonAsync";
+import {unbanUserByReasonAsync} from "../services/unbanUserAsync";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 

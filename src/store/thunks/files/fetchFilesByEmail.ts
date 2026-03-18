@@ -12,8 +12,6 @@ export const fetchFilesByEmail = createAsyncThunk<
     GetFilesForUserDto>(
     'fileTree/fetchFilesByEmail',
     async (dto: GetFilesForUserDto) => {
-        const token = localStorage.getItem('token');
-
         const params = new URLSearchParams({
             viewedUserEmail: dto.viewedUserEmail,
             ...(dto.loggedInUserEmail && {loggedInUserEmail: dto.loggedInUserEmail})
@@ -23,9 +21,6 @@ export const fetchFilesByEmail = createAsyncThunk<
             `${API_BASE_URL}/files?${params}`,
             {
                 method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                }
             }
         );
         if (!response.ok) {

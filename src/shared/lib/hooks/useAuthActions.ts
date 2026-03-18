@@ -5,7 +5,7 @@ import {CodeResponse} from "@react-oauth/google";
 import useEmailModalActions, {EmailModalState} from "./useEmailModalActions";
 import useResetPasswordActions, {ResetPasswordState} from "./useResetPasswordActions";
 import {jwtDecode} from "jwt-decode";
-import {performGoogleLoginAsync} from "../../../services/performGoogleLoginAsync";
+import {performGoogleLoginAsync} from "../services/performGoogleLoginAsync";
 import {CustomJwtPayload} from "../../../types/customJWTPayload";
 import {useAuth} from "./useAuth";
 import {fetchLoggedInUserByEmail} from "../../../store/thunks/user/fetchLoggedInUserByEmail";
@@ -36,17 +36,19 @@ export default function useAuthActions(): AuthorizationState {
         const authorizationCode = codeResponse.code;
 
         performGoogleLoginAsync(authorizationCode)
-            .then((data: { token: string; user: any }) => {
-                const decoded: CustomJwtPayload = jwtDecode(data.token);
+            .then((data) => {
+                const decoded: CustomJwtPayload = jwtDecode(data.accessToken);
                 const roleValues = decoded.roles.map((role: any) => role.value);
 
-                localStorage.setItem('token', data.token);
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
 
                 dispatch(fetchLoggedInUserByEmail(decoded.email));
 
-                setAuthStatus('authenticated')
+                setAuthStatus('authenticated');
                 loginState.setIsLoginModalOpen(false);
             })
             .catch((error) => {
@@ -56,7 +58,7 @@ export default function useAuthActions(): AuthorizationState {
                 }
                 console.error('Google login error', error);
             });
-    }, [loginState]);
+    }, [loginState, dispatch, setAuthStatus]);
 
     const handleGoogleError = () => {
         console.error('Google Login Failed');

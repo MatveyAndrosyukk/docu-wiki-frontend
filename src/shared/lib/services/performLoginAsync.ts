@@ -1,8 +1,9 @@
-import API_BASE_URL from "../shared/assets/config/api-config";
+import API_BASE_URL from "../../assets/config/api-config";
 
 
 interface LoginResponse {
-    token: string;
+    accessToken: string;
+    refreshToken: string;
 }
 
 export async function performLoginAsync(email: string, password: string): Promise<LoginResponse> {

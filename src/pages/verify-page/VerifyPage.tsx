@@ -1,6 +1,6 @@
 import React, {FC, useEffect} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {performVerificationAsync} from "../../services/performVerificationAsync";
+import {performVerificationAsync} from "../../shared/lib/services/performVerificationAsync";
 import {useAppContext} from "../../shared/lib/hooks/useAppContext";
 
 const VerifyPage: FC = () => {

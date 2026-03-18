@@ -1,4 +1,4 @@
-import API_BASE_URL from "../shared/assets/config/api-config";
+import API_BASE_URL from "../../assets/config/api-config";
 
 
 export async function performGoogleLoginAsync(code: string) {
@@ -21,5 +21,9 @@ export async function performGoogleLoginAsync(code: string) {
         throw new Error(message);
     }
 
-    return response.json();
+    return await response.json() as Promise<{
+        accessToken: string;
+        refreshToken: string;
+        user: any;
+    }>;
 }

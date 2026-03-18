@@ -3,28 +3,44 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../store";
 import {fetchLoggedInUserByEmail} from "../../../store/thunks/user/fetchLoggedInUserByEmail";
 import {useAuth} from "./useAuth";
+import API_BASE_URL from "../../assets/config/api-config";
+import {jwtDecode} from "jwt-decode";
 
 export default function useAuthBootstrap() {
     const dispatch = useDispatch<AppDispatch>();
     const {setAuthStatus} = useAuth();
 
     useEffect(() => {
+        const refreshToken = localStorage.getItem('refreshToken');
 
-        const token = localStorage.getItem("token");
-        const email = localStorage.getItem("email");
-
-        if (!token || !email) {
-            setAuthStatus("unauthenticated");
+        if (!refreshToken) {
+            setAuthStatus('unauthenticated');
             return;
         }
 
-        dispatch(fetchLoggedInUserByEmail(email))
-            .unwrap()
-            .then(() => {
+        fetch(`${API_BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({refreshToken}),
+        })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(async (data) => {
+                localStorage.setItem("accessToken", data.accessToken);
+                localStorage.setItem("refreshToken", data.refreshToken);
+
+                const decoded: any = jwtDecode(data.accessToken);
+
+                await dispatch(fetchLoggedInUserByEmail(decoded.email)).unwrap();
+
                 setAuthStatus("authenticated");
             })
             .catch(() => {
-                localStorage.clear()
+                localStorage.clear();
                 setAuthStatus("unauthenticated");
             });
 

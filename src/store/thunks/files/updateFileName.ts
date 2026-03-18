@@ -4,7 +4,7 @@ import {fetchFilesByEmail} from "./fetchFilesByEmail";
 import {optimisticUpdateFileName, revertFileName} from "../../slices/fileServerSlice";
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
-import API_BASE_URL from "../../../shared/assets/config/api-config";
+import {apiFetch} from "../../../shared/lib/services/apiFetch";
 
 interface ChangeFileNamePayload {
     id: number;
@@ -37,13 +37,10 @@ export const updateFileName = createAsyncThunk<
         );
 
         try {
-            const token = localStorage.getItem("token");
-
-            const response = await fetch(`${API_BASE_URL}/files/rename`, {
+            const response = await apiFetch(`/files/rename`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     id: body.id,

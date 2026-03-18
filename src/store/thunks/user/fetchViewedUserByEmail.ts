@@ -5,16 +5,11 @@ import API_BASE_URL from "../../../shared/assets/config/api-config";
 export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
     'user/fetchViewedUserByEmail',
     async (email, {rejectWithValue}) => {
-        const token = localStorage.getItem('token');
-
         try {
             const response = await fetch(
                 `${API_BASE_URL}/users/findOne?email=${email}`,
                 {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    }
                 }
             );
 

@@ -2,7 +2,7 @@ import {useDispatch} from "react-redux";
 import {Dispatch, SetStateAction, useCallback, useState} from "react";
 import {updateFileContent} from "../../../store/thunks/files/updateFileContent";
 import extractImagesName from "../utils/extractImageNames";
-import {deleteExtraImagesAsync} from "../../../services/deleteExtraImagesAsync";
+import {deleteExtraImagesAsync} from "../services/deleteExtraImagesAsync";
 import {AppDispatch} from "../../../store";
 import {openFile} from "../../../store/slices/fileUiSlice";
 

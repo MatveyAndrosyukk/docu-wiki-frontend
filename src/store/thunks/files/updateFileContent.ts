@@ -4,7 +4,7 @@ import {optimisticUpdateFileContent, revertFileContent} from "../../slices/fileS
 import {findFileById} from "../../utils/fileTreeActionUtils";
 import {RootState} from "../../index";
 import {setSaving} from "../../slices/fileUiSlice";
-import API_BASE_URL from "../../../shared/assets/config/api-config";
+import {apiFetch} from "../../../shared/lib/services/apiFetch";
 
 interface ChangeFileContentPayload {
     id: number;
@@ -39,13 +39,10 @@ export const updateFileContent = createAsyncThunk<
         );
 
         try {
-            const token = localStorage.getItem('token');
-
-            const response = await fetch(`${API_BASE_URL}/files/content`, {
+            const response = await apiFetch(`/files/content`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({id, content, editor}),
             });

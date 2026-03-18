@@ -1,5 +1,5 @@
 import {ChangeEvent, Dispatch, SetStateAction, useCallback, useState} from "react";
-import {performRegisterAsync} from "../../../services/performRegisterAsync";
+import {performRegisterAsync} from "../services/performRegisterAsync";
 
 export interface RegisterModalState {
     email: string;

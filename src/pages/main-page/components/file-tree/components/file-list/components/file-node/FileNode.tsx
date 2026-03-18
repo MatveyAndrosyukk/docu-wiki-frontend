@@ -112,7 +112,9 @@ const FileNode: React.FC<Props> = React.memo(
                         {file.isPending ? (
                             <FileLoader/>
                         ) : (
-                            <>
+                            <div
+                                onClick={!file.isPending ? clickHandler : undefined}
+                                className={styles['file-list__node-content']}>
                                 {isFolder ? (
                                     file.status === FileStatus.Opened
                                         ? <OpenedSvg style={{marginRight: 8}}/>
@@ -126,14 +128,13 @@ const FileNode: React.FC<Props> = React.memo(
                                             : ''
                                     }`}
                                     onContextMenu={contextMenuHandler}
-                                    onClick={!file.isPending ? clickHandler : undefined}
                                     onTouchStart={touchStartHandler}
                                     onTouchEnd={cancelLongPress}
                                     onTouchMove={cancelLongPress}
                                 >
                                     {file.name}
                                 </span>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>

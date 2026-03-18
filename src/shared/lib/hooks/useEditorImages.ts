@@ -1,5 +1,5 @@
 import {ChangeEvent, useCallback, useRef, useState} from "react";
-import {uploadImageAsync} from "../../../services/uploadImageAsync";
+import {uploadImageAsync} from "../services/uploadImageAsync";
 import {addPendingImage, markImageError, removePendingImage} from "../../../store/slices/fileUiSlice";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../store";

@@ -1,7 +1,7 @@
 import {Dispatch, Ref, SetStateAction, useCallback, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../store";
-import {performLoginAsync} from "../../../services/performLoginAsync";
+import {performLoginAsync} from "../services/performLoginAsync";
 import {jwtDecode} from "jwt-decode";
 import {clearUiState} from "../../../store/slices/fileUiSlice";
 import {useAuth} from "./useAuth";
@@ -73,14 +73,16 @@ export default function useLoginActions(): LoginState {
                     exp: number;
                 };
 
-                const decoded: JwtPayload = jwtDecode(data.token);
+                const decoded: JwtPayload = jwtDecode(data.accessToken);
                 const roleValues = decoded.roles.map(role => role.value);
 
-                localStorage.setItem('token', data.token);
+                localStorage.setItem('accessToken', data.accessToken);
+                localStorage.setItem('refreshToken', data.refreshToken);
+
                 localStorage.setItem('email', decoded.email);
                 localStorage.setItem('roles', JSON.stringify(roleValues));
 
-                dispatch(fetchLoggedInUserByEmail(decoded.email));
+                await dispatch(fetchLoggedInUserByEmail(decoded.email)).unwrap();
 
                 setAuthStatus("authenticated");
             } catch (error) {
@@ -92,10 +94,10 @@ export default function useLoginActions(): LoginState {
         setLoginError(null);
         try {
             await login();
-            setLoginLoading(false);
         } catch (error) {
-            setLoginLoading(false);
             throw error;
+        } finally {
+            setLoginLoading(false);
         }
     }, [dispatch, loginModalValue.login, loginModalValue.password, setAuthStatus]);
 
