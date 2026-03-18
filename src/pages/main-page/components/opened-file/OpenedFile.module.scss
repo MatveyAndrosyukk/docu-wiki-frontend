@@ -1,5 +1,7 @@
 .opened-file {
-  width: 890px;
+  width: 100%;
+  max-width: 890px;
+  min-width: 0;
   height: calc(100vh - 70px - 20px - 20px);
   background-color: #202222;
   border-radius: 14px;
@@ -41,6 +43,7 @@
   }
 
   &__content {
+    min-width: 0;
     flex: 1 1 auto;
     overflow-y: auto;
     will-change: transform;
