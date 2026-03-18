@@ -36,7 +36,7 @@ const fileUiSlice = createSlice({
             state,
             action: PayloadAction<{ id: number; tree: UiFile[] }>
         ) {
-            const { id, tree } = action.payload;
+            const {id, tree} = action.payload;
 
             if (state.openedFolders.includes(id)) {
                 const findNode = (nodes: UiFile[]): UiFile | null => {
@@ -120,9 +120,6 @@ const fileUiSlice = createSlice({
         },
         addPendingRootFolder(state, action: PayloadAction<{ tempId: number }>) {
             state.pendingRootFolders[action.payload.tempId] = true;
-        },
-        removePendingRootFolder(state, action: PayloadAction<number>) {
-            delete state.pendingRootFolders[action.payload];
         }
     },
     extraReducers: builder => {
@@ -131,7 +128,7 @@ const fileUiSlice = createSlice({
                 const tempId = action.meta.arg.tempId;
                 if (tempId && state.pendingFiles[tempId] !== undefined) {
                     delete state.pendingFiles[tempId];
-                }else if (tempId && state.pendingRootFolders[tempId] !== undefined){
+                } else if (tempId && state.pendingRootFolders[tempId] !== undefined) {
                     delete state.pendingRootFolders[tempId];
                 }
             })
@@ -139,7 +136,7 @@ const fileUiSlice = createSlice({
                 const tempId = action.meta.arg.tempId;
                 if (tempId && state.pendingFiles[tempId] !== undefined) {
                     delete state.pendingFiles[tempId];
-                }else if (tempId && state.pendingRootFolders[tempId] !== undefined){
+                } else if (tempId && state.pendingRootFolders[tempId] !== undefined) {
                     delete state.pendingRootFolders[tempId];
                 }
             });
