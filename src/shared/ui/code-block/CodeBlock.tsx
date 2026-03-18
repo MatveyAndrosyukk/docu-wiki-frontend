@@ -5,6 +5,7 @@ import styles from './CodeBlock.module.scss';
 import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
 import {getLanguage} from "../../lib/utils/getLanguage";
 import {useDebouncedValue} from "../../lib/hooks/useDebouncedValue";
+import useCheckIsMobile from "../../lib/hooks/useCheckIsMobile";
 
 interface CodeBlockProps {
     code: string;
@@ -22,9 +23,15 @@ const CodeBlock: FC<CodeBlockProps> = (
 
     const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
 
-    const maxHeight = isCodeExpanded
-        ? 'none'
-        : (isFileTreeOpened ? '21em' : '22em');
+    const isMobile = useCheckIsMobile();
+
+    const maxHeight = useMemo(() => {
+        if (isMobile) return 'none';
+
+        if (isCodeExpanded) return 'none';
+
+        return isFileTreeOpened ? '21em' : '22em';
+    }, [isMobile, isCodeExpanded, isFileTreeOpened]);
 
     const handleExpandCode = useCallback(() => {
         setIsCodeExpanded(prev => !prev);
