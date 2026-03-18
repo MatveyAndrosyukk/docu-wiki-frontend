@@ -7,7 +7,27 @@ interface TerminalBlockProps {
 
 const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
     const lines = commands.split('\n');
-    const promptRegex = /^([a-zA-Z0-9_.@\-\\:/\s]+[>$])\s?(.*)$/;
+    const promptRegex = new RegExp(
+        '^(' +
+        // 🔹 Windows: PS C:\Users\matve>
+        '(?:PS\\s+[A-Z]:\\\\[^>]+>)' +
+
+        '|' +
+
+        // 🔹 Linux / Mac: user@host:~$
+        '(?:[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+:[~\\/\\w.-]+\\$)' +
+
+        '|' +
+
+        // 🔹 Cisco / network:
+        // A4BRST-A002UL01(config)
+        // A4BRST-A002UL01#
+        // A4BRST-A002UL01(config-if)
+        '(?:[a-zA-Z0-9_.-]+(?:\\([a-zA-Z0-9\\-]+\\))?[#>])' +
+
+        ')' +
+        '\\s?(.*)$'
+    );
 
     return (
         <pre className={styles['terminal-block']}>
