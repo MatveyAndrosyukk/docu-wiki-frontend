@@ -21,6 +21,11 @@
     height: calc(100vh - 80px - 20px - 20px);
   }
 
+  & * {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
@@ -53,6 +58,8 @@
     scrollbar-color: #8D9191 #202222;
     z-index: 1;
     position: relative;
+    word-break: break-word;
+    overflow-wrap: break-word;
 
     &-text {
       font-family: "Roboto", sans-serif;
@@ -63,6 +70,7 @@
       line-height: 19px;
       color: #E8E8E6;
       margin-bottom: 5px;
+      white-space: pre-wrap;
     }
 
     &-bold {
