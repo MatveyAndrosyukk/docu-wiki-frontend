@@ -111,19 +111,22 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                             <div className={styles['header__links']}>
                                 <div className={styles['links__container']}>
                                     {!isEditing && (
-                                        <div
-                                            className={styles['links__edit']}
-                                            onClick={() => setIsEditing(true)}
-                                        >
-                                            Edit
-                                        </div>
+                                        <>
+                                            <div
+                                                className={styles['links__edit']}
+                                                onClick={() => setIsEditing(true)}
+                                            >
+                                                Edit
+                                            </div>
+
+                                            <div
+                                                onClick={() => onOpenDeleteModal(file, viewedUser)}
+                                                className={styles['links__delete']}
+                                            >
+                                                Delete
+                                            </div>
+                                        </>
                                     )}
-                                    <div
-                                        onClick={() => onOpenDeleteModal(file, viewedUser)}
-                                        className={styles['links__delete']}
-                                    >
-                                        Delete
-                                    </div>
                                 </div>
                             </div>
                         )}
