@@ -18,6 +18,10 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #202222;
 
     @media (max-width: 435px) {
       flex-direction: column;
