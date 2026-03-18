@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useMemo} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
@@ -33,6 +33,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const [openedImage, setOpenedImage] = React.useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
+    const [wasInitialized, setWasInitialized] = React.useState(false);
 
     const {fileState} = useAppContext();
     const {authStatus} = useAuth();
@@ -77,6 +78,22 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         handleOpenDeleteModal(file, viewedUser)
         setIsBurgerMenuOpened(false);
     }, [handleOpenDeleteModal, viewedUser])
+
+    useEffect(() => {
+        setWasInitialized(false);
+    }, [file?.id]);
+
+    useEffect(() => {
+        if (!file || wasInitialized) return;
+
+        const isEmpty = !file.content || file.content.trim() === '';
+
+        if (isEmpty) {
+            setIsEditing(true);
+        }
+
+        setWasInitialized(true);
+    }, [file, wasInitialized, setIsEditing]);
 
     if (!file) {
         return (
