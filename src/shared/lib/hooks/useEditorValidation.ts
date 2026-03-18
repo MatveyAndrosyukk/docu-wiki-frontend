@@ -12,8 +12,8 @@ export const useEditorValidation = (
         const length = content.length;
         const imagesLength = images.length;
 
-        if (length > 65000 && !isUserAdminOrOwner(loggedInUser)) {
-            setContentError(`Your note is too long (${length}/65000).`);
+        if (length > 100000 && !isUserAdminOrOwner(loggedInUser)) {
+            setContentError(`Your note is too long (${length}/100000).`);
             return;
         }
 
