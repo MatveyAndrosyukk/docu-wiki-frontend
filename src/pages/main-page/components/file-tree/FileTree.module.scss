@@ -16,6 +16,7 @@ $button-block-hover-bg: #191A1A;
 
 .file-tree {
   @include adaptive-size('width', 340px, 280px, 320px);
+  width: clamp(280px, 25vw, 340px);
   min-height: $file-tree-min-height;
   border-radius: $border-radius;
   background-color: $bg-color;
