@@ -39,7 +39,7 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
                 if (match) {
                     return (
                         <div key={i}>
-                            <span style={{color: '#577B0F'}}>{match[1]} </span>
+                            <span style={{color: '#577B0F', userSelect: 'none'}}>{match[1]} </span>
                             <span>{match[2]}</span>
                         </div>
                     );

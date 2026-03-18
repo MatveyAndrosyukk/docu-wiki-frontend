@@ -15,6 +15,7 @@
   scrollbar-color: #8D9191 #191A1A;
 
   &-title {
+    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
