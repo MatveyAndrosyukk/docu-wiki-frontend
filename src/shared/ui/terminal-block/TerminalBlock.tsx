@@ -9,6 +9,7 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
     const lines = commands.split('\n');
     const promptRegex = new RegExp(
         '^(' +
+
         // 🔹 Windows: PS C:\Users\matve>
         '(?:PS\\s+[A-Z]:\\\\[^>]+>)' +
 
@@ -19,11 +20,17 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
 
         '|' +
 
-        // 🔹 Cisco / network:
-        // A4BRST-A002UL01(config)
-        // A4BRST-A002UL01#
-        // A4BRST-A002UL01(config-if)
-        '(?:[a-zA-Z0-9_.-]+(?:\\([a-zA-Z0-9\\-]+\\))?[#>])' +
+        // 🔹 Cisco / network (расширенный)
+        '(?:' +
+        // hostname или [hostname]
+        '\\[?[a-zA-Z0-9_.-]+\\]?' +
+
+        // (config / diagnose / etc)
+        '(?:\\([a-zA-Z0-9\\-]+\\))?' +
+
+        // окончание: #, >, %, %%
+        '(?:[#>%]{1,2})?' +
+        ')' +
 
         ')' +
         '\\s?(.*)$'

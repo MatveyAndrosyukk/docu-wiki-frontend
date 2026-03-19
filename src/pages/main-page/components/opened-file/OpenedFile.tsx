@@ -14,6 +14,7 @@ import {useFileLikes} from "../../../../shared/lib/hooks/useFileLikes";
 import {RootState} from "../../../../store";
 import {useAuth} from "../../../../shared/lib/hooks/useAuth";
 import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 
 interface OpenedFileProps {
     file?: UiFile | null
@@ -88,12 +89,14 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
         const isEmpty = !file.content || file.content.trim() === '';
 
-        if (isEmpty) {
+        let isCanEdit = isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser);
+
+        if (isEmpty && isCanEdit) {
             setIsEditing(true);
         }
 
         setWasInitialized(true);
-    }, [file, wasInitialized, setIsEditing]);
+    }, [file, wasInitialized, setIsEditing, authStatus, emailParam, viewedUser, loggedInUser]);
 
     if (!file) {
         return (

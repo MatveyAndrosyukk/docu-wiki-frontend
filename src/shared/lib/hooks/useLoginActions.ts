@@ -1,6 +1,6 @@
 import {Dispatch, Ref, SetStateAction, useCallback, useRef, useState} from "react";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../store";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../../store";
 import {performLoginAsync} from "../services/performLoginAsync";
 import {jwtDecode} from "jwt-decode";
 import {clearUiState} from "../../../store/slices/fileUiSlice";
@@ -41,6 +41,8 @@ export default function useLoginActions(): LoginState {
     });
     const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
 
+    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
+
     const loginModalInputRef = useRef<HTMLInputElement>(null);
 
     const dispatch = useDispatch<AppDispatch>();
@@ -53,13 +55,19 @@ export default function useLoginActions(): LoginState {
     }, [setIsLoginModalOpen]);
 
     const handleLogout = useCallback(() => {
+        const isViewBlocked = viewedUser?.isViewBlocked
+
         localStorage.clear();
-        dispatch(clearUiState());
-        dispatch(clearServerFiles());
+
+        if (isViewBlocked) {
+            dispatch(clearUiState());
+            dispatch(clearServerFiles());
+        }
+
         dispatch(clearLoggedInUser());
 
         setAuthStatus("unauthenticated");
-    }, [dispatch, setAuthStatus]);
+    }, [dispatch, setAuthStatus, viewedUser]);
 
     const handleLogin = useCallback(async () => {
         const login = async () => {

@@ -36,15 +36,25 @@ export const useFetchFilesForViewedUser = (
                 prevViewedUser.amountOfFiles !== viewedUser.amountOfFiles);
 
         if (!isOnlyCounterOrViewBlockedChanged) {
-            const isUserEditor = viewedUser.whoCanEdit.some(u => u.email === loggedInUser?.email);
-            const isUserEqualsLoggedIn = viewedUser.email === loggedInUser?.email;
+            const isUserEditor = viewedUser.whoCanEdit.some(
+                u => u.email === loggedInUser?.email
+            );
+
+            const isUserEqualsLoggedIn =
+                viewedUser.email === loggedInUser?.email;
 
             const justLoggedOutFromOwnPage =
                 !loggedInUser &&
                 prevLoggedInUser &&
                 prevLoggedInUser.email === viewedUser.email;
 
-            if (justLoggedOutFromOwnPage || (viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn))) {
+            const isBlockedForCurrentUser =
+                viewedUser.isViewBlocked && !(isUserEditor || isUserEqualsLoggedIn);
+
+            const shouldClearOnLogout =
+                justLoggedOutFromOwnPage && viewedUser.isViewBlocked;
+
+            if (isBlockedForCurrentUser || shouldClearOnLogout) {
                 dispatch(clearServerFiles());
                 dispatch(clearUiState());
             } else {
