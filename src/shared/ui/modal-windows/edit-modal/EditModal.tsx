@@ -39,7 +39,7 @@ const EditModal: FC = () => {
 `;
 
     useEffect(() => {
-        if (modalValue.length >= 20) {
+        if (modalValue.length >= 35) {
             setModalError('Name is too long');
         } else {
             setModalError('')
