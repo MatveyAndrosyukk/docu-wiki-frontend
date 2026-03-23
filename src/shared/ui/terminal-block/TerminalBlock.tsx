@@ -16,7 +16,6 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
 
     const promptRegex = new RegExp(
         '^(' +
-
         // 🔹 Windows: PS C:\Users\matve>
         '(?:PS\\s+[A-Z]:\\\\[^>]+>)' +
 
@@ -27,20 +26,17 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
 
         '|' +
 
-        // 🔹 Cisco / network (расширенный)
+        // 🔹 Cisco / network
         '(?:' +
         // hostname или [hostname]
         '\\[?[a-zA-Z0-9_.-]+\\]?' +
-
-        // (config / diagnose / etc)
-        '(?:\\([a-zA-Z0-9\\-]+\\))?' +
-
+        // (config / diagnose / etc) и возможно другие ()
+        '(?:\\([^)]+\\))*' +  // <- любые скобки подряд, включая (config-if-adsl-0/5)
         // окончание: #, >, %, %%
-        '(?:[#>%]{1,2})?' +
+        '[#>%]{1,2}' +        // <- обязательно #, >, % или %%
         ')' +
-
         ')' +
-        '\\s?(.*)$'
+        '\\s*(.*)$'
     );
 
     return (

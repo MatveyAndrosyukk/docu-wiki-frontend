@@ -28,9 +28,9 @@ const CodeBlock: FC<CodeBlockProps> = (
     const maxHeight = useMemo(() => {
         if (isMobile) return 'none';
 
-        if (isCodeExpanded) return 'none';
+        if (isCodeExpanded) return isFileTreeOpened ? '21em' : '22em';
 
-        return isFileTreeOpened ? '21em' : '22em';
+        return 'none';
     }, [isMobile, isCodeExpanded, isFileTreeOpened]);
 
     const handleExpandCode = useCallback(() => {
