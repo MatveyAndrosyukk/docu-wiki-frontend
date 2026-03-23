@@ -16,6 +16,7 @@ import {findFileById} from "../../../store/utils/fileTreeActionUtils";
 import {addPendingFile, addPendingRootFolder, openFolder} from "../../../store/slices/fileUiSlice";
 import {updateFileName} from "../../../store/thunks/files/updateFileName";
 import {selectFileTree} from "../../../store/selectors/selectFileTree";
+import {isUserAdminOrOwner} from "../utils/permissions-utils/isUserAdminOrOwner";
 
 export enum ActionType {
     RenameFile = "RenameFile",
@@ -64,8 +65,8 @@ export default function useModalActions(): ModalActionsState {
     const totalFiles = useSelector(
         (state: RootState) => state.user.viewedUser?.amountOfFiles ?? 0
     );
-    const loggedInUserEmail = useSelector(
-        (state: RootState) => state.user.loggedInUser?.email
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
     );
 
     const dispatch = useDispatch<AppDispatch>();
@@ -215,7 +216,7 @@ export default function useModalActions(): ModalActionsState {
                     return;
                 }
 
-                if (totalFiles >= filesLimit) {
+                if (!isUserAdminOrOwner(loggedInUser) && totalFiles >= filesLimit) {
                     closeModal();
                     setIsLimitError(true)
                     setTimeout(() => {
@@ -270,7 +271,7 @@ export default function useModalActions(): ModalActionsState {
                     id: id as number,
                     name: trimmedTitle,
                     viewedUserEmail: viewedUser?.email as string,
-                    loggedInUserEmail: loggedInUserEmail ?? null,
+                    loggedInUserEmail: loggedInUser?.email ?? null,
                 }));
 
                 closeModal();
@@ -338,7 +339,7 @@ export default function useModalActions(): ModalActionsState {
             default:
                 return;
         }
-    }, [files, dispatch, loggedInUserEmail, closeModal, totalFiles, viewedUser?.email, copyPasteActions.copiedFile]);
+    }, [files, dispatch, viewedUser?.email, closeModal, loggedInUser, totalFiles, copyPasteActions.copiedFile]);
 
 
     const handleOpenRenameModal = useCallback((file: UiFile) => {

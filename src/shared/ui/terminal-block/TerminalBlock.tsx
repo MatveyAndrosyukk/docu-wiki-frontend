@@ -1,5 +1,6 @@
 import React, {FC} from 'react';
 import styles from './TerminalBlock.module.scss'
+import useCheckIsMobile from "../../lib/hooks/useCheckIsMobile";
 
 interface TerminalBlockProps {
     commands: string;
@@ -7,6 +8,12 @@ interface TerminalBlockProps {
 
 const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
     const lines = commands.split('\n');
+    const isMobile = useCheckIsMobile();
+
+    const maxHeight = () =>{
+        return isMobile ? 'none' : '500px';
+    }
+
     const promptRegex = new RegExp(
         '^(' +
 
@@ -37,7 +44,7 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
     );
 
     return (
-        <pre className={styles['terminal-block']}>
+        <pre style={{maxHeight: maxHeight()}} className={styles['terminal-block']}>
             <div className={styles['terminal-block-title']}>
                 Terminal
             </div>
