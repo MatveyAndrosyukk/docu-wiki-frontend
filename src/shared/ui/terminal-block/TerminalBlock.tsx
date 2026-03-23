@@ -1,18 +1,21 @@
-import React, {FC} from 'react';
+import React, {FC, useCallback, useMemo, useState} from 'react';
 import styles from './TerminalBlock.module.scss'
-import useCheckIsMobile from "../../lib/hooks/useCheckIsMobile";
+import {ReactComponent as ExpandCodeSvg} from '../code-block/images/code-block-expand-code.svg';
 
 interface TerminalBlockProps {
     commands: string;
 }
 
 const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
     const lines = commands.split('\n');
-    const isMobile = useCheckIsMobile();
 
-    const maxHeight = () =>{
-        return isMobile ? 'none' : '500px';
-    }
+    const maxHeight = useMemo(() => {
+
+        if (isExpanded) return '500px';
+
+        return 'none';
+    }, [isExpanded]);
 
     const promptRegex = new RegExp(
         '^(' +
@@ -39,11 +42,16 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
         '\\s*(.*)$'
     );
 
+    const handleExpand = useCallback(() => {
+        setIsExpanded(prev => !prev);
+    }, []);
+
     return (
-        <pre style={{maxHeight: maxHeight()}} className={styles['terminal-block']}>
-            <div className={styles['terminal-block-title']}>
-                Terminal
-            </div>
+        <pre
+            style={{maxHeight, overflowY: 'auto'}}
+            className={`${styles['terminal-block']} ${isExpanded ? styles['terminal-block-expanded'] : ''}`}
+        >
+            <div className={styles['terminal-block-title']}>Terminal</div>
             {lines.map((line, i) => {
                 const match = line.match(promptRegex);
                 if (match) {
@@ -57,7 +65,10 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
                     return <div key={i}>{line}</div>;
                 }
             })}
-    </pre>
+            <div className={styles['terminal-block__expand']} onClick={handleExpand}>
+                <ExpandCodeSvg className={styles['terminal-block__expand-icon']}/>
+            </div>
+        </pre>
     );
 };
 

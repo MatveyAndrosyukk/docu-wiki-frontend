@@ -1,17 +1,28 @@
 .terminal-block {
-  background-color: #191A1A;
+  background-color: #191a1a;
   padding: 0 1em 1em 1em;
   border-radius: 8px;
   font-family: "DM Mono", monospace;
   font-weight: 300;
   font-size: 13px;
   line-height: 18px;
-  color: #E8E8E6;
+  color: #e8e8e6;
   white-space: pre-wrap;
   word-break: break-word;
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: #8D9191 #191A1A;
+  scrollbar-color: #8d9191 #191a1a;
+
+  max-height: inherit; // чтобы учитывался maxHeight из стейта
+
+  &-wrapper {
+    // если ещё есть обёртка — можно аналогично
+  }
+
+  &-expanded {
+    max-height: none;
+    overflow: visible;
+  }
 
   &-title {
     user-select: none;
@@ -20,6 +31,31 @@
     justify-content: center;
     height: 30px;
     margin-bottom: 1em;
-    border-bottom: 1px solid #2B2C2D;
+    border-bottom: 1px solid #2b2c2d;
+  }
+
+  &__expand {
+    cursor: pointer;
+    background-color: #191a1a;
+    border: 1px solid #2b2c2d;
+    border-radius: 8px;
+    width: 23px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 17px;
+    right: 12px;
+    z-index: 5;
+
+    &:hover {
+      background-color: #202222;
+    }
+
+    &-icon {
+      width: 15px;
+      height: 15px;
+    }
   }
 }
