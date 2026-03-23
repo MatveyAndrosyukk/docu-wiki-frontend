@@ -53,7 +53,6 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
 
     return (
         <div className={styles['main']}>
-            <button onClick={() => console.log(loggedInUser?.roles)}>dfdffd</button>
             <Header/>
             <div className={styles['container']}>
                 <FileTree

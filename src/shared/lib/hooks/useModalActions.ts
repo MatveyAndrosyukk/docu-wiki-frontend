@@ -215,7 +215,7 @@ export default function useModalActions(): ModalActionsState {
                     setModalError('File with this name exists');
                     return;
                 }
-
+                console.log(isUserAdminOrOwner(loggedInUser))
                 if (!isUserAdminOrOwner(loggedInUser) && totalFiles >= filesLimit) {
                     closeModal();
                     setIsLimitError(true)
