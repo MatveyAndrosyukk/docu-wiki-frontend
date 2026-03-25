@@ -1,5 +1,14 @@
 @font-face {
   font-display: swap;
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/fira-code/fira-code-v27-cyrillic_latin-regular.woff2') format('woff2');
+}
+
+
+@font-face {
+  font-display: swap;
   font-family: 'Inter';
   font-style: normal;
   font-weight: 300;
@@ -43,7 +52,7 @@
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 300;
-  src: url('../fonts/roboto/roboto-v51-latin-300.woff2') format('woff2');
+  src: url('../fonts/roboto/roboto-v51-cyrillic_latin-300.woff2') format('woff2');
 }
 
 @font-face {
