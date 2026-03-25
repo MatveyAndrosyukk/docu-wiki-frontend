@@ -3,6 +3,7 @@ import React, {useRef} from "react";
 import styles from "../../FileList.module.scss"
 import {isUserCanEdit} from "../../../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {FileStatus, FileType} from "../../../../../../../../types/file";
+import {ReactComponent as LineSvg} from '../../images/file-list-line.svg';
 import {ReactComponent as ChildLineSvg} from '../../images/file-list-child-line.svg';
 import {ReactComponent as LastChildLineSvg} from '../../images/file-list-last-child-line.svg';
 import {ReactComponent as OpenedSvg} from '../../images/file-list-opened.svg';
@@ -44,26 +45,43 @@ const FileNode: React.FC<Props> = React.memo(
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
-                {Array.from({length: depth}).map((_, levelIndex) => {
-                    const isLastLevel = levelIndex === depth - 1;
+        {Array.from({ length: depth }).map((_, levelIndex) => {
+            const isLastLevel = levelIndex === depth - 1;
 
-                    if (!isLastLevel && !hasNextOnLevel[levelIndex]) {
-                        return (
-                            <span className={styles['file-list__node-line']} key={levelIndex}></span>
-                        );
-                    }
-
-                    const LineComponent = isLastLevel
-                        ? (isLastChild ? LastChildLineSvg : ChildLineSvg)
-                        : ChildLineSvg;
-
+            if (!isLastLevel) {
+                if (!hasNextOnLevel[levelIndex]) {
                     return (
-                        <span className={styles['file-list__node-line']} key={levelIndex}>
-                            <LineComponent style={{width: 10}}/>
-                        </span>
+                        <span
+                            className={styles['file-list__node-line']}
+                            key={levelIndex}
+                        />
                     );
-                })}
-            </span>
+                }
+
+                return (
+                    <span
+                        className={styles['file-list__node-line']}
+                        key={levelIndex}
+                    >
+                        <LineSvg style={{ width: 2 }} />
+                    </span>
+                );
+            }
+
+            const LineComponent = isLastChild
+                ? LastChildLineSvg
+                : ChildLineSvg;
+
+            return (
+                <span
+                    className={styles['file-list__node-line']}
+                    key={levelIndex}
+                >
+                    <LineComponent style={{ width: 10 }} />
+                </span>
+            );
+        })}
+    </span>
         );
 
         const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
