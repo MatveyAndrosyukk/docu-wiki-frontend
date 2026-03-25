@@ -137,6 +137,7 @@ $button-block-hover-bg: #191A1A;
     margin-top: 6px;
     scrollbar-width: thin;
     scrollbar-color: $font-color $bg-color;
+    overflow: auto;
     position: relative;
     flex: 1 1 auto;
   }
