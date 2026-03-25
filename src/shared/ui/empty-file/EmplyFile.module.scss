@@ -36,11 +36,9 @@
   }
 
   &__right, &__left {
-    transform-origin: 11px 12px;
-    animation-duration: 2s;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
   }
 
   &__right {
