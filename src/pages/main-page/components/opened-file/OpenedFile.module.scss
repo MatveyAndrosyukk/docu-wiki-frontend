@@ -62,7 +62,7 @@
     overflow-wrap: break-word;
 
     &-text {
-      font-family: "Roboto", sans-serif;
+      font-family: "DM Mono", sans-serif;
       font-weight: 300;
       font-style: normal;
       text-rendering: optimizeSpeed;
@@ -71,6 +71,7 @@
       color: #E8E8E6;
       margin-bottom: 5px;
       white-space: pre-wrap;
+      word-spacing: -4px;
     }
 
     &-bold {
