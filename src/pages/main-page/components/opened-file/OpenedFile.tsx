@@ -100,9 +100,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     if (!file) {
         return (
-            <EmptyFile
-                isFileTreeOpened={isFileTreeOpened}
-                setIsFileTreeOpened={setIsFileTreeOpened}/>
+            <EmptyFile isFileTreeOpened={isFileTreeOpened} setIsFileTreeOpened={setIsFileTreeOpened}/>
         )
     }
 

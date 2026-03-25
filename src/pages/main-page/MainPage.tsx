@@ -1,4 +1,4 @@
-import React, {FC, useMemo} from 'react';
+import React, {FC, useEffect, useMemo} from 'react';
 import Header from "./components/header/Header";
 import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
@@ -21,6 +21,8 @@ import {useResetPasswordModal} from "../../shared/lib/hooks/useResetPasswordModa
 import {useDocumentTitle} from "../../shared/lib/hooks/useDocumentTitle";
 import {useViewedUserLoader} from "../../shared/lib/hooks/useViewedUserLoader";
 import {useFetchFilesForViewedUser} from "../../shared/lib/hooks/useFetchFilesForViewedUser";
+import {ActionType} from "../../shared/lib/hooks/useModalActions";
+import {useAuth} from "../../shared/lib/hooks/useAuth";
 
 interface MainPageProps {
     emailParam?: string | undefined;
@@ -28,14 +30,17 @@ interface MainPageProps {
 }
 
 const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
-    const {authState} = useAppContext();
+    const {authState, fileState} = useAppContext();
+    const {authStatus} = useAuth();
 
     const files = useSelector(selectFileTree);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const openedFile = useSelector(selectOpenedFile);
 
-    const {setIsResetPasswordModalOpened} = authState
+    const {setIsResetPasswordModalOpened, setIsLoginModalOpen} = authState
+    const {handleOpenModalByReason} = fileState;
+
 
     const currentUserEmail = emailParam ?? loggedInUser?.email ?? null;
 
@@ -50,6 +55,27 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     useDocumentTitle(title || "Docuwiki Studio");
     useViewedUserLoader(currentUserEmail);
     useFetchFilesForViewedUser(viewedUser, loggedInUser);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+
+                if (authStatus === 'authenticated') {
+                    handleOpenModalByReason({
+                        reason: ActionType.AddRootFolder,
+                        id: null,
+                        title: "Add root folder",
+                    });
+                } else {
+                    setIsLoginModalOpen(true);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
 
     return (
         <div className={styles['main']}>
@@ -68,7 +94,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
             </div>
 
             {isOpened && window.innerWidth < 1270 && (
-                <div className={styles.overlay} onClick={() => setIsOpened(false)} />
+                <div className={styles.overlay} onClick={() => setIsOpened(false)}/>
             )}
 
             <EditModal/>
@@ -76,7 +102,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
             <LoginModal/>
             <EnterEmailModal/>
             <ResetPasswordModal resetToken={resetToken}/>
-            {isUserOwner(loggedInUser) && <BanModal />}
+            {isUserOwner(loggedInUser) && <BanModal/>}
         </div>
     );
 };

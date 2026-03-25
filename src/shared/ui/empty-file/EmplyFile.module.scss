@@ -1,70 +1,74 @@
-.empty-file {
-  &__content {
-    padding: 0 9px;
-    height: calc(100% - 31px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &__book-wrapper {
+  &__card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+
+    padding: 38px 32px;
+    border-radius: 12px;
+
+    animation: fadeIn 0.35s ease-out;
   }
 
-  &__text {
-    font-family: "Libertinus Math", system-ui;
-    font-weight: 400;
-    font-style: normal;
-    margin-top: 20px;
-    font-size: 33px;
+  &__icon {
+    font-size: 42px;
+    margin-bottom: 14px;
+    opacity: 0.85;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 500;
     color: #E8E8E6;
-    animation: fadeInPulse 2s ease-in-out infinite alternate;
-    animation-delay: 2s;
-    user-select: none;
+    margin-bottom: 4px;
+  }
+
+  &__subtitle {
+    font-size: 13px;
+    color: #8D9191;
+    margin-bottom: 14px;
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: #6B6F70;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__kbd {
+    background: #191A1A;
+    border: 1px solid #2B2C2D;
+    border-bottom: 2px solid #2B2C2D;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: "DM Mono", monospace;
+    color: #E8E8E6;
   }
 }
 
-.book-wrapper {
-  &__svg{
-    width: 200px;
-    height: 200px;
-    perspective: 600px;
-    shape-rendering: geometricPrecision;
-  }
-
-  &__right, &__left {
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
-    will-change: transform;
-  }
-
-  &__right {
-    animation-name: openRight;
-  }
-
-  &__left{
-    animation-name: openLeft;
-  }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
-@keyframes openLeft {
-  0% {
-    transform: rotateY(0deg);
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  100% {
-    transform: rotateY(-60deg);
-  }
-}
-
-@keyframes openRight {
-  0% {
-    transform: rotateY(0deg);
-  }
-  100% {
-    transform: rotateY(60deg);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -76,19 +80,22 @@
   position: absolute;
   border-radius: 50% 50% 0 0;
   top: -30px;
-  left: 47%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border-bottom: 1px solid #202222;
+  transition: 0.15s ease;
+
+  &:hover {
+    background-color: #2A2E2D;
+  }
 }
 
-@keyframes fadeInPulse {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.05);
-  }
+.file-tree-image {
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
 }
