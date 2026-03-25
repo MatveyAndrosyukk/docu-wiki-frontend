@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
+
 .code-block {
   max-width: 100%;
   min-width: 0;
@@ -24,8 +26,8 @@
     padding: 1em !important;
     background: #191A1A !important;
     border-radius: 6px !important;
-    font-family: "Fira Code", monospace !important;
     font-size: 12px !important;
+    font-weight: 400 !important;
     line-height: 1.5 !important;
     max-height: inherit;
     overflow: visible !important;
@@ -37,6 +39,7 @@
     white-space: pre-wrap !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
+    font-family: "Fira Code", monospace !important;
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100%;
