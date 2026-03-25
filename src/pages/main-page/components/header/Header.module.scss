@@ -39,6 +39,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    @include adaptive-size('gap', 20px, 5px, 320px);
   }
 
   &__buttons {
@@ -58,14 +59,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    @include adaptive-size('margin-right', 20px, 5px, 320px);
+    gap: 4px;
 
     &-input {
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      margin-right: 4px;
 
       input {
         @include adaptive-size('width', 222px, 73px, 320px, 550px);
@@ -96,6 +96,8 @@
 
     &-swap {
       cursor: pointer;
+      display: block;
+      flex-shrink: 0;
     }
   }
 
