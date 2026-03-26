@@ -20,8 +20,8 @@ const EmptyFile: React.FC<EmptyFileProps> = ({
                 <div className={emptyStyles['empty__card']}>
 
                     <div className={emptyStyles['empty__icon']}>
-                        ⭐
-                        {/*⚡*/}
+                        {/*⭐*/}
+                        ⚡
                     </div>
 
                     <div className={emptyStyles['empty__title']}>
