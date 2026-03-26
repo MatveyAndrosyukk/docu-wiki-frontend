@@ -32,9 +32,9 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
         // 🔹 Cisco / network
         '(?:' +
         // hostname или [hostname]
-        '\\[?[a-zA-Z0-9_.-]+\\]?' +
+        '\\[?[a-zA-Z0-9_.\\/-]+\\]?' +
         // (config / diagnose / etc) и возможно другие ()
-        '(?:\\([^)]+\\))*' +  // любые скобки подряд
+        '(?:\\([^)]+\\))*' +
         // окончание: #, >, %, %%
         '[#>%]{1,2}' +
         ')' +
