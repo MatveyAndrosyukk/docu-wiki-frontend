@@ -58,7 +58,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+            if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'p' || e.key.toLowerCase() === 'з')) {
                 e.preventDefault();
 
                 if (authStatus === 'authenticated') {

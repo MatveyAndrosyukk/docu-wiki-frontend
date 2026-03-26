@@ -12,11 +12,11 @@
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-color: #8d9191 #191a1a;
+  position: relative;
 
-  max-height: inherit; // чтобы учитывался maxHeight из стейта
+  max-height: inherit;
 
   &-wrapper {
-    // если ещё есть обёртка — можно аналогично
   }
 
   &-expanded {
@@ -45,8 +45,8 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 17px;
-    right: 12px;
+    top: 3px;
+    right: 7px;
     z-index: 5;
 
     &:hover {
