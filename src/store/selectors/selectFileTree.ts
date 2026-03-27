@@ -34,7 +34,7 @@ export const selectFileTree = createSelector(
                         : FileStatus.Closed,
                     isPending: false,
                 };
-            });
+            }).sort((a,b) => a.name.localeCompare(b.name));
 
         const tree = build(serverFiles);
 
@@ -78,6 +78,15 @@ export const selectFileTree = createSelector(
             });
         });
 
-        return tree;
+        const sortTree = (nodes: UiFile[]): UiFile[] => {
+            return nodes
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(node => ({
+                    ...node,
+                    children: sortTree(node.children || [])
+                }));
+        };
+
+        return sortTree(tree);
     }
 );
