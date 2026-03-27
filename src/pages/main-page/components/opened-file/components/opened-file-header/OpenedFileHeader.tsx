@@ -77,7 +77,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                 </div>
                 <div className={styles['header__title']}>
                     <div className={styles['header__title-email']}>{viewedUser?.email}</div>
-                    <span>|</span>
+                    <span className={styles['header__title-dash']}>|</span>
                     <div className={styles['header__title-path']} title={pathToFile}>{pathToFile}</div>
                 </div>
             </div>
