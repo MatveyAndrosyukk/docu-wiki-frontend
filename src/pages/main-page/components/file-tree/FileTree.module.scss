@@ -23,12 +23,14 @@ $button-block-hover-bg: #191A1A;
   border: 1px solid $border-color;
   margin-top: 20px;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-self: flex-start;
+  display: block;
   font-family: $font-family;
   font-optical-sizing: auto;
   font-style: normal;
+  height: auto;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: $font-color $bg-color;
 
   &-closed {
     display: none;
@@ -43,9 +45,9 @@ $button-block-hover-bg: #191A1A;
   }
 
   &__content {
-    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    max-height: inherit;
   }
 
   &__header {
@@ -141,9 +143,6 @@ $button-block-hover-bg: #191A1A;
 
   &__files {
     margin-top: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: $font-color $bg-color;
-    overflow: auto;
     position: relative;
     flex: 1 1 auto;
   }
