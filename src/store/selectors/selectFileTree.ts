@@ -39,7 +39,8 @@ export const selectFileTree = createSelector(
         const tree = build(serverFiles);
 
 
-        Object.entries(pendingFiles).forEach(([tempId, parentId]) => {
+        Object.entries(pendingFiles).forEach(([tempId, pending]) => {
+            const { parentId, name } = pending;
             if (parentId === null) return;
 
             const insert = (nodes: UiFile[]): boolean => {
@@ -47,7 +48,7 @@ export const selectFileTree = createSelector(
                     if (node.id === parentId) {
                         node.children.push({
                             id: Number(tempId),
-                            name: "Создание файла…",
+                            name,
                             type: FileType.File,
                             parent: parentId,
                             children: [],
@@ -65,11 +66,11 @@ export const selectFileTree = createSelector(
             insert(tree);
         });
 
-        Object.keys(pendingRootFolders).forEach(tempIdStr => {
+        Object.entries(pendingRootFolders).forEach(([tempIdStr, pending]) => {
             const tempId = Number(tempIdStr);
             tree.push({
                 id: tempId,
-                name: "Создание папки…",
+                name: pending.name,
                 type: FileType.Folder,
                 parent: null,
                 children: [],

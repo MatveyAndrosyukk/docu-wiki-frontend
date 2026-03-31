@@ -165,7 +165,10 @@ export default function useModalActions(): ModalActionsState {
 
                 const tempId = Date.now();
 
-                dispatch(addPendingRootFolder({tempId}));
+                dispatch(addPendingRootFolder({
+                    tempId,
+                    name: trimmedTitle,
+                }));
 
                 dispatch(
                     createFile({
@@ -192,7 +195,11 @@ export default function useModalActions(): ModalActionsState {
                 const tempId = Date.now();
 
                 dispatch(openFolder(id as number));
-                dispatch(addPendingFile({tempId, parentId: id}));
+                dispatch(addPendingFile({
+                    tempId,
+                    parentId: id,
+                    name: trimmedTitle,
+                }));
 
                 dispatch(
                     createFile({
@@ -228,7 +235,11 @@ export default function useModalActions(): ModalActionsState {
                 const tempId = Date.now();
 
                 dispatch(openFolder(id as number));
-                dispatch(addPendingFile({tempId, parentId: id}));
+                dispatch(addPendingFile({
+                    tempId,
+                    parentId: id,
+                    name: trimmedTitle,
+                }));
                 dispatch(updateUserFilesCount({
                     email: viewedUser?.email ?? 'unknown',
                     delta: +1
@@ -310,7 +321,11 @@ export default function useModalActions(): ModalActionsState {
                 const tempId = Date.now();
 
                 dispatch(openFolder(id as number));
-                dispatch(addPendingFile({tempId, parentId: id}));
+                dispatch(addPendingFile({
+                    tempId,
+                    parentId: id,
+                    name: trimmedTitle,
+                }));
                 dispatch(updateUserFilesCount({
                     email: viewedUser?.email ?? 'unknown',
                     delta: +filesToAdd

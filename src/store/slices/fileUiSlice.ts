@@ -14,8 +14,13 @@ interface FileUiState {
     openedFolders: number[];
     openedFileId: number | null;
     isSaving: boolean;
-    pendingFiles: Record<number, number | null>;
-    pendingRootFolders: Record<number, true>;
+    pendingFiles: Record<number, {
+        parentId: number | null;
+        name: string;
+    }>;
+    pendingRootFolders: Record<number, {
+        name: string;
+    }>;
     pendingImages: Record<string, PendingImage>;
 }
 
@@ -66,9 +71,16 @@ const fileUiSlice = createSlice({
         },
         addPendingFile(
             state,
-            action: PayloadAction<{ tempId: number; parentId: number | null }>
+            action: PayloadAction<{
+                tempId: number;
+                parentId: number | null;
+                name: string
+            }>
         ) {
-            state.pendingFiles[action.payload.tempId] = action.payload.parentId;
+            state.pendingFiles[action.payload.tempId] = {
+                parentId: action.payload.parentId,
+                name: action.payload.name,
+            };
         },
         clearUiState() {
             return initialState;
@@ -118,8 +130,13 @@ const fileUiSlice = createSlice({
         setSaving(state, action: PayloadAction<boolean>) {
             state.isSaving = action.payload;
         },
-        addPendingRootFolder(state, action: PayloadAction<{ tempId: number }>) {
-            state.pendingRootFolders[action.payload.tempId] = true;
+        addPendingRootFolder(state, action: PayloadAction<{
+            tempId: number;
+            name: string;
+        }>) {
+            state.pendingRootFolders[action.payload.tempId] = {
+                name: action.payload.name,
+            };
         }
     },
     extraReducers: builder => {
