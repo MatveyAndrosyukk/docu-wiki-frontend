@@ -11,7 +11,12 @@ export const selectFileTree = createSelector(
         (state: RootState) => state.fileUi.pendingFiles,
         (state: RootState) => state.fileUi.pendingRootFolders,
     ],
-    (serverFiles, openedFolders, pendingFiles, pendingRootFolders): UiFile[] => {
+    (
+        serverFiles,
+        openedFolders,
+        pendingFiles,
+        pendingRootFolders
+    ): UiFile[] => {
         const openedSet = new Set(openedFolders);
 
         const build = (nodes: ServerFile[]): UiFile[] =>
@@ -34,13 +39,13 @@ export const selectFileTree = createSelector(
                         : FileStatus.Closed,
                     isPending: false,
                 };
-            }).sort((a,b) => a.name.localeCompare(b.name));
+            }).sort((a, b) => a.name.localeCompare(b.name));
 
         const tree = build(serverFiles);
 
 
         Object.entries(pendingFiles).forEach(([tempId, pending]) => {
-            const { parentId, name } = pending;
+            const {parentId, name} = pending;
             if (parentId === null) return;
 
             const insert = (nodes: UiFile[]): boolean => {
