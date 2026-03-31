@@ -62,8 +62,11 @@ $button-block-hover-bg: #191A1A;
 
   &__user {
     color: $font-color;
-    font-size: 13px;
-    font-weight: 500;
+    font-family: "DM Mono", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    text-rendering: optimizeSpeed;
+    font-size: 14px;
     text-align: center;
   }
 
