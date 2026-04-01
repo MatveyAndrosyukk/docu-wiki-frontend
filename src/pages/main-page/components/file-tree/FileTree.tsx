@@ -119,7 +119,7 @@ const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setI
                                     <div className={styles['file-tree__header']}>
                                         <div className={styles['file-tree__top']}>
                                             <div className={styles['file-tree__user']}>
-                                                {viewedUser?.email}
+                                                {viewedUser?.name}
                                             </div>
 
                                             {isUserOwner(loggedInUser) && (

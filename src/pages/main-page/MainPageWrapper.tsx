@@ -26,7 +26,7 @@ const MainPageWrapper = () => {
             .then(data => setEmail(data.email))
             .catch(() => setEmail(undefined));
 
-    }, [navigate, setEmail, username]);
+    }, [email, navigate, setEmail, username]);
 
     return <MainPage
         resetToken={token}
