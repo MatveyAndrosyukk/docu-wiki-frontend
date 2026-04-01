@@ -12,6 +12,11 @@ const FileTreeSkeleton = () => {
             <div className={`${styles['file-tree__files']} ${styles['skeleton-files']}`}>
                 <div className={styles['skeleton-file-row']} />
                 <div className={styles['skeleton-file-row']} />
+                <div className={styles['skeleton-file-row']} />
+                <div className={styles['skeleton-file-row']} />
+                <div className={styles['skeleton-file-row']} />
+                <div className={styles['skeleton-file-row']} />
+                <div className={styles['skeleton-file-row']} />
                 <div className={styles['skeleton-file-row']} style={{ width: '80%' }} />
                 <div className={styles['skeleton-file-row']} style={{ width: '60%' }} />
             </div>
