@@ -23,11 +23,13 @@ const LoginModal: FC = () => {
         loginModalValue,
         loginMessage,
         registerMessage,
+        registerLoading,
         setIsEnterEmailModalOpened,
         handleChangeEmailInput,
         handleChangePasswordInput,
         handleChangeRePasswordInput,
         handleSwitchAuthorization,
+        handleChangeUsernameInput,
         handleAuthorize,
         getAuthorizationText,
     } = authState;
@@ -77,6 +79,15 @@ const LoginModal: FC = () => {
                         value={emailValue}
                         onChange={handleChangeEmailInput}
                     />
+                    {isRegisterModal && (
+                        <input
+                            type='text'
+                            className={modalStyles['modal__input']}
+                            placeholder="Enter username"
+                            value={registerModalValue.username}
+                            onChange={handleChangeUsernameInput}
+                        />
+                    )}
                     <input
                         type='password'
                         className={modalStyles['modal__input']}
@@ -111,7 +122,7 @@ const LoginModal: FC = () => {
                                 disabled={loginLoading || authStatus === 'loading'}
                                 onClick={handleAuthorize}
                             >
-                                {loginLoading ? <span className={styles['login-modal__loader']} /> : getAuthorizationText()}
+                                {(loginLoading || registerLoading) ? <span className={styles['login-modal__loader']} /> : getAuthorizationText()}
                             </button>
                         </div>
 

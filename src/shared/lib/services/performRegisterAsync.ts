@@ -5,13 +5,16 @@ interface RegisterResponse {
     token: string;
 }
 
-export async function performRegisterAsync(email: string, password: string): Promise<RegisterResponse> {
+export async function performRegisterAsync(
+    email: string,
+    password: string,
+    name: string,): Promise<RegisterResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({email, password, name}),
     })
 
     if (!response.ok) {

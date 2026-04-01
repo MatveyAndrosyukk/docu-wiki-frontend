@@ -18,7 +18,7 @@ import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUs
 
 interface OpenedFileProps {
     file?: UiFile | null
-    emailParam: string | undefined
+    viewedUserEmail: string | undefined
     isFileTreeOpened: boolean
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>
 }
@@ -26,7 +26,7 @@ interface OpenedFileProps {
 const OpenedFile: React.FC<OpenedFileProps> = (
     {
         file = null,
-        emailParam,
+        viewedUserEmail,
         isFileTreeOpened,
         setIsFileTreeOpened
     }) => {
@@ -89,14 +89,14 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
         const isEmpty = !file.content || file.content.trim() === '';
 
-        let isCanEdit = isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser);
+        let isCanEdit = isUserCanEdit(authStatus === 'authenticated', viewedUserEmail, viewedUser, loggedInUser);
 
         if (isEmpty && isCanEdit) {
             setIsEditing(true);
         }
 
         setWasInitialized(true);
-    }, [file, wasInitialized, setIsEditing, authStatus, emailParam, viewedUser, loggedInUser]);
+    }, [file, wasInitialized, setIsEditing, authStatus, viewedUserEmail, viewedUser, loggedInUser]);
 
     if (!file) {
         return (
@@ -116,7 +116,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 isBurgerMenuOpened={isBurgerMenuOpened}
                 isEditing={isEditing}
                 isLoggedIn={authStatus === 'authenticated'}
-                emailParam={emailParam}
+                emailParam={viewedUserEmail}
                 setIsEditing={setIsEditing}
                 setIsBurgerMenuOpened={setIsBurgerMenuOpened}
                 onTryToLikeFile={toggleLike}

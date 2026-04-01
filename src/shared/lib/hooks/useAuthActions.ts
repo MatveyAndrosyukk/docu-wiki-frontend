@@ -75,6 +75,7 @@ export default function useAuthActions(): AuthorizationState {
             email: '',
             password: '',
             rePassword: '',
+            username: ''
         });
         registerState.setRegisterError(null);
         registerState.setRegisterMessage(null);

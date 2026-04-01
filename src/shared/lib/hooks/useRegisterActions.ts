@@ -3,6 +3,7 @@ import {performRegisterAsync} from "../services/performRegisterAsync";
 
 export interface RegisterModalState {
     email: string;
+    username: string;
     password: string;
     rePassword: string;
 }
@@ -19,6 +20,7 @@ export interface RegisterState {
     registerModalValue: RegisterModalState;
     setRegisterModalValue: Dispatch<SetStateAction<RegisterModalState>>;
     handleChangeRePasswordInput: (e: ChangeEvent<HTMLInputElement>) => void;
+    handleChangeUsernameInput: (e: ChangeEvent<HTMLInputElement>) => void;
     handleRegister: () => Promise<void>;
 }
 
@@ -28,10 +30,20 @@ export default function useRegisterActions(): RegisterState {
     const [registerMessage, setRegisterMessage] = useState<string | null>(null);
     const [isRegisterModal, setIsRegisterModal] = useState<boolean>(false);
     const [registerModalValue, setRegisterModalValue] = useState<RegisterModalState>({
+        username: '',
         email: '',
         password: '',
         rePassword: '',
     });
+
+    const handleChangeUsernameInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        if (isRegisterModal) {
+            setRegisterModalValue({
+                ...registerModalValue,
+                username: e.currentTarget.value
+            });
+        }
+    }, [isRegisterModal, registerModalValue]);
 
     const handleChangeRePasswordInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         if (isRegisterModal) {
@@ -46,8 +58,18 @@ export default function useRegisterActions(): RegisterState {
         const email = registerModalValue.email.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+        const username = registerModalValue.username.trim();
+
         if (email.length === 0 || !emailRegex.test(email)) {
             setRegisterError('Enter a valid email address');
+            return;
+        }
+        if (username.length < 4) {
+            setRegisterError('Username must be at least 4 characters');
+            return;
+        }
+        if (username.length > 25) {
+            setRegisterError('Username must be no more than 25 characters');
             return;
         }
         if (registerModalValue.password.trim().length < 6 ||
@@ -62,12 +84,16 @@ export default function useRegisterActions(): RegisterState {
         setRegisterLoading(true);
         setRegisterError(null);
         try {
-            await performRegisterAsync(registerModalValue.email, registerModalValue.password).then(() => {
+            await performRegisterAsync(
+                registerModalValue.email,
+                registerModalValue.password,
+                registerModalValue.username,
+            ).then(() => {
                 setRegisterLoading(false);
                 setIsRegisterModal(false);
                 setRegisterError(null);
                 setRegisterMessage('Confirmation link has been sent')
-                setRegisterModalValue({email: '', password: '', rePassword: ''});
+                setRegisterModalValue({email: '', username: '', password: '', rePassword: ''});
             });
         } catch (error) {
             setRegisterLoading(false);
@@ -89,6 +115,7 @@ export default function useRegisterActions(): RegisterState {
         registerModalValue,
         setRegisterModalValue,
         handleChangeRePasswordInput,
+        handleChangeUsernameInput,
         handleRegister,
     }
 }

@@ -77,7 +77,6 @@ const UserModal: FC<UserModalProps> = ({ userModalState }) => {
 
                         <div className={styles.profileEmail}>{loggedInUser?.email}</div>
 
-                        {/* сохраняем пространство для ошибок, чтобы не прыгала модалка */}
                         <div className={styles.errorContainer}>
                             {editedNameError && <div className={styles.errorText}>{editedNameError}</div>}
                         </div>

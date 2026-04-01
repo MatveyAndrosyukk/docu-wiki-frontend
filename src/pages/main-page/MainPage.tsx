@@ -25,11 +25,11 @@ import {ActionType} from "../../shared/lib/hooks/useModalActions";
 import {useAuth} from "../../shared/lib/hooks/useAuth";
 
 interface MainPageProps {
-    emailParam?: string | undefined;
+    viewedUserEmail?: string | undefined;
     resetToken?: string | undefined;
 }
 
-const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
+const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken}) => {
     const {authState, fileState} = useAppContext();
     const {authStatus} = useAuth();
 
@@ -42,7 +42,7 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
     const {handleOpenModalByReason} = fileState;
 
 
-    const currentUserEmail = emailParam ?? loggedInUser?.email ?? null;
+    const currentUserEmail = viewedUserEmail ?? loggedInUser?.email ?? null;
 
     const title = useMemo(() => {
         if (openedFile) return findPathToFile(files, openedFile.id)?.join('/') ?? '';
@@ -84,12 +84,12 @@ const MainPage: FC<MainPageProps> = ({emailParam, resetToken}) => {
                 <FileTree
                     isOpened={isOpened}
                     setIsOpened={setIsOpened}
-                    emailParam={emailParam}
+                    viewedUserEmail={viewedUserEmail}
                 />
                 <OpenedFile
                     isFileTreeOpened={isOpened}
                     setIsFileTreeOpened={setIsOpened}
-                    emailParam={emailParam}
+                    viewedUserEmail={viewedUserEmail}
                     file={openedFile}/>
             </div>
 

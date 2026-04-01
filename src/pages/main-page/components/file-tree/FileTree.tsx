@@ -20,12 +20,12 @@ import {useNotification} from "../../../../shared/lib/hooks/useNotification";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 
 interface FileTreeProps {
-    emailParam: string | undefined;
+    viewedUserEmail: string | undefined;
     isOpened: boolean;
     setIsOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpened}) => {
+const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setIsOpened}) => {
 
         const dispatch = useDispatch<AppDispatch>();
 
@@ -93,8 +93,8 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
 
         const isBanned = !!viewedUser?.banned;
         const canView = isUserCanView(viewedUser, loggedInUser);
-        const canEdit = !isBanned && isUserCanEdit(authStatus === 'authenticated', emailParam, viewedUser, loggedInUser);
-        const showHeader = isUserEqualsLoggedIn(emailParam, authStatus === 'authenticated', viewedUser);
+        const canEdit = !isBanned && isUserCanEdit(authStatus === 'authenticated', viewedUserEmail, viewedUser, loggedInUser);
+        const showHeader = isUserEqualsLoggedIn(viewedUserEmail, authStatus === 'authenticated', viewedUser);
 
 
         return (
@@ -172,7 +172,7 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
 
                                 {viewedUser && !isBanned && canView && (
                                     <div className={styles['file-tree__files']}>
-                                        <FileList windowWidth={windowWidth} emailParam={emailParam}/>
+                                        <FileList windowWidth={windowWidth} viewedUserEmail={viewedUserEmail}/>
                                     </div>
                                 )
                                 }
@@ -186,7 +186,7 @@ const FileTree: FC<FileTreeProps> = React.memo(({emailParam, isOpened, setIsOpen
 
     }, (prev, next) =>
         prev.isOpened === next.isOpened &&
-        prev.emailParam === next.emailParam
+        prev.viewedUserEmail === next.viewedUserEmail
 );
 
 export default FileTree;

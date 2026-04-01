@@ -13,12 +13,12 @@ import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
 import {RootState} from "../../../../../../store";
 
 interface FileListProps {
-    emailParam: string | undefined;
+    viewedUserEmail: string | undefined;
     windowWidth: number;
 }
 
 const FileList: React.FC<FileListProps> = React.memo(
-    ({emailParam, windowWidth}) => {
+    ({viewedUserEmail, windowWidth}) => {
         const dispatch = useDispatch();
 
         const {fileState} = useAppContext();
@@ -55,7 +55,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                         <FileNode
                             key={node.file.id}
                             node={node}
-                            emailParam={emailParam}
+                            emailParam={viewedUserEmail}
                             onFolderClick={handleFolderClick}
                             contextMenuState={contextMenu}
                             viewedUser={viewedUser}
@@ -79,7 +79,7 @@ const FileList: React.FC<FileListProps> = React.memo(
         );
     },
     (prev, next) =>
-        prev.emailParam === next.emailParam &&
+        prev.viewedUserEmail === next.viewedUserEmail &&
         prev.windowWidth === next.windowWidth,
 );
 
