@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useLocation, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import MainPage from "./MainPage";
 import {performGetEmailByUsername} from "../../shared/lib/services/performGetEmailByUsername";
 
@@ -11,18 +11,22 @@ const MainPageWrapper = () => {
     let email: any, setEmail: any;
     [email, setEmail] = useState<string | undefined>(undefined);
     const query = useQuery()
+    const navigate = useNavigate();
     const token = query.get("token") || undefined;
 
     const {username} = useParams<{ username: string }>();
 
     useEffect(() => {
-        if (!username) return;
+        if (!username) {
+            navigate("/");
+            return;
+        }
 
         performGetEmailByUsername(username)
             .then(data => setEmail(data.email))
             .catch(() => setEmail(undefined));
 
-    }, [setEmail, username]);
+    }, [navigate, setEmail, username]);
 
     return <MainPage
         resetToken={token}
