@@ -119,14 +119,14 @@ const EditMode: React.FC<EditFileViewProps> = (
                     file.id as number,
                     newContent,
                     addedImages,
-                    loggedInUser?.email
+                    loggedInUser?.name
                 );
                 setAddedImagesWhileEditing([])
             } catch (error) {
                 console.error('Save failed:', error);
             }
         }
-        , [file, handleSaveEditedFileChanges, loggedInUser?.email, setAddedImagesWhileEditing]);
+        , [file, handleSaveEditedFileChanges, loggedInUser?.name, setAddedImagesWhileEditing]);
 
     const handleCancelEdition = useCallback(async (
         addedImages: string[],

@@ -65,7 +65,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
     const pathToFile = findPathToFile(files, file?.id as number)?.join('/')
 
     const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
+        navigator.clipboard.writeText(window.location.href).then();
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
     };
@@ -83,7 +83,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                     }
                 </div>
                 <div className={styles['header__title']}>
-                    <div className={styles['header__title-email']}>{viewedUser?.email}</div>
+                    <div className={styles['header__title-email']}>{viewedUser?.name}</div>
                     <span className={styles['header__title-dash']}>|</span>
                     <div className={styles['header__title-path']} title={pathToFile}>{pathToFile}</div>
                 </div>

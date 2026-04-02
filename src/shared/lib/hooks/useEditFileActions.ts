@@ -73,9 +73,9 @@ export default function useEditFileActions(): EditFileViewState {
         fileId: number,
         newContent: string,
         addedImages: string[],
-        editorEmail?: string
+        editorUsername?: string
     ) => {
-        if (!editorEmail || contentError) return;
+        if (!editorUsername || contentError) return;
 
         setIsEditing(false);
         setIsFileContentChanged(false);
@@ -83,7 +83,7 @@ export default function useEditFileActions(): EditFileViewState {
         dispatch(updateFileContent({
             id: fileId,
             content: newContent,
-            editor: editorEmail
+            editor: editorUsername
         }))
             .unwrap()
             .then(() => {
