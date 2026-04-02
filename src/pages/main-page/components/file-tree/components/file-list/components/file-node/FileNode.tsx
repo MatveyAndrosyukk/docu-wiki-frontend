@@ -14,6 +14,7 @@ import FileLoader from "../../../../../../../../shared/ui/file-loader/FileLoader
 import {useSelector} from "react-redux";
 import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
 import {ContextMenuState} from "../../../../../../../../shared/lib/hooks/useContextMenuActions";
+import {useNavigate} from "react-router-dom";
 
 interface Props {
     node: TreeNode;
@@ -38,6 +39,7 @@ const FileNode: React.FC<Props> = React.memo(
          loggedInUser,
      }) => {
         const {file, depth, isLastChild, hasNextOnLevel} = node;
+        const navigate = useNavigate();
 
         const openedFile = useSelector(selectOpenedFile)
 
@@ -116,7 +118,12 @@ const FileNode: React.FC<Props> = React.memo(
         };
 
         const isFolder = file.type === FileType.Folder;
-        const clickHandler = isFolder ? () => onFolderClick(file.id) : () => handleTryToOpenFile(file.id);
+        const clickHandler = isFolder
+            ? () => onFolderClick(file.id)
+            : () => {
+                handleTryToOpenFile(file.id);
+                navigate(`/${viewedUser?.name}/file/${file.id}`);
+            };
         const contextMenuHandler = !file.isPending ? handleOpenContextMenu : undefined;
         const touchStartHandler = !file.isPending ? handleTouchStart : undefined;
 

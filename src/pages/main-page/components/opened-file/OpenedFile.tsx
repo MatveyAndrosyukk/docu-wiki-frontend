@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
@@ -30,11 +30,9 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         isFileTreeOpened,
         setIsFileTreeOpened
     }) => {
-    const navigate = useNavigate()
-
-    const [openedImage, setOpenedImage] = React.useState<string | null>(null)
-    const [isBurgerMenuOpened, setIsBurgerMenuOpened] = React.useState(false)
-    const [wasInitialized, setWasInitialized] = React.useState(false);
+    const [openedImage, setOpenedImage] = useState<string | null>(null)
+    const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
+    const [wasInitialized, setWasInitialized] = useState(false);
 
     const {fileState} = useAppContext();
     const {authStatus} = useAuth();
@@ -46,6 +44,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const pendingImages = useSelector(
         (state: RootState) => state.fileUi.pendingImages
     );
+
+    const navigate = useNavigate()
 
     const {isEditing, setIsEditing, handleOpenDeleteModal} = fileState
 

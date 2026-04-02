@@ -15,6 +15,7 @@ function App() {
                 <Route path="/verify" element={<VerifyPage/>}/>
                 <Route path="/resetPassword" element={<MainPageWrapper/>}/>
                 <Route path="/:username" element={<MainPageWrapper/>}/>
+                <Route path="/:username/file/:fileId" element={<MainPageWrapper/>}/>
             </Routes>
 
         </Router>

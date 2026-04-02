@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useMemo} from 'react';
+import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import styles from "../../OpenedFile.module.scss";
 import {isUserCanEdit} from "../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {ReactComponent as HeartBtn} from '../../images/opened-file-heart.svg'
@@ -51,6 +51,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
     }
 ) => {
     const width = useWindowWidth();
+    const [copied, setCopied] = useState(false);
 
     const isMobile = width < 435;
 
@@ -62,6 +63,12 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
     }, [file?.likes]);
 
     const pathToFile = findPathToFile(files, file?.id as number)?.join('/')
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    };
 
     return (
         <div className={styles['opened-file__header']}>
@@ -114,16 +121,19 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                         <>
                                             <div
                                                 className={styles['links__edit']}
-                                                onClick={() => setIsEditing(true)}
-                                            >
+                                                onClick={() => setIsEditing(true)}>
                                                 Edit
                                             </div>
 
                                             <div
                                                 onClick={() => onOpenDeleteModal(file, viewedUser)}
-                                                className={styles['links__delete']}
-                                            >
+                                                className={styles['links__delete']}>
                                                 Delete
+                                            </div>
+                                            <div
+                                                className={styles['links__copy']}
+                                                onClick={handleCopyLink}>
+                                                {copied ? 'Copied!' : 'Share'}
                                             </div>
                                         </>
                                     )}

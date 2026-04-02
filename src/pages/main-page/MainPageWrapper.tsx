@@ -14,7 +14,13 @@ const MainPageWrapper = () => {
     const navigate = useNavigate();
     const token = query.get("token") || undefined;
 
-    const {username} = useParams<{ username: string }>();
+    const {
+        username,
+        fileId
+    } = useParams<{
+        username: string
+        fileId: string
+    }>();
 
     useEffect(() => {
         if (!username) {
@@ -30,7 +36,9 @@ const MainPageWrapper = () => {
 
     return <MainPage
         resetToken={token}
-        viewedUserEmail={email}/>
+        viewedUserEmail={email}
+        fileId={fileId}
+    />
 };
 
 export default MainPageWrapper;

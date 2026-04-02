@@ -3,7 +3,7 @@ import Header from "./components/header/Header";
 import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import EditModal from "../../shared/ui/modal-windows/edit-modal/EditModal";
 import DeleteModal from "../../shared/ui/modal-windows/delete-modal/DeleteModal";
@@ -23,15 +23,18 @@ import {useViewedUserLoader} from "../../shared/lib/hooks/useViewedUserLoader";
 import {useFetchFilesForViewedUser} from "../../shared/lib/hooks/useFetchFilesForViewedUser";
 import {ActionType} from "../../shared/lib/hooks/useModalActions";
 import {useAuth} from "../../shared/lib/hooks/useAuth";
+import {findFileById} from "../../store/utils/fileTreeActionUtils";
 
 interface MainPageProps {
     viewedUserEmail?: string | undefined;
     resetToken?: string | undefined;
+    fileId?: string;
 }
 
-const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken}) => {
+const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     const {authState, fileState} = useAppContext();
     const {authStatus} = useAuth();
+    const dispatch = useDispatch();
 
     const files = useSelector(selectFileTree);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
@@ -39,7 +42,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken}) => {
     const openedFile = useSelector(selectOpenedFile);
 
     const {setIsResetPasswordModalOpened, setIsLoginModalOpen} = authState
-    const {handleOpenModalByReason} = fileState;
+    const {handleOpenModalByReason, handleTryToOpenFile} = fileState;
 
 
     const currentUserEmail = viewedUserEmail ?? loggedInUser?.email ?? null;
@@ -55,6 +58,18 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken}) => {
     useDocumentTitle(title || "Docuwiki Studio");
     useViewedUserLoader(currentUserEmail);
     useFetchFilesForViewedUser(viewedUser, loggedInUser);
+
+    useEffect(() => {
+        if (!fileId || !files?.length) return;
+
+        if (openedFile?.id === Number(fileId)) return;
+
+        const file = findFileById(files, Number(fileId));
+
+        if (file) {
+            handleTryToOpenFile(file.id)
+        }
+    }, [fileId, files, dispatch, handleTryToOpenFile, openedFile?.id]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

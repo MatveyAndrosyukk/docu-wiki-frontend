@@ -347,6 +347,29 @@
     background: rgba(239, 68, 68, 0.12);
     transform: translateY(1px);
   }
+
+  &__copy {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    border: 1px solid #2E3131;
+    user-select: none;
+
+    background: #262828;
+    color: #E5E7EB;
+
+    &:hover {
+      background: #2F3232;
+      border-color: #3A3E3E;
+    }
+    &:active {
+      background: #232525;
+      transform: translateY(1px);
+    }
+  }
 }
 
 .buttons-menu {
