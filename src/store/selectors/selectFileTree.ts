@@ -3,6 +3,7 @@ import {RootState} from "../index";
 import {UiFile} from "../types/UiFile";
 import {ServerFile} from "../types/ServerFile";
 import {FileStatus, FileType} from "../../types/file";
+import {compareNodes} from "../../shared/lib/utils/compareNodes";
 
 export const selectFileTree = createSelector(
     [
@@ -39,7 +40,7 @@ export const selectFileTree = createSelector(
                         : FileStatus.Closed,
                     isPending: false,
                 };
-            }).sort((a, b) => a.name.localeCompare(b.name));
+            }).sort(compareNodes);
 
         const tree = build(serverFiles);
 
@@ -86,7 +87,7 @@ export const selectFileTree = createSelector(
 
         const sortTree = (nodes: UiFile[]): UiFile[] => {
             return nodes
-                .sort((a, b) => a.name.localeCompare(b.name))
+                .sort(compareNodes)
                 .map(node => ({
                     ...node,
                     children: sortTree(node.children || [])
