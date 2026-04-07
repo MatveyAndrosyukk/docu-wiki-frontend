@@ -51,6 +51,34 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const {isEditing, setIsEditing, handleOpenDeleteModal} = fileState
 
+    useEffect(() => {
+        if (openedImage) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [openedImage]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setOpenedImage(null);
+            }
+        };
+
+        if (openedImage) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [openedImage]);
+
     const handleOpenImage = useCallback((imageUrl: string) => {
         setOpenedImage(imageUrl)
     }, []);
@@ -131,8 +159,26 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             />
 
             {openedImage && (
-                <div className={styles['opened-image__background']} onClick={() => setOpenedImage(null)}>
-                    <img src={openedImage} alt="Opened" className={styles['opened-image__image']} onClick={e => e.stopPropagation()} />
+                <div
+                    className={styles['opened-image__background']}
+                    onClick={() => setOpenedImage(null)}
+                >
+                    <button
+                        className={styles['opened-image__close']}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenedImage(null);
+                        }}
+                    >
+                        ✕
+                    </button>
+
+                    <img
+                        src={openedImage}
+                        alt="Opened"
+                        className={styles['opened-image__image']}
+                        onClick={e => e.stopPropagation()}
+                    />
                 </div>
             )}
 
