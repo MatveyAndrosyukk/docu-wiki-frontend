@@ -46,6 +46,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
 
 
     const currentUserEmail = viewedUserEmail ?? loggedInUser?.email ?? null;
+    const isFileLoading = Boolean(fileId) && (!files || files.length === 0);
 
     const title = useMemo(() => {
         if (openedFile) return findPathToFile(files, openedFile.id)?.join('/') ?? '';
@@ -67,7 +68,9 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
         const file = findFileById(files, Number(fileId));
 
         if (file) {
+
             handleTryToOpenFile(file.id)
+
         }
     }, [fileId, files, dispatch, handleTryToOpenFile, openedFile?.id]);
 
@@ -102,6 +105,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                     viewedUserEmail={viewedUserEmail}
                 />
                 <OpenedFile
+                    isFileLoading={isFileLoading}
                     isFileTreeOpened={isOpened}
                     setIsFileTreeOpened={setIsOpened}
                     viewedUserEmail={viewedUserEmail}

@@ -2,15 +2,18 @@ import React, {Dispatch, SetStateAction} from 'react';
 import styles from "../../../pages/main-page/components/opened-file/OpenedFile.module.scss";
 import emptyStyles from "./EmplyFile.module.scss";
 import {ReactComponent as BurgerSvg} from '../../../pages/main-page/components/opened-file/images/empty-file-burger.svg'
+import commonStyles from '../../assets/styles/Common.module.scss';
 
 interface EmptyFileProps {
     isFileTreeOpened: boolean;
+    isFileLoading: boolean;
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>;
 }
 
 const EmptyFile: React.FC<EmptyFileProps> = ({
                                                  isFileTreeOpened,
                                                  setIsFileTreeOpened,
+                                                 isFileLoading,
                                              }) => {
 
     return (
@@ -19,10 +22,14 @@ const EmptyFile: React.FC<EmptyFileProps> = ({
             <div className={emptyStyles['empty']}>
                 <div className={emptyStyles['empty__card']}>
 
-                    <div className={emptyStyles['empty__icon']}>
-                        {/*⭐*/}
-                        ⚡
-                    </div>
+                    {isFileLoading ?
+                        <div className={`${commonStyles['common__loader']} ${emptyStyles['empty__loader']}`}>
+
+                        </div> :
+                        <div className={emptyStyles['empty__icon']}>
+                            {/*⭐*/}
+                            ⚡
+                        </div>}
 
                     <div className={emptyStyles['empty__title']}>
                         No file opened

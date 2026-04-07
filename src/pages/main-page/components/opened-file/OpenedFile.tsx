@@ -21,6 +21,7 @@ interface OpenedFileProps {
     viewedUserEmail: string | undefined
     isFileTreeOpened: boolean
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>
+    isFileLoading: boolean
 }
 
 const OpenedFile: React.FC<OpenedFileProps> = (
@@ -28,7 +29,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         file = null,
         viewedUserEmail,
         isFileTreeOpened,
-        setIsFileTreeOpened
+        setIsFileTreeOpened,
+        isFileLoading
     }) => {
     const [openedImage, setOpenedImage] = useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
@@ -100,7 +102,10 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     if (!file) {
         return (
-            <EmptyFile isFileTreeOpened={isFileTreeOpened} setIsFileTreeOpened={setIsFileTreeOpened}/>
+            <EmptyFile
+                isFileLoading={isFileLoading}
+                isFileTreeOpened={isFileTreeOpened}
+                setIsFileTreeOpened={setIsFileTreeOpened}/>
         )
     }
 
