@@ -3,7 +3,6 @@ import {RootState} from "../index";
 import {UiFile} from "../types/UiFile";
 import {ServerFile} from "../types/ServerFile";
 import {FileStatus, FileType} from "../../types/file";
-import {compareNodes} from "../../shared/lib/utils/compareNodes";
 
 export const selectFileTree = createSelector(
     [
@@ -20,30 +19,39 @@ export const selectFileTree = createSelector(
     ): UiFile[] => {
         const openedSet = new Set(openedFolders);
 
-        const build = (nodes: ServerFile[]): UiFile[] =>
-            nodes.map(node => {
-                const children = node.children ? build(node.children) : [];
+        const compareNodes = (a: UiFile, b: UiFile) => {
+            if (a.type !== b.type) {
+                if (a.type === FileType.Folder) return -1;
+                if (b.type === FileType.Folder) return 1;
+            }
+            return a.name.localeCompare(b.name, undefined, {sensitivity: "base"});
+        };
 
-                return {
-                    id: node.id,
-                    name: node.name,
-                    type: node.type,
-                    parent: node.parent,
-                    author: node.author,
-                    content: node.content,
-                    likes: node.likes,
-                    isLiked: node.isLiked,
-                    lastEditor: node.lastEditor,
-                    children,
-                    status: openedSet.has(node.id)
-                        ? FileStatus.Opened
-                        : FileStatus.Closed,
-                    isPending: false,
-                };
-            }).sort(compareNodes);
+        const insertSorted = (nodes: UiFile[], newNode: UiFile) => {
+            nodes.push(newNode);
+            nodes.sort(compareNodes);
+        };
+
+        const build = (nodes: ServerFile[]): UiFile[] =>
+            nodes.map(node => ({
+                id: node.id,
+                name: node.name,
+                type: node.type,
+                parent: node.parent,
+                author: node.author,
+                content: node.content,
+                likes: node.likes,
+                isLiked: node.isLiked,
+                lastEditor: node.lastEditor,
+                children: node.children ? build(node.children) : [],
+                status: openedSet.has(node.id)
+                    ? FileStatus.Opened
+                    : FileStatus.Closed,
+                isPending: false,
+            }));
 
         const tree = build(serverFiles);
-
+        tree.sort(compareNodes);
 
         Object.entries(pendingFiles).forEach(([tempId, pending]) => {
             const {parentId, name} = pending;
@@ -52,7 +60,7 @@ export const selectFileTree = createSelector(
             const insert = (nodes: UiFile[]): boolean => {
                 for (const node of nodes) {
                     if (node.id === parentId) {
-                        node.children.push({
+                        insertSorted(node.children, {
                             id: Number(tempId),
                             name,
                             type: FileType.File,
@@ -63,7 +71,6 @@ export const selectFileTree = createSelector(
                         });
                         return true;
                     }
-
                     if (insert(node.children)) return true;
                 }
                 return false;
@@ -73,9 +80,8 @@ export const selectFileTree = createSelector(
         });
 
         Object.entries(pendingRootFolders).forEach(([tempIdStr, pending]) => {
-            const tempId = Number(tempIdStr);
-            tree.push({
-                id: tempId,
+            insertSorted(tree, {
+                id: Number(tempIdStr),
                 name: pending.name,
                 type: FileType.Folder,
                 parent: null,
@@ -85,15 +91,6 @@ export const selectFileTree = createSelector(
             });
         });
 
-        const sortTree = (nodes: UiFile[]): UiFile[] => {
-            return nodes
-                .sort(compareNodes)
-                .map(node => ({
-                    ...node,
-                    children: sortTree(node.children || [])
-                }));
-        };
-
-        return sortTree(tree);
+        return tree;
     }
 );
