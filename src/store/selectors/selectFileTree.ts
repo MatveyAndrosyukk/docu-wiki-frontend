@@ -1,8 +1,27 @@
-import {createSelector} from "@reduxjs/toolkit";
-import {RootState} from "../index";
-import {UiFile} from "../types/UiFile";
-import {ServerFile} from "../types/ServerFile";
-import {FileStatus, FileType} from "../../types/file";
+import { createSelector } from "@reduxjs/toolkit";
+import { RootState } from "../index";
+import { UiFile } from "../types/UiFile";
+import { ServerFile } from "../types/ServerFile";
+import { FileStatus, FileType } from "../../types/file";
+
+const compareNodes = (a: UiFile, b: UiFile) => {
+    if (a.type !== b.type) {
+        if (a.type === FileType.Folder) return -1;
+        if (b.type === FileType.Folder) return 1;
+    }
+
+    return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+};
+
+const sortTree = (nodes: UiFile[]): UiFile[] => {
+    nodes.sort(compareNodes);
+    nodes.forEach(node => {
+        if (node.children?.length) {
+            sortTree(node.children);
+        }
+    });
+    return nodes;
+};
 
 export const selectFileTree = createSelector(
     [
@@ -18,19 +37,6 @@ export const selectFileTree = createSelector(
         pendingRootFolders
     ): UiFile[] => {
         const openedSet = new Set(openedFolders);
-
-        const compareNodes = (a: UiFile, b: UiFile) => {
-            if (a.type !== b.type) {
-                if (a.type === FileType.Folder) return -1;
-                if (b.type === FileType.Folder) return 1;
-            }
-            return a.name.localeCompare(b.name, undefined, {sensitivity: "base"});
-        };
-
-        const insertSorted = (nodes: UiFile[], newNode: UiFile) => {
-            nodes.push(newNode);
-            nodes.sort(compareNodes);
-        };
 
         const build = (nodes: ServerFile[]): UiFile[] =>
             nodes.map(node => ({
@@ -51,16 +57,15 @@ export const selectFileTree = createSelector(
             }));
 
         const tree = build(serverFiles);
-        tree.sort(compareNodes);
 
         Object.entries(pendingFiles).forEach(([tempId, pending]) => {
-            const {parentId, name} = pending;
+            const { parentId, name } = pending;
             if (parentId === null) return;
 
             const insert = (nodes: UiFile[]): boolean => {
                 for (const node of nodes) {
                     if (node.id === parentId) {
-                        insertSorted(node.children, {
+                        node.children.push({
                             id: Number(tempId),
                             name,
                             type: FileType.File,
@@ -71,6 +76,7 @@ export const selectFileTree = createSelector(
                         });
                         return true;
                     }
+
                     if (insert(node.children)) return true;
                 }
                 return false;
@@ -80,7 +86,7 @@ export const selectFileTree = createSelector(
         });
 
         Object.entries(pendingRootFolders).forEach(([tempIdStr, pending]) => {
-            insertSorted(tree, {
+            tree.push({
                 id: Number(tempIdStr),
                 name: pending.name,
                 type: FileType.Folder,
@@ -91,6 +97,6 @@ export const selectFileTree = createSelector(
             });
         });
 
-        return tree;
+        return sortTree(tree);
     }
 );

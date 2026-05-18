@@ -19,8 +19,7 @@ const MainPageWrapper = () => {
         fileId
     } = useParams<{
         username: string
-        fileId: string
-    }>();
+        fileId: string }>();
 
     useEffect(() => {
         if (!username) {
