@@ -291,15 +291,6 @@ export default function useModalActions(): ModalActionsState {
             case ActionType.PasteFile: {
                 if (!copyPasteActions.copiedFile) return;
 
-                if (!isUserAdminOrOwner(loggedInUser) && totalFiles >= filesLimit) {
-                    closeModal();
-                    setIsLimitError(true)
-                    setTimeout(() => {
-                        setIsLimitError(false);
-                    }, 3000);
-                    return;
-                }
-
                 if (checkNameConflictInFolder(files, id, trimmedTitle)) {
                     const typeLabel =
                         copyPasteActions.copiedFile?.type === FileType.File
@@ -318,7 +309,7 @@ export default function useModalActions(): ModalActionsState {
                     filesToAdd = countFilesRecursively(copyPasteActions.copiedFile);
                 }
 
-                if (totalFiles + filesToAdd > filesLimit) {
+                if (!isUserAdminOrOwner(loggedInUser) && (totalFiles + filesToAdd > filesLimit)) {
                     closeModal();
                     setIsLimitError(true)
                     setTimeout(() => {
