@@ -17,55 +17,55 @@ export const createEditorToolbar = (
     {
         title: 'Bold',
         icon: BoldImage,
-        action: () => wrapSelection('[`b`]', '[`/b`]'),
+        action: () => wrapSelection('[B]', '[/B]'),
         style: {width: '10.45px', height: '12.57px'}
     },
     {
         title: 'Italic',
         icon: ItalicImage,
-        action: () => wrapSelection('[`i`]', '[`/i`]'),
+        action: () => wrapSelection('[I]', '[/I]'),
         style: {width: '9px', height: '10.83px'}
     },
     {
         title: 'Underlined',
         icon: UnderlinedImage,
-        action: () => wrapSelection('[`u`]', '[`/u`]'),
+        action: () => wrapSelection('[U]', '[/U]'),
         style: {width: '10.45px', height: '12.57px'}
     },
     {
         title: 'Point',
         icon: PointImage,
-        action: () => wrapSelection('[`p`]\n', '\n[`/p`]'),
+        action: () => wrapSelection('[P]\n', '\n[/P]'),
         style: {width: '4px', height: '4px'}
     },
     {
         title: 'Link',
         icon: LinkImage,
-        action: () => wrapSelection('[`l to="https://example.com"`]', '[`/l`]'),
+        action: () => wrapSelection('[L to="https://example.com"]', '[/L]'),
         style: {width: '14px', height: '14px'}
     },
     {
         title: 'Code',
         icon: CodeImage,
-        action: () => wrapSelection('[`c`]\n', '\n[`/c`]'),
+        action: () => wrapSelection('[C]\n', '\n[/C]'),
         style: {width: '16.32px', height: '14.57px'}
     },
     {
         title: 'Code line',
         icon: CodeLineImage,
-        action: () => wrapSelection('[`lc`]', '[`/lc`]'),
+        action: () => wrapSelection('[LC]', '[/LC]'),
         style: {width: '16px', height: '16px'}
     },
     {
         title: 'Terminal',
         icon: TerminalImage,
-        action: () => wrapSelection('[`t`]\n', '\n[`/t`]'),
+        action: () => wrapSelection('[T]\n', '\n[/T]'),
         style: {width: '14.25px', height: '12.67px'}
     },
     {
         title: 'Line',
         icon: LineImage,
-        action: () => pasteTag('[`l`]'),
+        action: () => pasteTag('[L]'),
         style: {width: '14.25px', height: '1.81px'}
     },
     {

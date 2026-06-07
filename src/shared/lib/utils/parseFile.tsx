@@ -11,9 +11,9 @@ function parseInline(
     const parts: React.ReactNode[] = [];
 
     const imageRegx = /\[image\/(.+?)]/g;
-    const linkRegx = /\[`l to="([^"]+)"`](.+?)\[`\/l`]/g;
-    const simpleTagsRegex = /\[`([ubi])`]([\s\S]+?)\[`\/\1`]/g;
-    const lineCode = /\[`lc`](.*?)\[`\/lc`]/g;
+    const linkRegx = /\[L to="([^"]+)"](.+?)\[\/L]/g;
+    const simpleTagsRegex = /\[([UBI])]([\s\S]+?)\[\/\1]/g;
+    const lineCode = /\[LC](.*?)\[\/LC]/g;
 
     let lastIndex = 0;
 
@@ -71,13 +71,13 @@ function parseInline(
 
             let className = '';
             switch (tag) {
-                case 'u':
+                case 'U':
                     className = styles['opened-file__content-underline'];
                     break;
-                case 'b':
+                case 'B':
                     className = styles['opened-file__content-bold'];
                     break;
-                case 'i':
+                case 'I':
                     className = styles['opened-file__content-italic'];
                     break;
             }
@@ -154,10 +154,10 @@ export function parseFileTextToHTML(
     while (i < n) {
         const line = lines[i].trim();
 
-        if (line.startsWith('[`c`]')) {
+        if (line.startsWith('[C]')) {
             let codeLines: string[] = [];
             i++;
-            while (i < n && !lines[i].startsWith('[`/c`]')) {
+            while (i < n && !lines[i].startsWith('[/C]')) {
                 codeLines.push(lines[i]);
                 i++;
             }
@@ -174,10 +174,10 @@ export function parseFileTextToHTML(
             continue;
         }
 
-        if (line.startsWith('[`t`]')) {
+        if (line.startsWith('[T]')) {
             let terminalLines: string[] = [];
             i++;
-            while (i < n && !lines[i].startsWith('[`/t`]')) {
+            while (i < n && !lines[i].startsWith('[/T]')) {
                 terminalLines.push(lines[i]);
                 i++;
             }
@@ -191,7 +191,7 @@ export function parseFileTextToHTML(
             continue;
         }
 
-        if (line === '[`l`]') {
+        if (line === '[L]') {
             elements.push(
                 <div key={`line-${i}`} className={styles['opened-file__content-line']}/>
             );
@@ -199,10 +199,10 @@ export function parseFileTextToHTML(
             continue;
         }
 
-        if (line.startsWith('[`p`]')) {
+        if (line.startsWith('[P]')) {
             let pointLines: string[] = [];
             i++;
-            while (i < n && !lines[i].startsWith('[`/p`]')) {
+            while (i < n && !lines[i].startsWith('[/P]')) {
                 pointLines.push(lines[i]);
                 i++;
             }
