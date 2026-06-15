@@ -48,6 +48,8 @@ export const selectFileTree = createSelector(
                 content: node.content,
                 likes: node.likes,
                 isLiked: node.isLiked,
+                updatedAt: node.updatedAt,
+                createdAt: node.createdAt,
                 lastEditor: node.lastEditor,
                 children: node.children ? build(node.children) : [],
                 status: openedSet.has(node.id)

@@ -11,4 +11,6 @@ export interface ServerFile{
     likes?: number;
     isLiked?: boolean;
     lastEditor?: string;
+    updatedAt?: string,
+    createdAt?: string,
 }

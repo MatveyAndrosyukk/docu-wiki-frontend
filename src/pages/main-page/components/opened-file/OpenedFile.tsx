@@ -15,6 +15,7 @@ import {RootState} from "../../../../store";
 import {useAuth} from "../../../../shared/lib/hooks/useAuth";
 import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
 import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
+import {formatDate} from "./utils/formatDate";
 
 interface OpenedFileProps {
     file?: UiFile | null
@@ -137,6 +138,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         )
     }
 
+    console.log(formatDate(file.createdAt));
+
     return (
         <div className={styles['opened-file']}>
             <OpenedFileHeader
@@ -183,23 +186,31 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             )}
 
             {isEditing
-                ? <EditMode file={file} parseFileTextToHTML={parseFileTextToHTMLMemo} onImageClick={handleOpenImage} isFileTreeOpened={isFileTreeOpened} />
+                ? <EditMode file={file} parseFileTextToHTML={parseFileTextToHTMLMemo} onImageClick={handleOpenImage}
+                            isFileTreeOpened={isFileTreeOpened}/>
                 : <div className={styles['opened-file__content']}>{contentElements}</div>
             }
 
             <div className={styles['opened-file__footer']}>
-                Last edited by:
-                <span onClick={() => handleGoToUsersPage(file.lastEditor as string)} className={styles['footer__editor']}>
+                Last edited {formatDate(file.updatedAt)} -
+
+                <span
+                    onClick={() => handleGoToUsersPage(file.lastEditor as string)}
+                    className={styles['footer__editor']}
+                >
                     {file.lastEditor}
                 </span>
             </div>
 
             <div
-                style={{ display: isFileTreeOpened ? 'none' : 'flex' }}
+                style={{display: isFileTreeOpened ? 'none' : 'flex'}}
                 className={emptyStyles['file-tree']}
-                onClick={e => { e.stopPropagation(); setIsFileTreeOpened(!isFileTreeOpened); }}
+                onClick={e => {
+                    e.stopPropagation();
+                    setIsFileTreeOpened(!isFileTreeOpened);
+                }}
             >
-                <BurgerSvg className={emptyStyles['file-tree-image']} />
+                <BurgerSvg className={emptyStyles['file-tree-image']}/>
             </div>
         </div>
     );

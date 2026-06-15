@@ -13,4 +13,6 @@ export interface UiFile {
     lastEditor?: string;
     status: FileStatus;
     isPending: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
