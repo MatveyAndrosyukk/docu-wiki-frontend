@@ -1,4 +1,4 @@
-import React, {FC, useRef, useState} from 'react';
+import React, {Dispatch, FC, useRef, useState} from 'react';
 import styles from './Header.module.scss';
 import {ReactComponent as LogoSvg} from './images/header-logo.svg';
 import {ReactComponent as SearchSvg} from './images/header-search.svg';
@@ -17,7 +17,11 @@ import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 
-const Header: FC = () => {
+interface Props {
+    setIsFeedbackOpen: Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Header: FC<Props> = ({setIsFeedbackOpen}) => {
     const [burgerOpen, setBurgerOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -91,6 +95,13 @@ const Header: FC = () => {
                                     <div ref={menuRef} className={styles['header__burger-menu']}>
                                         <div className={styles['header__burger-item']}>
                                             <UserSvg onClick={handleOpenUserModal}/>
+                                        </div>
+                                        <div className={styles['header__burger-item']}>
+                                            <span
+                                                style={{color: '#8D9191'}}
+                                                onClick={() => setIsFeedbackOpen(true)}>
+                                                🗪
+                                            </span>
                                         </div>
                                         {authStatus === 'authenticated' ? (
                                             <div className={styles['header__burger-item']}>

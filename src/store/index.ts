@@ -2,12 +2,14 @@ import {configureStore} from "@reduxjs/toolkit";
 import fileServerReducer from './slices/fileServerSlice';
 import fileUiReducer from './slices/fileUiSlice';
 import userReducer from "./slices/userSlice";
+import notificationReducer from "./slices/notificationSlice";
 
 export const store = configureStore({
     reducer: {
         fileServer: fileServerReducer,
         fileUi: fileUiReducer,
-        user: userReducer
+        user: userReducer,
+        notification: notificationReducer
     },
 });
 

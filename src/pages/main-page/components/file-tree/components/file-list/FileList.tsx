@@ -46,7 +46,8 @@ const FileList: React.FC<FileListProps> = React.memo(
             <div className={styles['file-list']} style={{maxHeight}}>
                 {fileState.isLimitError && (
                     <div className={commonStyles['common__notification']}>
-                        You can't create more than 20 files without premium :(
+                        You've reached the free plan limit of 20 files.
+                        Upgrade to Premium to create more.
                     </div>
                 )}
 

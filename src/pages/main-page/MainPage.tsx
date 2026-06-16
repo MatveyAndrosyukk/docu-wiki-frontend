@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo} from 'react';
+import React, {FC, useEffect, useMemo, useState} from 'react';
 import Header from "./components/header/Header";
 import styles from './MainPage.module.scss'
 import FileTree from "./components/file-tree/FileTree";
@@ -24,6 +24,10 @@ import {useFetchFilesForViewedUser} from "../../shared/lib/hooks/useFetchFilesFo
 import {ActionType} from "../../shared/lib/hooks/useModalActions";
 import {useAuth} from "../../shared/lib/hooks/useAuth";
 import {findFileById} from "../../store/utils/fileTreeActionUtils";
+import FeedbackButton from "../../shared/ui/feedback-button/FeedbackButton";
+import FeedbackModal from "../../shared/ui/modal-windows/feedback-modal/FeedbackModal";
+import GlobalNotification from "../../shared/ui/global-notification/GlobalNotification";
+import {useWindowWidth} from "../../shared/lib/hooks/useWindowWidth";
 
 interface MainPageProps {
     viewedUserEmail?: string | undefined;
@@ -32,14 +36,18 @@ interface MainPageProps {
 }
 
 const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
+    const [isFeedbackOpen, setIsFeedbackOpen] =
+        useState(false);
     const {authState, fileState} = useAppContext();
     const {authStatus} = useAuth();
     const dispatch = useDispatch();
+    const width = useWindowWidth();
 
     const files = useSelector(selectFileTree);
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const openedFile = useSelector(selectOpenedFile);
+    const isMobile = width < 740;
 
     const {setIsResetPasswordModalOpened, setIsLoginModalOpen} = authState
     const {handleOpenModalByReason, handleTryToOpenFile} = fileState;
@@ -97,7 +105,9 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
 
     return (
         <div className={styles['main']}>
-            <Header/>
+            <Header
+                setIsFeedbackOpen={setIsFeedbackOpen}
+            />
             <div className={styles['container']}>
                 <FileTree
                     isOpened={isOpened}
@@ -115,12 +125,22 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             {isOpened && window.innerWidth < 1270 && (
                 <div className={styles.overlay} onClick={() => setIsOpened(false)}/>
             )}
-
+            {!isMobile &&
+                <FeedbackButton
+                    onClick={() => setIsFeedbackOpen(true)}
+                />
+            }
+            <FeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={() => setIsFeedbackOpen(false)}
+                userEmail={loggedInUser?.email}
+            />
             <EditModal/>
             <DeleteModal/>
             <LoginModal/>
             <EnterEmailModal/>
             <ResetPasswordModal resetToken={resetToken}/>
+            <GlobalNotification/>
             {isUserOwner(loggedInUser) && <BanModal/>}
         </div>
     );
