@@ -47,7 +47,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
     const openedFile = useSelector(selectOpenedFile);
-    const isMobile = width < 740;
+    const isMobile = width < 1066;
 
     const {setIsResetPasswordModalOpened, setIsLoginModalOpen} = authState
     const {handleOpenModalByReason, handleTryToOpenFile} = fileState;

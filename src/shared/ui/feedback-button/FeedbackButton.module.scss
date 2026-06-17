@@ -1,7 +1,7 @@
 .feedbackButton {
   position: fixed;
   right: 24px;
-  bottom: 24px;
+  bottom: 30px;
 
   width: 52px;
   height: 52px;
@@ -31,5 +31,15 @@
 
   &:active {
     transform: scale(0.95);
+  }
+
+  @media (min-width: 1271px) and (max-width: 1445px) {
+    right: 0;
+    left: 24px;
+  }
+
+  @media (max-width: 1270px) {
+    right: 24px;
+    bottom: 10px;
   }
 }

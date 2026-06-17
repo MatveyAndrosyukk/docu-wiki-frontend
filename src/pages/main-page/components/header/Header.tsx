@@ -38,7 +38,7 @@ const Header: FC<Props> = ({setIsFeedbackOpen}) => {
     const {handleLogout, handleOpenLoginModal} = authState;
     const {searchType, handleSwitchSearchType, handleOpenPathToSelectedFile} = fileSearch;
 
-    const isMobile = width < 740;
+    const isMobile = width < 1066;
 
     const menuRef = useRef<HTMLDivElement | null>(null);
     const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
