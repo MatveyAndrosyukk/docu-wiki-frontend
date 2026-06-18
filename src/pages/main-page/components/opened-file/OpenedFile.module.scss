@@ -12,7 +12,6 @@
   overflow: visible;
   scrollbar-width: thin;
   scrollbar-color: #8D9191 #191A1A;
-  scrollbar-gutter: stable;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -37,7 +36,7 @@
     font-size: 12px;
     font-weight: 500;
     color: #8D9191;
-    padding: 0 14px 0 11px;
+    padding: 0 11px;
     border-bottom: 1px solid #2B2C2D;
     margin-bottom: 5px;
     position: sticky;
@@ -54,10 +53,9 @@
     overflow-y: auto;
     will-change: transform;
     contain: layout paint;
-    padding: 0 3px 0 9px;
+    padding: 0 9px;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #202222;
-    scrollbar-gutter: stable;
     z-index: 1;
     position: relative;
     word-break: break-word;
@@ -149,7 +147,7 @@
     justify-content: flex-end;
     align-items: center;
     color: #8D9191;
-    padding: 7px 14px 7px 11px;
+    padding: 7px 11px;
     border-top: 1px solid #2B2C2D;
   }
 }
@@ -351,7 +349,7 @@
   }
 
   &__copy {
-    padding: 3px 5px;
+    padding: 4px 10px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 500;
