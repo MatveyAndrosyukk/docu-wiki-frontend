@@ -1,11 +1,15 @@
 import React, {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import styles from "../../OpenedFile.module.scss";
+import headerStyles from "./OpenedFileHeader.module.scss"
 import {isUserCanEdit} from "../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {ReactComponent as HeartBtn} from '../../images/opened-file-heart.svg'
 import {ReactComponent as LikedHeartBtn} from '../../images/opened-file-red-heart.svg'
 import {ReactComponent as EditFileSvg} from '../../images/opened-file-edit.svg'
 import {ReactComponent as DeleteFileSvg} from '../../images/opened-file-delete.svg'
 import {ReactComponent as OpenButtonsSvg} from '../../images/opened-file-open.svg'
+import {ReactComponent as ShareIcon} from './images/share.svg';
+import {ReactComponent as EditIcon} from './images/edit.svg';
+import {ReactComponent as DeleteIcon} from './images/delete.svg';
 import {User} from "../../../../../../store/slices/userSlice";
 import findPathToFile from "../../../../../../shared/lib/utils/findFilePath";
 import {UiFile} from "../../../../../../store/types/UiFile";
@@ -120,19 +124,28 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                     {!isEditing && (
                                         <>
                                             <div
-                                                className={styles['links__copy']}
-                                                onClick={handleCopyLink}>
-                                                {copied ? 'Copied!' : 'Share'}
+                                                className={headerStyles.button}
+                                                onClick={handleCopyLink}
+                                                title={'Copy link'}
+                                            >
+                                                {copied ?
+                                                    '✓'
+                                                    :
+                                                    <ShareIcon className={headerStyles.icon}/>}
                                             </div>
                                             <div
-                                                className={styles['links__edit']}
-                                                onClick={() => setIsEditing(true)}>
-                                                Edit
+                                                className={headerStyles.button}
+                                                onClick={() => setIsEditing(true)}
+                                                title={'Edit file'}
+                                            >
+                                                <EditIcon className={headerStyles.icon}/>
                                             </div>
                                             <div
+                                                className={`${headerStyles.button} ${headerStyles.delete}`}
                                                 onClick={() => onOpenDeleteModal(file, viewedUser)}
-                                                className={styles['links__delete']}>
-                                                Delete
+                                                title={'Remove file'}
+                                            >
+                                                <DeleteIcon className={`${headerStyles.icon} ${headerStyles.deleteIcon}`}/>
                                             </div>
                                         </>
                                     )}
