@@ -2,7 +2,6 @@ import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useSta
 import styles from './OpenedFile.module.scss'
 import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
-import {parseFileTextToHTML} from '../../../../shared/lib/utils/parseFile'
 import EditMode from './components/edit-mode/EditMode'
 import {useNavigate} from "react-router-dom";
 import EmptyFile from "../../../../shared/ui/empty-file/EmptyFile";
@@ -16,6 +15,7 @@ import {useAuth} from "../../../../shared/lib/hooks/useAuth";
 import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
 import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {formatDate} from "./utils/formatDate";
+import parseFileTextToHTML from "./utils/parse-file-content-utils/parseFileTextToHTML";
 
 interface OpenedFileProps {
     file?: UiFile | null
