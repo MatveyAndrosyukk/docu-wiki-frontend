@@ -228,7 +228,7 @@ const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setI
                         className={styles['file-tree__premium']}
                         // onClick={handleOpenPremiumModal}
                     >
-                        Upgrade to Premium
+                        Upgrade
                     </div>
                 )}
             </div>
