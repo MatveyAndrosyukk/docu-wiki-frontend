@@ -5,6 +5,7 @@ import {ReactComponent as SearchSvg} from './images/header-search.svg';
 import {ReactComponent as SwapSvg} from './images/header-swap.svg';
 import {ReactComponent as UserSvg} from './images/header-user.svg';
 import {ReactComponent as LogoutSvg} from './images/header-logout.svg';
+import {ReactComponent as PremiumSvg} from './images/premium.svg';
 import SearchInput from "./components/search-input/SearchInput";
 import UserModal from '../../../../shared/ui/modal-windows/user-modal/UserModal';
 import useUserModalActions from "../../../../shared/lib/hooks/useUserModalActions";
@@ -70,6 +71,10 @@ const Header: FC<Props> = ({setIsFeedbackOpen}) => {
                     </div>
 
                     <div className={styles['header__right']}>
+                        <div className={styles['header__premium-button']}>
+                            <PremiumSvg />
+                        </div>
+
                         <div className={styles['header__search']}>
                             <div className={styles['header__search-input']}>
                                 <SearchInput

@@ -54,6 +54,12 @@ const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setI
             isOpened && windowWidth < 1270
         );
 
+        const filesCount = viewedUser?.amountOfFiles ?? 0;
+
+        const isWarning =
+            !viewedUser?.isPremium &&
+            filesCount >= 15;
+
         const fileTreeStyles = useMemo(() => {
             if (!isOpened) return styles['file-tree-closed'];
 
@@ -170,17 +176,61 @@ const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setI
                                     </div>
                                 )}
 
-                                {viewedUser && !isBanned && canView && (
-                                    <div className={styles['file-tree__files']}>
-                                        <FileList windowWidth={windowWidth} viewedUserEmail={viewedUserEmail}/>
+                                {canEdit && (
+                                    <div className={styles['file-tree__usage']}>
+                                        <div className={styles['file-tree__usage-text']}>
+                                            {viewedUser?.isPremium
+                                                ? `${viewedUser?.amountOfFiles ?? 0} files`
+                                                : `${viewedUser?.amountOfFiles ?? 0} / 20 files`
+                                            }
+                                        </div>
+
+                                        <div className={styles['file-tree__usage-bar']}>
+                                            <div
+                                                className={`
+                                                    ${styles['file-tree__usage-fill']}
+                                                    ${isWarning ? styles['file-tree__usage-fill--warning'] : ''}
+                                                        `}
+                                                style={{
+                                                    width: viewedUser?.isPremium
+                                                        ? '100%'
+                                                        : `${Math.min(
+                                                            ((viewedUser?.amountOfFiles ?? 0) / 20) * 100,
+                                                            100
+                                                        )}%`
+                                                }}
+                                            />
+                                        </div>
                                     </div>
-                                )
-                                }
+                                )}
+
+                                    {viewedUser && !isBanned && canView && (
+                                        <div className={styles['file-tree__files']}>
+                                            <FileList windowWidth={windowWidth} viewedUserEmail={viewedUserEmail}/>
+                                        </div>
+                                    )
+                                    }
                             </>
                         )
                     }
 
                 </div>
+
+                {viewedUser?.isPremium ? (
+                    <div className={styles['file-tree__premium-active']}>
+                        <span>PREMIUM</span>
+                        <span className={styles['file-tree__premium-badge']}>
+                            ACTIVE
+                        </span>
+                    </div>
+                ) : (
+                    <div
+                        className={styles['file-tree__premium']}
+                        // onClick={handleOpenPremiumModal}
+                    >
+                        Upgrade to Premium
+                    </div>
+                )}
             </div>
         );
 
