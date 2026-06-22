@@ -16,6 +16,8 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
+  --scrollbar-width: 0px;
+  --content-padding-x: 11px;
 
   @media (max-width: 1270px) {
     height: calc(100vh - 80px - 20px - 20px);
@@ -36,7 +38,6 @@
     font-size: 12px;
     font-weight: 500;
     color: #8D9191;
-    padding: 0 11px;
     border-bottom: 1px solid #2B2C2D;
     margin-bottom: 5px;
     position: sticky;
@@ -45,6 +46,8 @@
     z-index: 10;
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
+    padding-left: var(--content-padding-x);
+    padding-right: var(--content-padding-x);
   }
 
   &__content {
@@ -53,13 +56,15 @@
     overflow-y: auto;
     will-change: transform;
     contain: layout paint;
-    padding: 0 9px;
     scrollbar-width: thin;
     scrollbar-color: #8D9191 #202222;
+    scrollbar-gutter: stable;
     z-index: 1;
     position: relative;
     word-break: break-word;
     overflow-wrap: break-word;
+    padding-left: var(--content-padding-x);
+    padding-right: var(--content-padding-x);
 
     &-text {
       font-family: "DM Mono", sans-serif;
@@ -100,10 +105,14 @@
 
     &-code {
       margin-bottom: 5px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     &-terminal {
       margin-bottom: 5px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     &-point {
@@ -278,6 +287,7 @@
 
   &__right-side {
     display: flex;
+    padding-right: var(--scrollbar-width);
   }
 
   &__buttons {

@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState} from 'react'
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
 import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
@@ -36,6 +36,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const [openedImage, setOpenedImage] = useState<string | null>(null)
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
     const [wasInitialized, setWasInitialized] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const {fileState} = useAppContext();
     const {authStatus} = useAuth();
@@ -63,6 +64,19 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             document.body.style.overflow = '';
         };
     }, [openedImage]);
+
+    useEffect(() => {
+        if (!contentRef.current) return;
+
+        const scrollbarWidth =
+            contentRef.current.offsetWidth -
+            contentRef.current.clientWidth;
+
+        contentRef.current.parentElement?.style.setProperty(
+            '--scrollbar-width',
+            `${scrollbarWidth}px`
+        );
+    }, [file]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -138,8 +152,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         )
     }
 
-    console.log(formatDate(file.createdAt));
-
     return (
         <div className={styles['opened-file']}>
             <OpenedFileHeader
@@ -188,7 +200,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             {isEditing
                 ? <EditMode file={file} parseFileTextToHTML={parseFileTextToHTMLMemo} onImageClick={handleOpenImage}
                             isFileTreeOpened={isFileTreeOpened}/>
-                : <div className={styles['opened-file__content']}>{contentElements}</div>
+                : <div
+                    className={styles['opened-file__content']}
+                    ref={contentRef}
+                >
+                    {contentElements}
+            </div>
             }
 
             <div className={styles['opened-file__footer']}>
