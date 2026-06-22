@@ -123,7 +123,7 @@ const FeedbackModal: React.FC<Props> = ({
                                 isSubmitting
                             }
                         >
-                            <ArrowIcon />
+                            <ArrowIcon className={styles.arrow}/>
                         </button>
 
                         <input
