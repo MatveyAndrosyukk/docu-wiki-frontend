@@ -17,6 +17,7 @@ import {addPendingFile, addPendingRootFolder, openFolder} from "../../../store/s
 import {updateFileName} from "../../../store/thunks/files/updateFileName";
 import {selectFileTree} from "../../../store/selectors/selectFileTree";
 import {isUserAdminOrOwner} from "../utils/permissions-utils/isUserAdminOrOwner";
+import {PremiumState} from "../../ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 
 export enum ActionType {
     RenameFile = "RenameFile",
@@ -52,26 +53,50 @@ export type ModalActionsState = CopyPasteState & {
     handleOpenModalByReason: (modalState: ModalOpenState) => void;
 }
 
-export default function useModalActions(): ModalActionsState {
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [modalValue, setModalValue] = useState<string>('');
-    const [pendingPasteId, setPendingPasteId] = useState<number | null>(null);
-    const [modalError, setModalError] = useState<string>('');
-    const [modalOpenState, setModalOpenState] = useState<ModalOpenState>({reason: null, id: null, title: null});
-    const [isLimitError, setIsLimitError] = useState<boolean>(false);
+export default function useModalActions(
+    premiumState: PremiumState
+): ModalActionsState {
+    const dispatch = useDispatch<AppDispatch>();
 
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-    const files = useSelector(selectFileTree);
+    const modalInputRef =
+        useRef<HTMLInputElement>(null);
+
+    const [isModalOpen, setIsModalOpen] =
+        useState<boolean>(false);
+
+    const [modalValue, setModalValue] =
+        useState<string>('');
+
+    const [pendingPasteId, setPendingPasteId] =
+        useState<number | null>(null);
+
+    const [modalError, setModalError] =
+        useState<string>('');
+
+    const [modalOpenState, setModalOpenState] =
+        useState<ModalOpenState>(
+            {
+                reason: null,
+                id: null,
+                title: null
+            });
+
+    const [isLimitError, setIsLimitError] =
+        useState<boolean>(false);
+
+    const viewedUser = useSelector(
+        (state: RootState) => state.user.viewedUser
+    );
+
     const totalFiles = useSelector(
         (state: RootState) => state.user.viewedUser?.amountOfFiles ?? 0
     );
+
     const loggedInUser = useSelector(
         (state: RootState) => state.user.loggedInUser
     );
 
-    const dispatch = useDispatch<AppDispatch>();
-
-    const modalInputRef = useRef<HTMLInputElement>(null);
+    const files = useSelector(selectFileTree);
 
     const filesLimit = 20;
 
@@ -225,10 +250,9 @@ export default function useModalActions(): ModalActionsState {
 
                 if (!isUserAdminOrOwner(loggedInUser) && totalFiles >= filesLimit) {
                     closeModal();
-                    setIsLimitError(true)
-                    setTimeout(() => {
-                        setIsLimitError(false);
-                    }, 3000);
+
+                    premiumState.setIsPremiumModalOpen(true);
+
                     return;
                 }
 
@@ -311,10 +335,9 @@ export default function useModalActions(): ModalActionsState {
 
                 if (!isUserAdminOrOwner(loggedInUser) && (totalFiles + filesToAdd > filesLimit)) {
                     closeModal();
-                    setIsLimitError(true)
-                    setTimeout(() => {
-                        setIsLimitError(false);
-                    }, 3000);
+
+                    premiumState.setIsPremiumModalOpen(true);
+
                     return;
                 }
 
@@ -354,7 +377,7 @@ export default function useModalActions(): ModalActionsState {
             default:
                 return;
         }
-    }, [files, dispatch, viewedUser?.email, closeModal, loggedInUser, totalFiles, copyPasteActions.copiedFile]);
+    }, [files, dispatch, viewedUser?.email, closeModal, loggedInUser, totalFiles, premiumState, copyPasteActions.copiedFile]);
 
 
     const handleOpenRenameModal = useCallback((file: UiFile) => {

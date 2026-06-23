@@ -10,7 +10,7 @@ import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../shared/assets/styles/Common.module.scss";
 import {useAuth} from "../../../../../../shared/lib/hooks/useAuth";
 import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
-import {RootState} from "../../../../../../store";
+import {AppDispatch, RootState} from "../../../../../../store";
 
 interface FileListProps {
     viewedUserEmail: string | undefined;
@@ -18,64 +18,108 @@ interface FileListProps {
 }
 
 const FileList: React.FC<FileListProps> = React.memo(
-    ({viewedUserEmail, windowWidth}) => {
-        const dispatch = useDispatch();
+    (
+        {
+            viewedUserEmail,
+            windowWidth
+        }
+    ) => {
+        const dispatch
+            = useDispatch<AppDispatch>();
 
         const {fileState} = useAppContext();
+
         const {authStatus} = useAuth();
 
         const files = useSelector(selectFileTree)
-        const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-        const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
+
+        const viewedUser = useSelector(
+            (state: RootState) => state.user.viewedUser
+        );
+
+        const loggedInUser = useSelector(
+            (state: RootState) => state.user.loggedInUser
+        );
 
         const contextMenu = useContextMenuActions();
-        const {state, handleCloseContextMenu, menuRef} = contextMenu;
+
+        const {
+            state,
+            handleCloseContextMenu,
+            menuRef
+        } = contextMenu;
 
         const flattenedNodes = useFlattenedTree(files);
 
         const handleFolderClick = useCallback(
-            (id: number) => {
-                dispatch(toggleFolder({id, tree: files}));
+            (
+                id: number
+            ) => {
+                dispatch(toggleFolder(
+                        {
+                            id,
+                            tree: files
+                        }
+                    )
+                );
             },
-            [dispatch, files],
+            [
+                dispatch,
+                files
+            ],
         );
 
-        const maxHeight = windowWidth < 1270 ? '300px' : '81vh';
+        const maxHeight = windowWidth < 1270
+            ? '300px'
+            : '81vh';
 
         return (
-            <div className={styles['file-list']} style={{maxHeight}}>
-                {fileState.isLimitError && (
-                    <div className={commonStyles['common__notification']}>
-                        You've reached the free plan limit of 20 files.
-                        Upgrade to Premium to create more.
-                    </div>
-                )}
+            <div
+                className={styles['file-list']}
+                style={{maxHeight}}
+            >
+                {
+                    fileState.isLimitError && (
+                        <div className={commonStyles['common__notification']}>
+                            You've reached the free plan limit of 20 files.
+                            Upgrade to Premium to create more.
+                        </div>
+                    )
+                }
 
                 <div>
-                    {flattenedNodes.map((node: TreeNode) => (
-                        <FileNode
-                            key={node.file.id}
-                            node={node}
-                            emailParam={viewedUserEmail}
-                            onFolderClick={handleFolderClick}
-                            contextMenuState={contextMenu}
-                            viewedUser={viewedUser}
-                            loggedInUser={loggedInUser}
-                            handleTryToOpenFile={fileState.handleTryToOpenFile}
-                            isLoggedIn={authStatus === 'authenticated'}
-                        />
-                    ))}
+                    {
+                        flattenedNodes.map(
+                            (
+                                node: TreeNode
+                            ) => (
+                                <FileNode
+                                    key={node.file.id}
+                                    node={node}
+                                    emailParam={viewedUserEmail}
+                                    onFolderClick={handleFolderClick}
+                                    contextMenuState={contextMenu}
+                                    viewedUser={viewedUser}
+                                    loggedInUser={loggedInUser}
+                                    handleTryToOpenFile={fileState.handleTryToOpenFile}
+                                    isLoggedIn={authStatus === 'authenticated'}
+                                />
+                            )
+                        )
+                    }
                 </div>
 
-                {state.visible && state.file && (
-                    <ContextMenu
-                        clickX={state.clickX}
-                        clickY={state.clickY}
-                        file={state.file}
-                        onCloseContextMenu={handleCloseContextMenu}
-                        menuRef={menuRef}
-                    />
-                )}
+                {
+                    (state.visible && state.file) && (
+                        <ContextMenu
+                            clickX={state.clickX}
+                            clickY={state.clickY}
+                            file={state.file}
+                            onCloseContextMenu={handleCloseContextMenu}
+                            menuRef={menuRef}
+                        />
+                    )
+                }
             </div>
         );
     },

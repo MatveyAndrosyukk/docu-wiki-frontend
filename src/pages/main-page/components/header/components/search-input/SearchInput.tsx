@@ -12,62 +12,104 @@ import {useElementOutsideEvent} from "../../../../../../shared/lib/hooks/useElem
 import {useSelectPlaceholderText} from "../../../../../../shared/lib/hooks/useSelectPlaceholderText";
 
 interface SearchProps {
-    onClick: (id: number) => void;
+    onClick: (
+        id: number
+    ) => void;
     searchType: SearchType;
 }
 
 const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
-    const [query, setQuery] = useState('');
-    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [query, setQuery] =
+        useState('');
+
+    const [isInputFocused, setIsInputFocused] =
+        useState(false);
 
     const files = useSelector(selectFileTree);
 
-    const searchInputBlockRef = useRef<HTMLDivElement>(null);
+    const searchInputBlockRef =
+        useRef<HTMLDivElement>(null);
 
     const width = useWindowWidth();
 
     const isNarrowScreen = width < 457;
 
-    const results = useFileSearch(query, files, searchType);
+    const results = useFileSearch(
+        query,
+        files,
+        searchType
+    );
 
-    const placeholderText = useSelectPlaceholderText(isNarrowScreen, searchType);
+    const placeholderText =
+        useSelectPlaceholderText(
+            isNarrowScreen,
+            searchType
+        );
 
-    useElementOutsideEvent(searchInputBlockRef, 'mousedown', () => setIsInputFocused(true), true);
+    useElementOutsideEvent(
+        searchInputBlockRef,
+        'mousedown',
+        () => setIsInputFocused(true),
+        true
+    );
 
     return (
-        <div className={styles["search-input"]} ref={searchInputBlockRef}>
+        <div
+            className={styles["search-input"]}
+            ref={searchInputBlockRef}
+        >
             <input
+                className={styles["search-input__field"]}
                 type="text"
                 placeholder={placeholderText}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setIsInputFocused(true)}
-                className={styles["search-input__field"]}
             />
 
-            {isInputFocused && results.length > 0 && (
-                <ul className={styles["search-input__list"]}>
-                    {results.map(result => {
-                        const Icon = result.type === FileType.Folder ? FolderIcon : FileIcon;
-                        const text = searchType === SearchType.InFileNames ? result.fullPath : result.content;
+            {
+                isInputFocused
+                && results.length > 0 && (
+                    <ul className={styles["search-input__list"]}>
+                        {
+                            results.map(
+                                result => {
+                                    const Icon =
+                                        result.type === FileType.Folder
+                                            ? FolderIcon
+                                            : FileIcon;
+                                    const text =
+                                        searchType === SearchType.InFileNames
+                                            ? result.fullPath
+                                            : result.content;
 
-                        return (
-                            <li
-                                key={result.id}
-                                title={result.fullPath}
-                                onClick={() => onClick(result.id)}
-                                className={styles["search-input__item"]}
-                            >
-                                <Icon className={styles["search-input__icon"]}/>
-                                <span className={styles["search-input__text"]}
-                                      title={searchType === SearchType.InFileContents ? result.fullPath : undefined}>
-                                    {text}
-                                </span>
-                            </li>
-                        )
-                    })}
-                </ul>
-            )}
+                                    return (
+                                        <li
+                                            className={styles["search-input__item"]}
+                                            key={result.id}
+                                            title={result.fullPath}
+                                            onClick={() => onClick(result.id)}
+                                        >
+                                            <Icon
+                                                className={styles["search-input__icon"]}
+                                            />
+
+                                            <span className={styles["search-input__text"]}
+                                                  title={
+                                                      searchType === SearchType.InFileContents
+                                                          ? result.fullPath
+                                                          : undefined}
+                                            >
+                                            {text}
+                                            </span>
+                                        </li>
+                                    )
+                                }
+                            )
+                        }
+                    </ul>
+                )
+            }
         </div>
     );
 };

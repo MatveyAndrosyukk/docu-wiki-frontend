@@ -1,6 +1,7 @@
 import {TreeNode} from "../../../../../../../../shared/lib/hooks/useFlattenedTree";
 import React, {useRef} from "react";
-import styles from "../../FileList.module.scss"
+import styles from "../../FileList.module.scss";
+import nodeStyles from './FileNode.module.scss';
 import {isUserCanEdit} from "../../../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {FileStatus, FileType} from "../../../../../../../../types/file";
 import {ReactComponent as LineSvg} from '../../images/file-list-line.svg';
@@ -19,75 +20,110 @@ import {useNavigate} from "react-router-dom";
 interface Props {
     node: TreeNode;
     emailParam: string | undefined;
-    onFolderClick: (id: number) => void;
+    onFolderClick: (
+        id: number
+    ) => void;
     contextMenuState: ContextMenuState;
     isLoggedIn: boolean;
-    handleTryToOpenFile: (id: number) => void;
+    handleTryToOpenFile: (
+        id: number
+    ) => void;
     viewedUser: User | null;
     loggedInUser: User | null;
 }
 
 const FileNode: React.FC<Props> = React.memo(
-    ({
-         node,
-         emailParam,
-         onFolderClick,
-         contextMenuState,
-         isLoggedIn,
-         handleTryToOpenFile,
-         viewedUser,
-         loggedInUser,
-     }) => {
-        const {file, depth, isLastChild, hasNextOnLevel} = node;
+    (
+        {
+            node,
+            emailParam,
+            onFolderClick,
+            contextMenuState,
+            isLoggedIn,
+            handleTryToOpenFile,
+            viewedUser,
+            loggedInUser,
+        }
+    ) => {
+        const {
+            file,
+            depth,
+            isLastChild,
+            hasNextOnLevel
+        } = node;
+
         const navigate = useNavigate();
 
-        const openedFile = useSelector(selectOpenedFile)
+        const openedFile = useSelector(selectOpenedFile);
 
-        const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+        const longPressTimer =
+            useRef<NodeJS.Timeout | null>(null);
 
         const linesBlock = (
             <span className={styles['file-list__node-line-block']}>
-        {Array.from({ length: depth }).map((_, levelIndex) => {
-            const isLastLevel = levelIndex === depth - 1;
+                {
+                    Array.from(
+                        {
+                            length: depth
+                        }
+                    ).map(
+                        (
+                            _,
+                            levelIndex
+                        ) => {
+                            const isLastLevel = levelIndex === depth - 1;
 
-            if (!isLastLevel) {
-                if (!hasNextOnLevel[levelIndex]) {
-                    return (
-                        <span
-                            className={styles['file-list__node-line']}
-                            key={levelIndex}
-                        />
-                    );
+                            if (!isLastLevel) {
+                                if (!hasNextOnLevel[levelIndex]) {
+                                    return (
+                                        <span
+                                            className={styles['file-list__node-line']}
+                                            key={levelIndex}
+                                        />
+                                    );
+                                }
+
+                                return (
+                                    <span
+                                        className={styles['file-list__node-line']}
+                                        key={levelIndex}
+                                    >
+                                    <LineSvg
+                                        className={nodeStyles.line}
+                                    />
+                                </span>
+                                );
+                            }
+
+                            const LineComponent = isLastChild
+                                ? LastChildLineSvg
+                                : ChildLineSvg;
+
+                            return (
+                                <span
+                                    className={styles['file-list__node-line']}
+                                    key={levelIndex}
+                                >
+                                <LineComponent
+                                    className={nodeStyles.lineComponent}
+                                />
+                            </span>
+                            );
+                        }
+                    )
                 }
-
-                return (
-                    <span
-                        className={styles['file-list__node-line']}
-                        key={levelIndex}
-                    >
-                        <LineSvg style={{ width: 2 }} />
-                    </span>
-                );
-            }
-
-            const LineComponent = isLastChild
-                ? LastChildLineSvg
-                : ChildLineSvg;
-
-            return (
-                <span
-                    className={styles['file-list__node-line']}
-                    key={levelIndex}
-                >
-                    <LineComponent style={{ width: 10 }} />
-                </span>
-            );
-        })}
-    </span>
+            </span>
         );
 
-        const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-            if (!isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser)) return;
+        const handleTouchStart = (
+            e: React.TouchEvent<HTMLDivElement>
+        ) => {
+            if (!isUserCanEdit(
+                isLoggedIn,
+                emailParam,
+                viewedUser,
+                loggedInUser
+            )) return;
 
             const touch = e.touches[0];
 
@@ -107,60 +143,105 @@ const FileNode: React.FC<Props> = React.memo(
         const cancelLongPress = () => {
             if (longPressTimer.current) {
                 clearTimeout(longPressTimer.current);
+
                 longPressTimer.current = null;
             }
         };
 
-        const handleOpenContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-            if (isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser)) {
+        const handleOpenContextMenu = (
+            e: React.MouseEvent<HTMLDivElement>
+        ) => {
+            if (isUserCanEdit(
+                isLoggedIn,
+                emailParam,
+                viewedUser,
+                loggedInUser
+            )) {
                 contextMenuState.handleOpenContextMenu(e, file);
             }
         };
 
         const isFolder = file.type === FileType.Folder;
+
         const clickHandler = isFolder
             ? () => onFolderClick(file.id)
             : () => {
                 handleTryToOpenFile(file.id);
+
                 navigate(`/${viewedUser?.name}/file/${file.id}`);
             };
-        const contextMenuHandler = !file.isPending ? handleOpenContextMenu : undefined;
-        const touchStartHandler = !file.isPending ? handleTouchStart : undefined;
+
+        const contextMenuHandler = !file.isPending
+            ? handleOpenContextMenu
+            : undefined;
+
+        const touchStartHandler = !file.isPending
+            ? handleTouchStart
+            : undefined;
 
         return (
-            <div className={styles['file-list__node']} key={file.id}>
+            <div
+                className={styles['file-list__node']}
+                key={file.id}
+            >
                 <div className={styles['file-list__node-container']}>
                     {linesBlock}
 
                     <div
-                        className={isFolder ? styles['file-list__node-folder'] : styles['file-list__node-file']}>
-                        {file.isPending ? (
-                            <FileLoader/>
-                        ) : (
-                            <div
-                                onClick={!file.isPending ? clickHandler : undefined}
-                                className={styles['file-list__node-content']}>
-                                {isFolder ? (
-                                    file.status === FileStatus.Opened
-                                        ? <OpenedSvg style={{marginRight: 8}}/>
-                                        : <ClosedSvg style={{marginRight: 8}}/>
-                                ) : <FileImg className={styles['file-list__node-image']}/>}
+                        className={isFolder
+                            ? styles['file-list__node-folder']
+                            : styles['file-list__node-file']}
+                    >
+                        {
+                            file.isPending ? (
+                                <FileLoader/>
+                            ) : (
+                                <div
+                                    className={styles['file-list__node-content']}
+                                    onClick={!file.isPending
+                                        ? clickHandler
+                                        : undefined
+                                    }
+                                >
+                                    {
+                                        isFolder ? (
+                                            file.status === FileStatus.Opened
+                                                ? <OpenedSvg
+                                                    style={
+                                                        {
+                                                            marginRight: 8
+                                                        }
+                                                    }
+                                                />
+                                                : <ClosedSvg
+                                                    style={
+                                                        {
+                                                            marginRight: 8
+                                                        }
+                                                    }
+                                                />
+                                        ) : <FileImg
+                                            className={styles['file-list__node-image']}
+                                        />
+                                    }
 
-                                <span
-                                    className={`${styles['file-list__node-text']} ${
-                                        !isFolder && file.id === openedFile?.id
+                                    <span
+                                        className={`
+                                        ${styles['file-list__node-text']} 
+                                        ${(!isFolder && file.id === openedFile?.id)
                                             ? styles['file-list__node-text--opened']
                                             : ''
-                                    }`}
-                                    onContextMenu={contextMenuHandler}
-                                    onTouchStart={touchStartHandler}
-                                    onTouchEnd={cancelLongPress}
-                                    onTouchMove={cancelLongPress}
-                                >
+                                        }`}
+                                        onContextMenu={contextMenuHandler}
+                                        onTouchStart={touchStartHandler}
+                                        onTouchEnd={cancelLongPress}
+                                        onTouchMove={cancelLongPress}
+                                    >
                                     {file.name}
-                                </span>
-                            </div>
-                        )}
+                                    </span>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>

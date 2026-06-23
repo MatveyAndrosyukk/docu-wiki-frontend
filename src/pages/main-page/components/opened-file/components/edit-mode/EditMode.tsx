@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
 import styles from './EditMode.module.scss';
-import SwitchWhileEditModal from "../../../../../../shared/ui/modal-windows/switch-while-edit-modal/SwitchWhileEditModal";
+import SwitchWhileEditModal
+    from "../../../../../../shared/ui/modal-windows/switch-while-edit-modal/SwitchWhileEditModal";
 import extractImagesName from "../../../../../../shared/lib/utils/extractImageNames";
 import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebouncedValue";
 import {UiFile} from "../../../../../../store/types/UiFile";
@@ -18,10 +19,15 @@ interface EditFileViewProps {
     file: UiFile;
     parseFileTextToHTML: (
         content: string,
-        onImageClick: (imageUrl: string) => void | null,
-        isFileTreeOpened: boolean) => React.ReactNode[],
+        onImageClick: (
+            imageUrl: string
+        ) => void | null,
+        isFileTreeOpened: boolean
+    ) => React.ReactNode[],
     isFileTreeOpened: boolean,
-    onImageClick: (imageUrl: string) => void | null;
+    onImageClick: (
+        imageUrl: string
+    ) => void | null;
 }
 
 const EditMode: React.FC<EditFileViewProps> = (
@@ -33,7 +39,10 @@ const EditMode: React.FC<EditFileViewProps> = (
     }
 ) => {
     const {fileState} = useAppContext();
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
 
     const isSaving = useSelector(
         (state: RootState) => state.fileUi.isSaving
@@ -49,8 +58,12 @@ const EditMode: React.FC<EditFileViewProps> = (
 
 
     const {
-        textareaRef, textareaContent, setTextareaContent,
-        pasteTag, wrapSelection, handleChangeTextareaContent
+        textareaRef,
+        textareaContent,
+        setTextareaContent,
+        pasteTag,
+        wrapSelection,
+        handleChangeTextareaContent
     } = useEditorTextarea(
         file.content ?? '',
         setIsFileContentChanged
@@ -78,12 +91,16 @@ const EditMode: React.FC<EditFileViewProps> = (
     );
 
     const replaceImageTag = useCallback(
-        (tempName: string, realName: string) => {
-            setTextareaContent(prev =>
-                prev.replace(
-                    `[image/${tempName}]`,
-                    `[image/${realName}]`
-                )
+        (
+            tempName: string,
+            realName: string
+        ) => {
+            setTextareaContent(
+                prev =>
+                    prev.replace(
+                        `[image/${tempName}]`,
+                        `[image/${realName}]`
+                    )
             );
         },
         [setTextareaContent]
@@ -95,13 +112,15 @@ const EditMode: React.FC<EditFileViewProps> = (
         setAddedImagesWhileEditing,
         handleOpenFileDialog,
         changeFileHandler
-    } = useEditorImages({
-        fileId: file.id,
-        pasteTag,
-        replaceImageTag,
-        contentError,
-        initialContent: file.content ?? '',
-    });
+    } = useEditorImages(
+        {
+            fileId: file.id,
+            pasteTag,
+            replaceImageTag,
+            contentError,
+            initialContent: file.content ?? '',
+        }
+    );
 
     const toolbar = createEditorToolbar(
         wrapSelection,
@@ -109,11 +128,13 @@ const EditMode: React.FC<EditFileViewProps> = (
         handleOpenFileDialog
     );
 
-    const handleSaveEdition = useCallback((
+    const handleSaveEdition = useCallback(
+        (
             newContent: string,
             addedImages: string[],
         ) => {
             if (!file) return;
+
             try {
                 handleSaveEditedFileChanges(
                     file.id as number,
@@ -121,30 +142,50 @@ const EditMode: React.FC<EditFileViewProps> = (
                     addedImages,
                     loggedInUser?.name
                 );
+
                 setAddedImagesWhileEditing([])
             } catch (error) {
                 console.error('Save failed:', error);
             }
         }
-        , [file, handleSaveEditedFileChanges, loggedInUser?.name, setAddedImagesWhileEditing]);
+        ,
+        [
+            file,
+            handleSaveEditedFileChanges,
+            loggedInUser?.name,
+            setAddedImagesWhileEditing
+        ]
+    );
 
-    const handleCancelEdition = useCallback(async (
-        addedImages: string[],
-        contentBeforeEdition: string,
-    ) => {
-        try {
-            await handleCancelEditedFileChanges(contentBeforeEdition, addedImages);
-            setAddedImagesWhileEditing([])
-        } catch (error) {
-            console.error('Cancel failed:', error);
-        }
-    }, [handleCancelEditedFileChanges, setAddedImagesWhileEditing])
+    const handleCancelEdition = useCallback(
+        async (
+            addedImages: string[],
+            contentBeforeEdition: string,
+        ) => {
+            try {
+                await handleCancelEditedFileChanges(
+                    contentBeforeEdition,
+                    addedImages
+                );
+
+                setAddedImagesWhileEditing([])
+            } catch (error) {
+                console.error('Cancel failed:', error);
+            }
+        },
+        [
+            handleCancelEditedFileChanges,
+            setAddedImagesWhileEditing
+        ]
+    );
 
     return (
         <div className={styles['edit-mode']}>
             <div className={styles['edit-mode__header']}>
                 <div className={styles['header__edit-buttons']}>
+
                     <EditorToolbar toolbar={toolbar}/>
+
                     <input
                         type="file"
                         accept="image/*"
@@ -152,24 +193,34 @@ const EditMode: React.FC<EditFileViewProps> = (
                         ref={fileInputRef}
                         onChange={changeFileHandler}
                     />
+
                 </div>
+
                 <div className={styles['header__action-buttons']}>
+
                     <button
                         className={styles['header__action-buttons-save']}
-                        onClick={() => handleSaveEdition(
-                            textareaContent,
-                            addedImagesWhileEditing)}
+                        onClick={
+                            () => handleSaveEdition(
+                                textareaContent,
+                                addedImagesWhileEditing)}
                         disabled={isSaving}
-                    >{isSaving ? 'Saving…' : 'Save'}
+                    >
+                        {isSaving ? 'Saving…' : 'Save'}
                     </button>
+
                     <button
-                        onClick={() => handleCancelEdition(
-                            addedImagesWhileEditing,
-                            file.content ?? '')}
-                        className={styles['header__action-buttons-cancel']}>Cancel
+                        className={styles['header__action-buttons-cancel']}
+                        onClick={
+                            () => handleCancelEdition(
+                                addedImagesWhileEditing,
+                                file.content ?? '')}
+                    >
+                        Cancel
                     </button>
                 </div>
             </div>
+
             <div className={styles['edit-mode__body']}>
                     <textarea
                         ref={textareaRef}
@@ -177,17 +228,27 @@ const EditMode: React.FC<EditFileViewProps> = (
                         value={textareaContent}
                         onChange={handleChangeTextareaContent}
                     />
-                <div className={styles['edit-mode__error']}>{contentError}</div>
+
+                <div className={styles['edit-mode__error']}>
+                    {contentError}
+                </div>
+
                 <div className={styles['body__preview']}>
-                    <div className={styles['body__preview-title']}>Preview</div>
-                    <div
-                        className={styles['body__preview-content']}>{previewContent}</div>
+                    <div className={styles['body__preview-title']}>
+                        Preview
+                    </div>
+
+                    <div className={styles['body__preview-content']}>
+                        {previewContent}
+                    </div>
                 </div>
             </div>
+
             <SwitchWhileEditModal
                 contentBeforeEdition={file.content ?? ''}
                 onCancelEditedFileChange={handleCancelEdition}
-                addedImagesWhileEditing={addedImagesWhileEditing}/>
+                addedImagesWhileEditing={addedImagesWhileEditing}
+            />
         </div>
     );
 };

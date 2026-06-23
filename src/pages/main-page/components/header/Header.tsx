@@ -22,27 +22,57 @@ interface Props {
     setIsFeedbackOpen: Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Header: FC<Props> = ({setIsFeedbackOpen}) => {
-    const [burgerOpen, setBurgerOpen] = useState(false);
+const Header: FC<Props> = ({
+                               setIsFeedbackOpen,
+                           }) => {
+    const [burgerOpen, setBurgerOpen] =
+        useState(false);
 
     const navigate = useNavigate();
 
-    const {authState} = useAppContext();
+    const {
+        authState,
+        premiumState
+    } = useAppContext();
+
     const {authStatus} = useAuth();
 
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
 
-    const userModalState = useUserModalActions(loggedInUser, authState);
+    const userModalState =
+        useUserModalActions(
+            loggedInUser,
+            authState
+        );
+
     const fileSearch = useFileSearchActions();
+
     const width = useWindowWidth();
+
     const {handleOpenUserModal} = userModalState
-    const {handleLogout, handleOpenLoginModal} = authState;
-    const {searchType, handleSwitchSearchType, handleOpenPathToSelectedFile} = fileSearch;
+
+    const {
+        handleLogout,
+        handleOpenLoginModal
+    } = authState;
+
+    const {setIsPremiumModalOpen} = premiumState;
+
+    const {
+        searchType,
+        handleSwitchSearchType,
+        handleOpenPathToSelectedFile
+    } = fileSearch;
 
     const isMobile = width < 1066;
 
-    const menuRef = useRef<HTMLDivElement | null>(null);
-    const burgerButtonRef = useRef<HTMLButtonElement | null>(null);
+    const menuRef =
+        useRef<HTMLDivElement | null>(null);
+
+    const burgerButtonRef =
+        useRef<HTMLButtonElement | null>(null);
 
     useElementOutsideEvent(
         menuRef,
@@ -65,14 +95,22 @@ const Header: FC<Props> = ({setIsFeedbackOpen}) => {
             <div className={styles['header__container']}>
                 <div className={styles['header__content']}>
                     <div className={styles['header__left']}>
-                        <div className={styles['header__logo']} onClick={handleRedirectToMainPage}>
+                        <div
+                            className={styles['header__logo']}
+                            onClick={handleRedirectToMainPage}
+                        >
                             <LogoSvg/>
                         </div>
                     </div>
 
                     <div className={styles['header__right']}>
-                        <div className={styles['header__premium-button']}>
-                            <PremiumSvg />
+                        <div
+                            className={styles['header__premium-button']}
+                            onClick={
+                                () => setIsPremiumModalOpen(true)
+                            }
+                        >
+                            <PremiumSvg/>
                         </div>
 
                         <div className={styles['header__search']}>
@@ -81,63 +119,101 @@ const Header: FC<Props> = ({setIsFeedbackOpen}) => {
                                     onClick={handleOpenPathToSelectedFile}
                                     searchType={searchType}
                                 />
+
                                 <SearchSvg className={styles['header__search-icon']}/>
                             </div>
-                            <SwapSvg className={styles['header__search-swap']} onClick={handleSwitchSearchType}/>
+
+                            <SwapSvg className={styles['header__search-swap']}
+                                     onClick={handleSwitchSearchType}
+                            />
                         </div>
 
-                        {isMobile ? (
-                            <div className={styles['header__burger-container']}>
-                                <button
-                                    ref={burgerButtonRef}
-                                    className={styles['header__burger-button']}
-                                    onClick={handleToggleBurgerMenu}
-                                    aria-label="Toggle menu"
-                                >
-                                    &#9776;
-                                </button>
-                                {burgerOpen && (
-                                    <div ref={menuRef} className={styles['header__burger-menu']}>
-                                        <div className={styles['header__burger-item']}>
-                                            <UserSvg onClick={handleOpenUserModal}/>
-                                        </div>
-                                        <div className={styles['header__burger-item']}>
+                        {
+                            isMobile ? (
+                                <div className={styles['header__burger-container']}>
+                                    <button
+                                        ref={burgerButtonRef}
+                                        className={styles['header__burger-button']}
+                                        onClick={handleToggleBurgerMenu}
+                                        aria-label="Toggle menu"
+                                    >
+                                        &#9776;
+                                    </button>
+
+                                    {
+                                        burgerOpen && (
+                                            <div
+                                                className={styles['header__burger-menu']}
+                                                ref={menuRef}
+                                            >
+                                                <div className={styles['header__burger-item']}>
+                                                    <UserSvg
+                                                        onClick={handleOpenUserModal}
+                                                    />
+                                                </div>
+                                                <div className={styles['header__burger-item']}>
                                             <span
                                                 style={{color: '#8D9191'}}
-                                                onClick={() => setIsFeedbackOpen(true)}>
+                                                onClick={
+                                                    () => setIsFeedbackOpen(true)
+                                                }
+                                            >
                                                 🗪
                                             </span>
-                                        </div>
-                                        {authStatus === 'authenticated' ? (
-                                            <div className={styles['header__burger-item']}>
-                                                <LogoutSvg onClick={handleLogout}/>
+                                                </div>
+                                                {
+                                                    authStatus === 'authenticated' ? (
+                                                        <div className={styles['header__burger-item']}>
+                                                            <LogoutSvg
+                                                                onClick={handleLogout}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={handleOpenLoginModal}
+                                                        >
+                                                            Login
+                                                        </button>
+                                                    )}
                                             </div>
-                                        ) : (
-                                            <button onClick={handleOpenLoginModal}>Login</button>
                                         )}
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className={styles['header__buttons']}>
-                                <UserSvg className={styles['header__user']} onClick={handleOpenUserModal}/>
-                                {authStatus === 'loading' ? (
-                                    <div className={styles['header__auth-skeleton']}/>
-                                ) : (
-                                    <div
-                                        className={authStatus === 'authenticated' ? styles['header__logout'] : styles['header__login']}
-                                        onClick={authStatus === 'authenticated' ? handleLogout : handleOpenLoginModal}
-                                    >
-                                        {authStatus === 'authenticated' ? 'Logout' : 'Login'}
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                </div>
+                            ) : (
+                                <div className={styles['header__buttons']}>
+                                    <UserSvg
+                                        className={styles['header__user']}
+                                        onClick={handleOpenUserModal}
+                                    />
+
+                                    {
+                                        authStatus === 'loading' ? (
+                                            <div className={styles['header__auth-skeleton']}/>
+                                        ) : (
+                                            <div
+                                                className={authStatus === 'authenticated'
+                                                    ? styles['header__logout']
+                                                    : styles['header__login']
+                                                }
+                                                onClick={authStatus === 'authenticated'
+                                                    ? handleLogout
+                                                    : handleOpenLoginModal
+                                                }
+                                            >
+                                                {authStatus === 'authenticated'
+                                                    ? 'Logout'
+                                                    : 'Login'
+                                                }
+                                            </div>
+                                        )}
+                                </div>
+                            )}
                     </div>
                 </div>
             </div>
 
-            <UserModal userModalState={userModalState}/>
+            <UserModal
+                userModalState={userModalState}
+            />
         </div>
     );
 };

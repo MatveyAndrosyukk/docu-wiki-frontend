@@ -1,11 +1,13 @@
 import React, { FC, useCallback } from 'react';
 import styles from './UserModal.module.scss';
+import commonStyles from '../../../assets/styles/Common.module.scss'
 import Modal from "../modal/Modal";
 import { User } from "../../../../store/slices/userSlice";
 import { UserModalState } from "../../../lib/hooks/useUserModalActions";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
+import {useAppContext} from "../../../lib/hooks/useAppContext";
 
 interface UserModalProps {
     userModalState: UserModalState
@@ -13,7 +15,12 @@ interface UserModalProps {
 
 const UserModal: FC<UserModalProps> = ({ userModalState }) => {
     const navigate = useNavigate();
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
+
+    const {premiumState} = useAppContext();
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
 
     const {
         isAddingEditor,
@@ -43,6 +50,15 @@ const UserModal: FC<UserModalProps> = ({ userModalState }) => {
         setUserModalValue('');
         setIsUserModalOpen(false);
     }, [navigate, setIsUserModalOpen, setUserModalValue]);
+
+    const handlePromoteClick = () => {
+        if (!loggedInUser?.isPremium) {
+            premiumState.setIsPremiumModalOpen(true);
+            return;
+        }
+
+        handleAddUserWhoCanEdit();
+    };
 
     if (!isUserModalOpen) return null;
 
@@ -98,9 +114,9 @@ const UserModal: FC<UserModalProps> = ({ userModalState }) => {
                                 onChange={(e) => setUserModalValue(e.target.value)}
                             />
                             <button
-                                className={styles.primaryButton}
+                                className={`${commonStyles.premium} ${styles.promote}`}
                                 disabled={!userModalValue.trim() || isAddingEditor}
-                                onClick={handleAddUserWhoCanEdit}
+                                onClick={handlePromoteClick}
                             >
                                 {isAddingEditor ? <div className={styles.loaderSmall} /> : 'Promote'}
                             </button>

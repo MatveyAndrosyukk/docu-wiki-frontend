@@ -23,11 +23,13 @@ $button-block-hover-bg: #191A1A;
   border: 1px solid $border-color;
   margin-top: 20px;
   padding: 10px;
-  display: block;
+  display: flex;
+  flex-direction: column;
   font-family: $font-family;
   font-optical-sizing: auto;
   font-style: normal;
   height: auto;
+  max-height: calc(100vh - 80px - 20px - 20px);
 
   &-closed {
     display: none;
@@ -44,10 +46,8 @@ $button-block-hover-bg: #191A1A;
   &__content {
     display: flex;
     flex-direction: column;
-    max-height: inherit;
-    overflow: auto;
-    scrollbar-width: thin;
-    scrollbar-color: $font-color $bg-color;
+    flex: 1;
+    min-height: 0;
   }
 
   &__header {
@@ -143,8 +143,28 @@ $button-block-hover-bg: #191A1A;
 
   &__files {
     margin-top: 6px;
-    position: relative;
-    flex: 1 1 auto;
+
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    scrollbar-width: thin;
+    scrollbar-color: #8D9191 #202222;
+  }
+
+  &__files::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &__files::-webkit-scrollbar-track {
+    background: #202222;
+  }
+
+  &__files::-webkit-scrollbar-thumb {
+    background: #8D9191;
+    border-radius: 999px;
   }
 }
 
@@ -240,36 +260,8 @@ $button-block-hover-bg: #191A1A;
   transition: width .3s ease;
 }
 
-.file-tree__premium {
+.premium {
   margin-top: 10px;
-
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  font-size: 13px;
-  font-weight: 700;
-
-  color: white;
-
-  background: linear-gradient(
-                  135deg,
-                  #81A2FA,
-                  #A98FFF
-  );
-
-  transition: all .2s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 12px rgba(129, 162, 250, .35);
-  }
 }
 
 .file-tree__usage-fill--warning {
@@ -320,4 +312,29 @@ $button-block-hover-bg: #191A1A;
   color: #FFFFFF;
 
   backdrop-filter: blur(4px);
+}
+
+.file-tree__button-block--premium {
+  position: relative;
+
+  &::after {
+    content: 'PRO';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    padding: 2px 4px;
+    border-radius: 4px;
+
+    background: linear-gradient(
+                    135deg,
+                    #81A2FA,
+                    #A98FFF
+    );
+
+    color: white;
+  }
 }

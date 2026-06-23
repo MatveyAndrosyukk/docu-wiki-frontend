@@ -22,12 +22,17 @@ interface OpenedFileHeaderProps {
     setIsBurgerMenuOpened: Dispatch<SetStateAction<boolean>>;
     isEditing: boolean;
     onOpenEditionMode: () => void;
-    onDeleteFile: (file: UiFile) => void;
+    onDeleteFile: (
+        file: UiFile
+    ) => void;
     isLoggedIn: boolean;
     emailParam: string | undefined;
     loggedInUser: User | null;
     setIsEditing: Dispatch<SetStateAction<boolean>>;
-    onOpenDeleteModal: (file: UiFile, user: User | null) => void;
+    onOpenDeleteModal: (
+        file: UiFile,
+        user: User | null
+    ) => void;
 }
 
 const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
@@ -50,23 +55,33 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
         onOpenDeleteModal,
     }
 ) => {
+    const [copied, setCopied] =
+        useState(false);
+
     const width = useWindowWidth();
-    const [copied, setCopied] = useState(false);
 
     const isMobile = width < 435;
 
-    const likesStyle = useMemo(() => {
-        const likesCount = file?.likes?.toString().length || 1;
-        return likesCount === 1 ? 'one-digit' :
-            likesCount === 2 ? 'two-digit' :
-                likesCount === 3 ? 'three-digit' : 'four-digit';
-    }, [file?.likes]);
+    const likesStyle = useMemo(
+        () => {
+            const likesCount = file?.likes?.toString().length
+                || 1;
 
-    const pathToFile = findPathToFile(files, file?.id as number)?.join('/')
+            return likesCount === 1 ? 'one-digit' :
+                likesCount === 2 ? 'two-digit' :
+                    likesCount === 3 ? 'three-digit' : 'four-digit';
+        }, [file?.likes]);
+
+    const pathToFile = findPathToFile(
+        files,
+        file?.id as number
+    )?.join('/');
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(window.location.href).then();
+
         setCopied(true);
+
         setTimeout(() => setCopied(false), 1500);
     };
 
@@ -75,72 +90,129 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
             <div className={styles['header__left-side']}>
                 <div className={styles['header__likes']}>
                     <div
-                        className={`${styles['header__likes-amount']} ${styles[likesStyle]}`}>{likes}</div>
+                        className={`${styles['header__likes-amount']} ${styles[likesStyle]}`}
+                    >
+                        {likes}
+                    </div>
+
                     {
                         isLiked ?
-                            <LikedHeartBtn onClick={() => onTryToLikeFile()}/> :
-                            <HeartBtn onClick={() => onTryToLikeFile()}/>
+                            <LikedHeartBtn
+                                onClick={
+                                    () => onTryToLikeFile()
+                                }
+                            /> :
+                            <HeartBtn
+                                onClick={
+                                    () => onTryToLikeFile()
+                                }
+                            />
                     }
                 </div>
+
                 <div className={styles['header__title']}>
-                    <div className={styles['header__title-email']}>{viewedUser?.name}</div>
-                    <span className={styles['header__title-dash']}>|</span>
-                    <div className={styles['header__title-path']} title={pathToFile}>{pathToFile}</div>
+                    <div className={styles['header__title-email']}>
+                        {viewedUser?.name}
+                    </div>
+
+                    <span className={styles['header__title-dash']}>
+                        |
+                    </span>
+
+                    <div
+                        className={styles['header__title-path']}
+                        title={pathToFile}
+                    >
+                        {pathToFile}
+                    </div>
                 </div>
             </div>
+
             <div className={styles['header__right-side']}>
-                {isUserCanEdit(isLoggedIn, emailParam, viewedUser, loggedInUser) && (
-                    <>
-                        {isMobile ? (
-                            <div className={styles['header__buttons']}>
-                                <OpenButtonsSvg
-                                    className={`${styles['buttons-menu-open']}`}
-                                    onClick={() => setIsBurgerMenuOpened(!isBurgerMenuOpened)}/>
-                                {isBurgerMenuOpened && !isEditing && (
-                                    <div className={styles['buttons-menu']}>
-                                        <EditFileSvg
-                                            className={`${styles['buttons-menu-item']}`}
-                                            onClick={() => onOpenEditionMode()}/>
-                                        <DeleteFileSvg
-                                            className={`${styles['buttons-menu-item']}`}
-                                            onClick={() => onDeleteFile(file)}/>
+                {
+                    isUserCanEdit(
+                        isLoggedIn,
+                        emailParam,
+                        viewedUser,
+                        loggedInUser
+                    ) && (
+                        <>
+                            {
+                                isMobile ? (
+                                    <div className={styles['header__buttons']}>
+
+                                        <OpenButtonsSvg
+                                            className={`${styles['buttons-menu-open']}`}
+                                            onClick={
+                                                () => setIsBurgerMenuOpened(!isBurgerMenuOpened)
+                                            }
+                                        />
+
+                                        {
+                                            isBurgerMenuOpened && !isEditing && (
+                                                <div className={styles['buttons-menu']}>
+
+                                                    <EditFileSvg
+                                                        className={`${styles['buttons-menu-item']}`}
+                                                        onClick={
+                                                            () => onOpenEditionMode()
+                                                        }
+                                                    />
+
+                                                    <DeleteFileSvg
+                                                        className={`${styles['buttons-menu-item']}`}
+                                                        onClick={
+                                                            () => onDeleteFile(file)
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+
+                                        {isBurgerMenuOpened && isEditing && (
+                                            <div className={styles['buttons-menu']}>
+                                                <DeleteFileSvg
+                                                    className={`${styles['buttons-menu-item']}`}
+                                                    onClick={
+                                                        () => onDeleteFile(file)
+                                                    }
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className={styles['header__links']}>
+                                        <div className={styles['links__container']}>
+                                            {!isEditing && (
+                                                <>
+                                                    <div
+                                                        className={styles['links__copy']}
+                                                        onClick={handleCopyLink}>
+                                                        {copied ? 'Copied!' : 'Share'}
+                                                    </div>
+
+                                                    <div
+                                                        className={styles['links__edit']}
+                                                        onClick={
+                                                            () => setIsEditing(true)
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </div>
+                                                    <div
+                                                        className={styles['links__delete']}
+                                                        onClick={
+                                                            () => onOpenDeleteModal(file, viewedUser)
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
-                                {isBurgerMenuOpened && isEditing && (
-                                    <div className={styles['buttons-menu']}>
-                                        <DeleteFileSvg
-                                            className={`${styles['buttons-menu-item']}`}
-                                            onClick={() => onDeleteFile(file)}/>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className={styles['header__links']}>
-                                <div className={styles['links__container']}>
-                                    {!isEditing && (
-                                        <>
-                                            <div
-                                                className={styles['links__copy']}
-                                                onClick={handleCopyLink}>
-                                                {copied ? 'Copied!' : 'Share'}
-                                            </div>
-                                            <div
-                                                className={styles['links__edit']}
-                                                onClick={() => setIsEditing(true)}>
-                                                Edit
-                                            </div>
-                                            <div
-                                                onClick={() => onOpenDeleteModal(file, viewedUser)}
-                                                className={styles['links__delete']}>
-                                                Delete
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </>
-                )}
+                        </>
+                    )}
             </div>
         </div>
     );

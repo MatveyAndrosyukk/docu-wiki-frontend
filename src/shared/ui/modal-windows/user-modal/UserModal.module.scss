@@ -73,6 +73,12 @@
 .addEditorRow {
     display: flex;
     gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.promote {
+    margin-top: 0;
 }
 
 .emailInput {

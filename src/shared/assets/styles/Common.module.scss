@@ -1,3 +1,44 @@
+.premium {
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: white;
+
+  background: linear-gradient(
+                  135deg,
+                  #81A2FA,
+                  #A98FFF
+  );
+
+  transition: all .2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 0 12px rgba(129, 162, 250, .35);
+  }
+
+  &:disabled {
+    background: linear-gradient(
+                    135deg,
+                    #5a5d63,
+                    #474a50
+    );
+
+    color: #9ea3ab;
+    cursor: not-allowed;
+  }
+}
+
 .editor-skeleton {
   height: 40px;
   border-radius: 8px;

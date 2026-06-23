@@ -33,32 +33,54 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         setIsFileTreeOpened,
         isFileLoading
     }) => {
-    const [openedImage, setOpenedImage] = useState<string | null>(null)
-    const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false)
-    const [wasInitialized, setWasInitialized] = useState(false);
-    const contentRef = useRef<HTMLDivElement>(null);
+    const [openedImage, setOpenedImage] =
+        useState<string | null>(null);
+
+    const [isBurgerMenuOpened, setIsBurgerMenuOpened] =
+        useState(false);
+
+    const [wasInitialized, setWasInitialized] =
+        useState(false);
+
+    const contentRef =
+        useRef<HTMLDivElement>(null);
 
     const {fileState} = useAppContext();
     const {authStatus} = useAuth();
-    const {isLiked, likes, toggleLike} = useFileLikes({fileId: file?.id as number});
+    const {
+        isLiked,
+        likes,
+        toggleLike
+    } = useFileLikes(
+        {
+            fileId: file?.id as number
+        }
+    );
 
     const files = useSelector(selectFileTree)
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-    const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser);
+
+    const viewedUser = useSelector(
+        (state: RootState) => state.user.viewedUser
+    );
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
+
     const pendingImages = useSelector(
         (state: RootState) => state.fileUi.pendingImages
     );
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const {isEditing, setIsEditing, handleOpenDeleteModal} = fileState
+    const {
+        isEditing,
+        setIsEditing,
+        handleOpenDeleteModal
+    } = fileState;
 
     useEffect(() => {
-        if (openedImage) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
+        document.body.style.overflow = openedImage ? 'hidden' : '';
 
         return () => {
             document.body.style.overflow = '';
@@ -79,7 +101,9 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     }, [file]);
 
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = (
+            e: KeyboardEvent
+        ) => {
             if (e.key === 'Escape') {
                 setOpenedImage(null);
             }
@@ -94,61 +118,125 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         };
     }, [openedImage]);
 
-    const handleOpenImage = useCallback((imageUrl: string) => {
-        setOpenedImage(imageUrl)
-    }, []);
+    const handleOpenImage = useCallback(
+        (
+            imageUrl: string
+        ) => {
+            setOpenedImage(imageUrl)
+        }, []);
 
     const parseFileTextToHTMLMemo = useCallback(
-        (content: string,
-         onImageClick: (url: string) => void,
-         isFileTreeOpened: boolean) =>
-            parseFileTextToHTML(content, onImageClick, isFileTreeOpened, pendingImages),
+        (
+            content: string,
+            onImageClick: (url: string) => void,
+            isFileTreeOpened: boolean
+        ) =>
+            parseFileTextToHTML(
+                content,
+                onImageClick,
+                isFileTreeOpened,
+                pendingImages
+            ),
         [pendingImages]
     );
 
     const contentElements = useMemo(() => {
-        if (!file?.content) return [];
-        return parseFileTextToHTML(file.content, handleOpenImage, isFileTreeOpened, pendingImages);
-    }, [file?.content, handleOpenImage, isFileTreeOpened, pendingImages]);
+            if (!file?.content) return [];
 
-    const handleGoToUsersPage = useCallback((user: string | null) => {
-        return navigate(`/${encodeURIComponent(user as string)}`)
-    }, [navigate])
+            return parseFileTextToHTML(
+                file.content,
+                handleOpenImage,
+                isFileTreeOpened,
+                pendingImages
+            );
+        },
+        [
+            file?.content,
+            handleOpenImage,
+            isFileTreeOpened,
+            pendingImages
+        ]
+    );
 
-    const handleOpenEditionMode = useCallback(() => {
-        setIsEditing(true);
-        setIsBurgerMenuOpened(false);
-    }, [setIsEditing])
+    const handleGoToUsersPage = useCallback(
+        (
+            user: string | null
+        ) => {
+            return navigate(
+                `/${encodeURIComponent(user as string)}`
+            );
+        }, [navigate]);
 
-    const handleDeleteFile = useCallback((file: UiFile) => {
-        handleOpenDeleteModal(file, viewedUser)
-        setIsBurgerMenuOpened(false);
-    }, [handleOpenDeleteModal, viewedUser])
+    const handleOpenEditionMode = useCallback(
+        () => {
+            setIsEditing(true);
+
+            setIsBurgerMenuOpened(false);
+        }, [setIsEditing]);
+
+    const handleDeleteFile = useCallback(
+        (
+            file: UiFile
+        ) => {
+            handleOpenDeleteModal(file, viewedUser)
+
+            setIsBurgerMenuOpened(false);
+        },
+        [
+            handleOpenDeleteModal,
+            viewedUser
+        ]
+    );
 
     useEffect(() => {
         setWasInitialized(false);
     }, [file?.id]);
 
-    useEffect(() => {
-        if (!file || wasInitialized) return;
+    useEffect(
+        () => {
+            if (
+                !file ||
+                wasInitialized
+            ) return;
 
-        const isEmpty = !file.content || file.content.trim() === '';
+            const isEmpty =
+                !file.content ||
+                file.content.trim() === '';
 
-        let isCanEdit = isUserCanEdit(authStatus === 'authenticated', viewedUserEmail, viewedUser, loggedInUser);
+            let isCanEdit = isUserCanEdit(
+                authStatus === 'authenticated',
+                viewedUserEmail,
+                viewedUser,
+                loggedInUser
+            );
 
-        if (isEmpty && isCanEdit) {
-            setIsEditing(true);
-        }
+            if (
+                isEmpty &&
+                isCanEdit
+            ) {
+                setIsEditing(true);
+            }
 
-        setWasInitialized(true);
-    }, [file, wasInitialized, setIsEditing, authStatus, viewedUserEmail, viewedUser, loggedInUser]);
+            setWasInitialized(true);
+        },
+        [
+            file,
+            wasInitialized,
+            setIsEditing,
+            authStatus,
+            viewedUserEmail,
+            viewedUser,
+            loggedInUser
+        ]
+    );
 
     if (!file) {
         return (
             <EmptyFile
                 isFileLoading={isFileLoading}
                 isFileTreeOpened={isFileTreeOpened}
-                setIsFileTreeOpened={setIsFileTreeOpened}/>
+                setIsFileTreeOpened={setIsFileTreeOpened}
+            />
         )
     }
 
@@ -173,59 +261,78 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 onOpenDeleteModal={handleOpenDeleteModal}
             />
 
-            {openedImage && (
-                <div
-                    className={styles['opened-image__background']}
-                    onClick={() => setOpenedImage(null)}
-                >
-                    <button
-                        className={styles['opened-image__close']}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenedImage(null);
-                        }}
+            {
+                openedImage && (
+                    <div
+                        className={styles['opened-image__background']}
+                        onClick={() => setOpenedImage(null)}
                     >
-                        ✕
-                    </button>
+                        <button
+                            className={styles['opened-image__close']}
+                            onClick={
+                                (e) => {
+                                    e.stopPropagation();
 
-                    <img
-                        src={openedImage}
-                        alt="Opened"
-                        className={styles['opened-image__image']}
-                        onClick={e => e.stopPropagation()}
+                                    setOpenedImage(null);
+                                }
+                            }
+                        >
+                            ✕
+                        </button>
+
+                        <img
+                            src={openedImage}
+                            alt="Opened"
+                            className={styles['opened-image__image']}
+                            onClick={
+                                e => e.stopPropagation()
+                            }
+                        />
+                    </div>
+                )}
+
+            {
+                isEditing
+                    ? <EditMode
+                        file={file}
+                        parseFileTextToHTML={parseFileTextToHTMLMemo}
+                        onImageClick={handleOpenImage}
+                        isFileTreeOpened={isFileTreeOpened}
                     />
-                </div>
-            )}
-
-            {isEditing
-                ? <EditMode file={file} parseFileTextToHTML={parseFileTextToHTMLMemo} onImageClick={handleOpenImage}
-                            isFileTreeOpened={isFileTreeOpened}/>
-                : <div
-                    className={styles['opened-file__content']}
-                    ref={contentRef}
-                >
-                    {contentElements}
-            </div>
+                    : <div
+                        className={styles['opened-file__content']}
+                        ref={contentRef}
+                    >
+                        {contentElements}
+                    </div>
             }
 
             <div className={styles['opened-file__footer']}>
                 Last edited {formatDate(file.updatedAt)} -
 
                 <span
-                    onClick={() => handleGoToUsersPage(file.lastEditor as string)}
                     className={styles['footer__editor']}
+                    onClick={
+                        () => handleGoToUsersPage(file.lastEditor as string)
+                    }
                 >
                     {file.lastEditor}
                 </span>
             </div>
 
             <div
-                style={{display: isFileTreeOpened ? 'none' : 'flex'}}
+                style={
+                    {
+                        display: isFileTreeOpened ? 'none' : 'flex'
+                    }
+                }
                 className={emptyStyles['file-tree']}
-                onClick={e => {
-                    e.stopPropagation();
-                    setIsFileTreeOpened(!isFileTreeOpened);
-                }}
+                onClick={
+                    e => {
+                        e.stopPropagation();
+
+                        setIsFileTreeOpened(!isFileTreeOpened);
+                    }}
             >
                 <BurgerSvg className={emptyStyles['file-tree-image']}/>
             </div>

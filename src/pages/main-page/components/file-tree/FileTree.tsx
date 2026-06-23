@@ -25,23 +25,52 @@ interface FileTreeProps {
     setIsOpened: Dispatch<SetStateAction<boolean>>;
 }
 
-const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setIsOpened}) => {
+const FileTree: FC<FileTreeProps> = React.memo(
+    (
+        {
+            viewedUserEmail,
+            isOpened,
+            setIsOpened,
+        }
+    ) => {
+        const dispatch =
+            useDispatch<AppDispatch>();
 
-        const dispatch = useDispatch<AppDispatch>();
+        const {
+            authState,
+            fileState,
+            banState,
+            premiumState
+        } = useAppContext();
 
-        const {authState, fileState, banState} = useAppContext();
         const {authStatus} = useAuth();
 
-        const viewedUser = useSelector((state: RootState) => state.user.viewedUser)
-        const loggedInUser = useSelector((state: RootState) => state.user.loggedInUser)
-        const areFilesLoading = useSelector((state: RootState) => state.fileServer.loading);
-        const isViewedUserLoading = useSelector((state: RootState) => state.user.isViewedUserLoading);
+        const viewedUser = useSelector(
+            (state: RootState) => state.user.viewedUser
+        );
+
+        const loggedInUser = useSelector(
+            (state: RootState) => state.user.loggedInUser
+        );
+
+        const areFilesLoading = useSelector(
+            (state: RootState) => state.fileServer.loading
+        );
+
+        const isViewedUserLoading = useSelector(
+            (state: RootState) => state.user.isViewedUserLoading
+        );
 
         const {setIsBanModalOpened} = banState;
+
         const {setIsLoginModalOpen} = authState;
+
         const {handleOpenModalByReason} = fileState;
 
-        const fileTreeRef = useRef<HTMLDivElement>(null);
+        const {setIsPremiumModalOpen} = premiumState;
+
+        const fileTreeRef =
+            useRef<HTMLDivElement>(null);
 
         const windowWidth = useWindowWidth();
 
@@ -51,182 +80,272 @@ const FileTree: FC<FileTreeProps> = React.memo(({viewedUserEmail, isOpened, setI
             fileTreeRef,
             'dblclick',
             () => setIsOpened(false),
-            isOpened && windowWidth < 1270
+            (isOpened && windowWidth < 1270)
         );
 
-        const filesCount = viewedUser?.amountOfFiles ?? 0;
+        const filesCount =
+            viewedUser?.amountOfFiles ??
+            0;
 
         const isWarning =
             !viewedUser?.isPremium &&
             filesCount >= 15;
 
-        const fileTreeStyles = useMemo(() => {
-            if (!isOpened) return styles['file-tree-closed'];
+        const fileTreeStyles = useMemo(
+            () => {
+                if (!isOpened) return styles['file-tree-closed'];
 
-            if (windowWidth < 1270) {
-                return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
-            }
+                if (windowWidth < 1270) {
+                    return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
+                }
 
-            return styles['file-tree'];
-        }, [isOpened, windowWidth]);
+                return styles['file-tree'];
+            },
+            [
+                isOpened,
+                windowWidth
+            ]
+        );
 
-        const blockViewHandler = useCallback(async () => {
-            if (!viewedUser?.email) return;
+        const blockViewHandler = useCallback(
+            async () => {
+                if (!viewedUser?.email) return;
 
-            notification.show();
+                if (!loggedInUser?.isPremium) {
+                    setIsPremiumModalOpen(true);
 
-            try {
-                await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
-            } catch (error) {
-                console.error(error);
-            }
+                    return;
+                }
 
-        }, [dispatch, viewedUser, notification]);
+                notification.show();
 
-        const handleCreateRootFolder = useCallback(() => {
+                try {
+                    await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
+                } catch (error) {
+                    console.error(error);
+                }
 
-            if (authStatus === 'authenticated') {
-                handleOpenModalByReason({
-                    reason: ActionType.AddRootFolder,
-                    id: null,
-                    title: "Add root folder",
-                });
-            } else {
-                setIsLoginModalOpen(true);
-            }
+            },
+            [
+                dispatch,
+                viewedUser,
+                notification,
+                loggedInUser,
+                setIsPremiumModalOpen
+            ]
+        );
 
-        }, [authStatus, handleOpenModalByReason, setIsLoginModalOpen]);
+        const handleCreateRootFolder = useCallback(
+            () => {
+                if (authStatus === 'authenticated') {
+                    handleOpenModalByReason(
+                        {
+                            reason: ActionType.AddRootFolder,
+                            id: null,
+                            title: "Add root folder",
+                        }
+                    );
+                } else {
+                    setIsLoginModalOpen(true);
+                }
+
+            },
+            [
+                authStatus,
+                handleOpenModalByReason,
+                setIsLoginModalOpen
+            ]
+        );
 
         const isBanned = !!viewedUser?.banned;
-        const canView = isUserCanView(viewedUser, loggedInUser);
-        const canEdit = !isBanned && isUserCanEdit(authStatus === 'authenticated', viewedUserEmail, viewedUser, loggedInUser);
-        const showHeader = isUserEqualsLoggedIn(viewedUserEmail, authStatus === 'authenticated', viewedUser);
 
+        const canView = isUserCanView(
+            viewedUser,
+            loggedInUser
+        );
+
+        const canEdit =
+            !isBanned &&
+            isUserCanEdit(
+                authStatus === 'authenticated',
+                viewedUserEmail,
+                viewedUser,
+                loggedInUser
+            );
+
+        const showHeader = isUserEqualsLoggedIn(
+            viewedUserEmail,
+            authStatus === 'authenticated',
+            viewedUser
+        );
 
         return (
-            <div ref={fileTreeRef} className={fileTreeStyles}>
-
-                {notification.visible && (
-                    <div
-                        key={notification.id}
-                        onClick={notification.close}
-                        className={`${commonStyles.common__notification} ${notification.closing ? commonStyles['common__notification--closing'] : ''}`}
-                    >
-                        You {viewedUser?.isViewBlocked ? 'blocked' : 'unblocked'} files for view
-                    </div>
-                )}
+            <div
+                className={fileTreeStyles}
+                ref={fileTreeRef}
+            >
+                {
+                    notification.visible && (
+                        <div
+                            className={`${commonStyles.common__notification} ${notification.closing
+                                ? commonStyles['common__notification--closing']
+                                : ''
+                            }`}
+                            key={notification.id}
+                            onClick={notification.close}
+                        >
+                            You
+                            {viewedUser?.isViewBlocked
+                                ? 'blocked'
+                                : 'unblocked'
+                            }
+                            files for view
+                        </div>
+                    )}
 
                 <div className={styles['file-tree__content']}>
-                    {(isViewedUserLoading || areFilesLoading || authStatus === 'loading')
-                        ? <FileTreeSkeleton/>
-                        : (
-                            <>
-                                {showHeader && (
-                                    <div className={styles['file-tree__header']}>
-                                        <div className={styles['file-tree__top']}>
-                                            <div className={styles['file-tree__user']}>
-                                                {viewedUser?.name}
-                                            </div>
+                    {
+                        (
+                            isViewedUserLoading
+                            || areFilesLoading
+                            || authStatus === 'loading'
+                        )
+                            ? <FileTreeSkeleton/>
+                            : (
+                                <>
+                                    {
+                                        showHeader && (
+                                            <div className={styles['file-tree__header']}>
+                                                <div className={styles['file-tree__top']}>
+                                                    <div className={styles['file-tree__user']}>
+                                                        {viewedUser?.name}
+                                                    </div>
 
-                                            {isUserOwner(loggedInUser) && (
-                                                <div
-                                                    className={styles['file-tree__ban']}
-                                                    onClick={() => setIsBanModalOpened(true)}
-                                                >
-                                                    <BanSvg/>
+                                                    {isUserOwner(loggedInUser) && (
+                                                        <div
+                                                            className={styles['file-tree__ban']}
+                                                            onClick={() => setIsBanModalOpened(true)}
+                                                        >
+                                                            <BanSvg/>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
 
-                                        <div className={styles['file-tree__line']}/>
-                                    </div>
-                                )}
-
-                                {isBanned && <div className={styles['file-tree__view']}>This user has been banned</div>}
-                                {!isBanned && !canView &&
-                                    <div className={styles['file-tree__view']}>User blocked his files for view</div>}
-
-                                {canEdit && (
-                                    <div className={styles['file-tree__buttons']}>
-
-                                        <div
-                                            className={styles['file-tree__button-create']}
-                                            onClick={handleCreateRootFolder}
-                                        >
-                                            Create a root folder
-                                        </div>
-
-                                        {authStatus === 'authenticated' && (
-                                            <div
-                                                className={styles['file-tree__button-block']}
-                                                title={viewedUser?.isViewBlocked
-                                                    ? 'Unblock view for other users'
-                                                    : 'Block view for other users'}
-                                                onClick={blockViewHandler}
-                                                style={{
-                                                    background: viewedUser?.isViewBlocked
-                                                        ? '#191A1A'
-                                                        : '#202222'
-                                                }}
-                                            >
-                                                <LockSvg/>
+                                                <div className={styles['file-tree__line']}/>
                                             </div>
                                         )}
 
-                                    </div>
-                                )}
-
-                                {canEdit && (
-                                    <div className={styles['file-tree__usage']}>
-                                        <div className={styles['file-tree__usage-text']}>
-                                            {viewedUser?.isPremium
-                                                ? `${viewedUser?.amountOfFiles ?? 0} files`
-                                                : `${viewedUser?.amountOfFiles ?? 0} / 20 files`
-                                            }
+                                    {
+                                        isBanned &&
+                                        <div className={styles['file-tree__view']}>
+                                            This user has been banned
                                         </div>
-
-                                        <div className={styles['file-tree__usage-bar']}>
-                                            <div
-                                                className={`
-                                                    ${styles['file-tree__usage-fill']}
-                                                    ${isWarning ? styles['file-tree__usage-fill--warning'] : ''}
-                                                        `}
-                                                style={{
-                                                    width: viewedUser?.isPremium
-                                                        ? '100%'
-                                                        : `${Math.min(
-                                                            ((viewedUser?.amountOfFiles ?? 0) / 20) * 100,
-                                                            100
-                                                        )}%`
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                    {viewedUser && !isBanned && canView && (
-                                        <div className={styles['file-tree__files']}>
-                                            <FileList windowWidth={windowWidth} viewedUserEmail={viewedUserEmail}/>
-                                        </div>
-                                    )
                                     }
-                            </>
-                        )
-                    }
 
+                                    {
+                                        (!isBanned && !canView) &&
+                                        <div className={styles['file-tree__view']}>
+                                            User blocked his files for view
+                                        </div>
+                                    }
+
+                                    {
+                                        canEdit && (
+                                            <div className={styles['file-tree__buttons']}>
+                                                <div
+                                                    className={styles['file-tree__button-create']}
+                                                    onClick={handleCreateRootFolder}
+                                                >
+                                                    Create a root folder
+                                                </div>
+
+                                                {
+                                                    authStatus === 'authenticated' && (
+                                                        <div
+                                                            className={`
+                                                                ${styles['file-tree__button-block']}
+                                                                ${!loggedInUser?.isPremium
+                                                                ? styles['file-tree__button-block--premium']
+                                                                : ''
+                                                            }
+`}
+                                                            title={
+                                                                viewedUser?.isViewBlocked
+                                                                    ? 'Unblock view for other users'
+                                                                    : 'Block view for other users'
+                                                            }
+                                                            onClick={blockViewHandler}
+                                                        >
+                                                            <LockSvg/>
+                                                        </div>
+                                                    )
+                                                }
+                                            </div>
+                                        )}
+
+                                    {
+                                        canEdit && (
+                                            <div className={styles['file-tree__usage']}>
+                                                <div className={styles['file-tree__usage-text']}>
+                                                    {
+                                                        viewedUser?.isPremium
+                                                            ? `${viewedUser?.amountOfFiles ?? 0} files`
+                                                            : `${viewedUser?.amountOfFiles ?? 0} / 20 files`
+                                                    }
+                                                </div>
+
+                                                <div className={styles['file-tree__usage-bar']}>
+                                                    <div
+                                                        className={`
+                                                            ${styles['file-tree__usage-fill']}
+                                                            ${isWarning
+                                                            ? styles['file-tree__usage-fill--warning']
+                                                            : ''
+                                                        }`}
+                                                        style={
+                                                            {
+                                                                width: viewedUser?.isPremium
+                                                                    ? '100%'
+                                                                    : `${Math.min(
+                                                                        ((viewedUser?.amountOfFiles ?? 0) / 20) * 100,
+                                                                        100
+                                                                    )}%`
+                                                            }
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                    {
+                                        (viewedUser && !isBanned && canView) && (
+                                            <div className={styles['file-tree__files']}>
+                                                <FileList
+                                                    windowWidth={windowWidth}
+                                                    viewedUserEmail={viewedUserEmail}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                </>
+                            )
+                    }
                 </div>
 
                 {viewedUser?.isPremium ? (
                     <div className={styles['file-tree__premium-active']}>
                         <span>PREMIUM</span>
+
                         <span className={styles['file-tree__premium-badge']}>
                             ACTIVE
                         </span>
                     </div>
                 ) : (
                     <div
-                        className={styles['file-tree__premium']}
-                        // onClick={handleOpenPremiumModal}
+                        className={`${commonStyles.premium} ${styles.premium}`}
+                        onClick={
+                            () => setIsPremiumModalOpen(true)
+                        }
                     >
                         Upgrade
                     </div>

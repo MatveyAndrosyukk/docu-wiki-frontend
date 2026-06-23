@@ -9,35 +9,55 @@ function useQuery() {
 
 const MainPageWrapper = () => {
     let email: any, setEmail: any;
-    [email, setEmail] = useState<string | undefined>(undefined);
+
+    [email, setEmail] =
+        useState<string | undefined>(undefined);
+
     const query = useQuery()
+
     const navigate = useNavigate();
-    const token = query.get("token") || undefined;
+
+    const token =
+        query.get("token") ||
+        undefined;
 
     const {
         username,
         fileId
-    } = useParams<{
-        username: string
-        fileId: string }>();
+    } = useParams<
+        {
+            username: string
+            fileId: string
+        }
+    >();
 
     useEffect(() => {
-        if (!username) {
-            navigate("/");
-            return;
-        }
+            if (!username) {
+                navigate("/");
 
-        performGetEmailByUsername(username)
-            .then(data => setEmail(data.email))
-            .catch(() => setEmail(undefined));
+                return;
+            }
 
-    }, [email, navigate, setEmail, username]);
+            performGetEmailByUsername(username)
+                .then(
+                    data => setEmail(data.email)
+                )
+                .catch(
+                    () => setEmail(undefined)
+                );
+        },
+        [
+            email,
+            navigate,
+            setEmail,
+            username
+        ]
+    );
 
     return <MainPage
         resetToken={token}
         viewedUserEmail={email}
-        fileId={fileId}
-    />
+        fileId={fileId}/>
 };
 
 export default MainPageWrapper;
