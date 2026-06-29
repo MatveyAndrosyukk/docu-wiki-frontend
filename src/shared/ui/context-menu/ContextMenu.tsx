@@ -3,10 +3,7 @@ import styles from './ContextMenu.module.scss'
 import {FileType} from "../../../types/file";
 import {UiFile} from "../../../store/types/UiFile";
 import {useAppContext} from "../../lib/hooks/useAppContext";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../store";
 import {useElementOutsideEvent} from "../../lib/hooks/useElementOutsideEvent";
-import {ActionType} from "../../lib/hooks/modal-actions/types/ActionType";
 
 interface ContextMenuProps {
     clickX: number;
@@ -27,11 +24,7 @@ const ContextMenu: FC<ContextMenuProps> = (
 
     const {fileState} = useAppContext();
 
-    const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
-
-    const {
-        handleOpenDeleteModal,
-    } = fileState;
+    const contextMenu = fileState.contextMenu;
 
     useElementOutsideEvent(
         menuRef,
@@ -47,44 +40,33 @@ const ContextMenu: FC<ContextMenuProps> = (
                 onClick={onCloseContextMenu}>
                 {file.type === FileType.Folder && (
                     <>
-                        {fileState.copyPaste.copiedFile && (
+                        {contextMenu.copiedFile && (
                             <li className={styles['context-menu__item']}
-                                onClick={() => fileState.copyPaste.handlePasteFile(file.id)}>
+                                onClick={() => contextMenu.paste(file.id)}>
                                 Paste
                             </li>
                         )}
                         <li className={styles['context-menu__item']}
-                            onClick={() => fileState.actions.open({
-                                reason: ActionType.AddFile,
-                                id: file.id,
-                                title: "Add File"
-                            })}>
+                            onClick={() => contextMenu.addFile(file.id)}>
                             Add File
                         </li>
                         <li className={styles['context-menu__item']}
-                            onClick={() => fileState.actions.open({
-                                reason: ActionType.AddFolder,
-                                id: file.id,
-                                title: 'Add Folder'
-                            })}>
+                            onClick={() => contextMenu.addFolder(file.id)}>
                             Add Folder
                         </li>
                     </>
                 )}
                 <li className={styles['context-menu__item']}
-                    onClick={() => fileState.actions.open({
-                        reason: ActionType.RenameFile,
-                        id: file.id,
-                        title: "Rename file"
-                    })}>
+                    onClick={() => contextMenu.rename(file)}>
                     Rename
                 </li>
                 <li className={styles['context-menu__item']}
-                    onClick={() => fileState.copyPaste.handleCopyFile(file)}>
+                    onClick={() => contextMenu.copy(file)}>
                     Copy
                 </li>
                 <li className={`${styles['context-menu__item']} ${styles['context-menu__item-delete']}`}
-                    onClick={() => handleOpenDeleteModal(file, viewedUser)}>
+                    onClick={() => contextMenu.remove(file)}
+                >
                     Delete
                 </li>
             </ul>

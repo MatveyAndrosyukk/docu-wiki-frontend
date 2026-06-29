@@ -1,9 +1,10 @@
 import {useEffect} from "react";
+import {UiFile} from "../../../../../store/types/UiFile";
 
 interface Params {
     pendingPasteId: number | null;
-    copiedFile: any;
-    handlePasteFile: (id: number) => void;
+    copiedFile: UiFile | null;
+    paste: (id: number | null) => void;
     clearPendingPaste: () => void;
 }
 
@@ -11,7 +12,7 @@ export function usePendingPasteEffect(
     {
         pendingPasteId,
         copiedFile,
-        handlePasteFile,
+        paste,
         clearPendingPaste,
     }: Params) {
 
@@ -23,7 +24,7 @@ export function usePendingPasteEffect(
             return;
         }
 
-        handlePasteFile(
+        paste(
             pendingPasteId
         );
 
@@ -31,7 +32,7 @@ export function usePendingPasteEffect(
     }, [
         pendingPasteId,
         copiedFile,
-        handlePasteFile,
+        paste,
         clearPendingPaste,
     ]);
 }

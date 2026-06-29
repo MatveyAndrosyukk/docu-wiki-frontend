@@ -7,10 +7,6 @@ export interface CopyPasteState {
     handleCopyFile: (file: UiFile) => void;
 }
 
-export interface CopyPasteActions extends CopyPasteState {
-    handlePasteFile: (id: number | null) => void;
-}
-
 export default function useCopyPasteActions(): CopyPasteState {
     const [copiedFile, setCopiedFile] = useState<UiFile | null>(null);
 

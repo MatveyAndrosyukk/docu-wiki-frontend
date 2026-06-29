@@ -2,7 +2,6 @@ import React, {FC} from 'react';
 import Modal from "../modal/Modal";
 import styles from './EditModal.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
-import {FileType} from "../../../../types/file";
 import {useAppContext} from "../../../lib/hooks/useAppContext";
 import {ReactComponent as ArrowIcon} from './images/arrow.svg'
 import {ActionType} from "../../../lib/hooks/modal-actions/types/ActionType";
@@ -12,7 +11,6 @@ const EditModal: FC = () => {
 
     const {
         modal,
-        copyPaste,
         actions,
     } = fileState;
 

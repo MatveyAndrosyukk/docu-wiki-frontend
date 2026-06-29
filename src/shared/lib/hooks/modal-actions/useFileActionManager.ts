@@ -1,8 +1,6 @@
 import {Ref, useCallback, useMemo, useReducer, useRef} from "react";
-import useCopyPasteActions, {CopyPasteActions} from "../useCopyPasteActions";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../../store";
-import {UiFile} from "../../../../store/types/UiFile";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 import {PremiumState} from "../../../ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 import {getModalInitialValue} from "./utils/getModalInitialValue";
@@ -11,12 +9,13 @@ import {usePendingPasteEffect} from "./effects/usePendingPasteEffect";
 import {usePasteNameValidation} from "./effects/usePasteNameValidation";
 import {ModalActionContext} from "./types/ModalActionContext";
 import {confirmModalAction} from "./actions/confirmModalAction";
-import {ActionType} from "./types/ActionType";
 import {OpenModalState} from "./types/OpenModalState";
 import {filesLimit} from "./constants/filesLimit";
 import {useNameLengthValidation} from "./effects/useNameLengthValidation";
-import {checkNameConflictInFolder} from "../../utils/modalUtils";
-import {pasteFileCase} from "./cases/pasteFileCase";
+import useContextMenuFileActions, {
+    ContextMenuFileActions
+} from "../../../ui/context-menu/hooks/useContextMenuFileActions";
+import {OpenDeleteModal} from "../useDeleteFileActions";
 
 export type ModalActionsState = {
     modal: {
@@ -33,12 +32,11 @@ export type ModalActionsState = {
         open: (openState: OpenModalState, value?: string) => void;
         close: () => void;
         confirm: (modalState: OpenModalState & { title: string }) => void;
-        openRename: (file: UiFile) => void;
         setValue: (value: string) => void;
         setError: (value: string) => void;
     };
 
-    copyPaste: CopyPasteActions;
+    contextMenu: ContextMenuFileActions;
 };
 
 type ModalState = {
@@ -59,8 +57,9 @@ type ModalAction =
     | { type: "SET_PENDING_PASTE"; payload: number | null }
     | { type: "RESET" };
 
-export default function useModalActions(
-    premiumState: PremiumState
+export default function useFileActionManager(
+    premiumState: PremiumState,
+    openDeleteModal: OpenDeleteModal,
 ): ModalActionsState {
     const initialModalState: ModalState = {
         isOpen: false,
@@ -168,14 +167,22 @@ export default function useModalActions(
         [files]
     );
 
-    const copyPasteActions = useCopyPasteActions();
-
-    const {
-        copiedFile,
-    } = copyPasteActions;
-
     const closeModal = useCallback(() => {
         dispatchModal({type: "CLOSE"});
+    }, []);
+
+    const setModalValue = useCallback((value: string) => {
+        dispatchModal({
+            type: "SET_VALUE",
+            payload: value,
+        });
+    }, []);
+
+    const setModalError = useCallback((value: string) => {
+        dispatchModal({
+            type: "SET_ERROR",
+            payload: value,
+        });
     }, []);
 
     const actionContext = useMemo<ModalActionContext>(
@@ -191,13 +198,7 @@ export default function useModalActions(
             filesLimit,
             premiumState,
             closeModal,
-            setModalError: (
-                value: string
-            ) =>
-                dispatchModal({
-                    type: "SET_ERROR",
-                    payload: value,
-                }),
+            setModalError
         }),
         [
             files,
@@ -207,8 +208,20 @@ export default function useModalActions(
             totalFiles,
             premiumState,
             closeModal,
+            setModalError
         ]
     );
+
+    const contextMenuActions =
+        useContextMenuFileActions({
+            openModal,
+            openDeleteModal,
+            actionContext,
+        });
+
+    const {
+        copiedFile,
+    } = contextMenuActions;
 
     const confirmModal = useCallback(
         (
@@ -227,75 +240,6 @@ export default function useModalActions(
         ]
     );
 
-
-    const handleOpenRenameModal = useCallback((file: UiFile) => {
-        openModal(
-            {
-                reason: ActionType.RenameFile,
-                id: file.id,
-                title: 'Rename file'
-            },
-            file.name
-        );
-
-    }, [openModal]);
-
-    const handlePasteFile = useCallback(
-        (parentId: number | null) => {
-
-            if (!copiedFile || parentId === null) {
-                return;
-            }
-
-            const hasConflict = checkNameConflictInFolder(
-                files,
-                parentId,
-                copiedFile.name
-            );
-
-            if (hasConflict) {
-                openModal(
-                    {
-                        reason: ActionType.PasteFile,
-                        id: parentId,
-                        title: "Paste file",
-                    },
-                    copiedFile.name
-                );
-
-                return;
-            }
-
-            pasteFileCase({
-                context: actionContext,
-                parentId,
-                title: copiedFile.name,
-                copiedFile,
-            });
-
-        },
-        [
-            copiedFile,
-            files,
-            actionContext,
-            openModal,
-        ]
-    );
-
-    const setModalValue = useCallback((value: string) => {
-        dispatchModal({
-            type: "SET_VALUE",
-            payload: value,
-        });
-    }, []);
-
-    const setModalError = useCallback((value: string) => {
-        dispatchModal({
-            type: "SET_ERROR",
-            payload: value,
-        });
-    }, []);
-
     usePasteNameValidation(
         {
             modalValue: modalState.value,
@@ -306,18 +250,16 @@ export default function useModalActions(
         }
     );
 
-    usePendingPasteEffect(
-        {
-            pendingPasteId: modalState.pendingPasteId,
-            copiedFile,
-            handlePasteFile,
-            clearPendingPaste: () =>
-                dispatchModal({
-                    type: "SET_PENDING_PASTE",
-                    payload: null,
-                }),
-        }
-    );
+    usePendingPasteEffect({
+        pendingPasteId: modalState.pendingPasteId,
+        copiedFile,
+        paste: contextMenuActions.paste,
+        clearPendingPaste: () =>
+            dispatchModal({
+                type: "SET_PENDING_PASTE",
+                payload: null,
+            }),
+    });
 
     useModalFocusEffect(
         modalState.isOpen,
@@ -344,19 +286,15 @@ export default function useModalActions(
         open: openModal,
         close: closeModal,
         confirm: confirmModal,
-        openRename: handleOpenRenameModal,
         setValue: setModalValue,
         setError: setModalError,
     };
 
-    const copyPaste: CopyPasteActions = {
-        ...copyPasteActions,
-        handlePasteFile,
-    };
+    const contextMenu = contextMenuActions;
 
     return {
         modal,
         actions,
-        copyPaste,
+        contextMenu,
     };
 }

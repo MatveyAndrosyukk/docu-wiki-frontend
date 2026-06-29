@@ -14,9 +14,14 @@ export interface DeleteModalState {
     isDeleting: boolean;
 }
 
+export type OpenDeleteModal = (
+    file: UiFile,
+    user: User | null
+) => void;
+
 export interface DeleteFileState {
     deleteModalState: DeleteModalState;
-    handleOpenDeleteModal: (file: UiFile, user: User | null) => void;
+    handleOpenDeleteModal: OpenDeleteModal;
     handleConfirmDeleteFile: () => void;
     handleCancelDeleteFile: () => void;
 }
