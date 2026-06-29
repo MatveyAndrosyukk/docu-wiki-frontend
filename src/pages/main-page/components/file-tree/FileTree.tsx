@@ -7,7 +7,6 @@ import FileList from "./components/file-list/FileList";
 import {AppDispatch, RootState} from "../../../../store";
 import {useDispatch, useSelector} from "react-redux";
 import {toggleUserIsViewBlocked} from "../../../../store/thunks/user/toggleUserIsViewBlocked";
-import {ActionType} from "../../../../shared/lib/hooks/useModalActions";
 import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {isUserCanView} from "../../../../shared/lib/utils/permissions-utils/isUserCanView";
 import {isUserEqualsLoggedIn} from "../../../../shared/lib/utils/permissions-utils/isUserEqualsLoggedIn";
@@ -18,6 +17,7 @@ import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useNotification} from "../../../../shared/lib/hooks/useNotification";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
+import {ActionType} from "../../../../shared/lib/hooks/modal-actions/types/ActionType";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
@@ -65,7 +65,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const {setIsLoginModalOpen} = authState;
 
-        const {handleOpenModalByReason} = fileState;
+        const {actions} = fileState;
 
         const {setIsPremiumModalOpen} = premiumState;
 
@@ -138,7 +138,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
         const handleCreateRootFolder = useCallback(
             () => {
                 if (authStatus === 'authenticated') {
-                    handleOpenModalByReason(
+                    actions.open(
                         {
                             reason: ActionType.AddRootFolder,
                             id: null,
@@ -151,8 +151,8 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
             },
             [
+                actions,
                 authStatus,
-                handleOpenModalByReason,
                 setIsLoginModalOpen
             ]
         );

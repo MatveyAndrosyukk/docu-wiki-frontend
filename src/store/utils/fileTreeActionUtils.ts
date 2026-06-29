@@ -1,56 +1,10 @@
 import {File, FileStatus, FileType} from "../../types/file";
-import {ServerFile} from "../types/ServerFile";
 import {UiFile} from "../types/UiFile";
 
 interface TreeNodeBase {
     id: number;
     children?: TreeNodeBase[];
 }
-
-export function findAndUpdate(
-    nodes: File[],
-    id: number | null,
-    updater: (node: File, idx: number, arr: File[]) => boolean | void
-): boolean {
-    for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        if (node.id === id) {
-            updater(node, i, nodes);
-            return true;
-        }
-        if (node.children && node.children.length > 0) {
-            if (findAndUpdate(node.children, id, updater)) return true;
-        }
-    }
-    return false;
-}
-
-export const normalizeParentId = (
-    parent: number | { id: number } | null
-): number | null => {
-    if (parent === null) return null;
-    if (typeof parent === 'number') return parent;
-    return parent.id;
-};
-
-export const extractPendingFiles = (files: File[]): File[] => {
-    const result: File[] = [];
-
-    const walk = (nodes: File[]) => {
-        nodes.forEach(node => {
-            if ((node as any).isPending) {
-                result.push(node);
-            }
-
-            if (node.type === FileType.Folder && node.children) {
-                walk(node.children);
-            }
-        });
-    };
-
-    walk(files);
-    return result;
-};
 
 export const updateLikesInTree = (
     files: File[],
@@ -135,57 +89,6 @@ export function closeAllFilesExcept(
         return newNode;
     });
 }
-
-export const extractOpenFolders = (files: File[]): Set<number> => {
-    const openFolders = new Set<number>();
-
-    const walk = (nodes: File[]) => {
-        nodes.forEach(node => {
-            if (
-                node.type === FileType.Folder &&
-                node.status === FileStatus.Opened
-            ) {
-                openFolders.add(node.id as number);
-            }
-
-            if (node.children) {
-                walk(node.children);
-            }
-        });
-    };
-
-    walk(files);
-    return openFolders;
-};
-
-export const restoreOpenFolders = (
-    files: File[],
-    openFolders: Set<number>
-): File[] => {
-    const walk = (nodes: File[]) =>
-        nodes.map(node => {
-            if (
-                node.type === FileType.Folder &&
-                openFolders.has(node.id as number)
-            ) {
-                node = {
-                    ...node,
-                    status: FileStatus.Opened
-                };
-            }
-
-            if (node.children) {
-                node = {
-                    ...node,
-                    children: walk(node.children)
-                };
-            }
-
-            return node;
-        });
-
-    return walk(files);
-};
 
 export const getAllChildFolderIdsUi = (node: UiFile): number[] => {
     let ids: number[] = [];

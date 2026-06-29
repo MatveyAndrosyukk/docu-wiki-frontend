@@ -51,6 +51,10 @@ const FileList: React.FC<FileListProps> = React.memo(
 
         const flattenedNodes = useFlattenedTree(files);
 
+        const {
+            isLimitError
+        } = fileState.modal
+
         const handleFolderClick = useCallback(
             (
                 id: number
@@ -79,7 +83,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                 style={{maxHeight}}
             >
                 {
-                    fileState.isLimitError && (
+                    isLimitError && (
                         <div className={commonStyles['common__notification']}>
                             You've reached the free plan limit of 20 files.
                             Upgrade to Premium to create more.

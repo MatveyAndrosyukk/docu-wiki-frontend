@@ -1,6 +1,7 @@
 import {useCallback, useState} from "react";
 import {UiFile} from "../../../store/types/UiFile";
-import {ActionType, ModalOpenState} from "./useModalActions";
+import {OpenModalState} from "./modal-actions/types/OpenModalState";
+import {ActionType} from "./modal-actions/types/ActionType";
 
 export interface CopyPasteState {
     copiedFile: UiFile | null;
@@ -10,7 +11,7 @@ export interface CopyPasteState {
 }
 
 export default function useCopyPasteActions(
-    openModalByReason: (modalState: ModalOpenState) => void
+    openModal: (modalState: OpenModalState) => void
 ): CopyPasteState {
     const [copiedFile, setCopiedFile] = useState<UiFile | null>(null);
 
@@ -22,14 +23,14 @@ export default function useCopyPasteActions(
         (id: number | null) => {
             if (!copiedFile) return;
 
-            openModalByReason({
+            openModal({
                 reason: ActionType.PasteFile,
                 id,
                 title: "Paste file",
                 defaultValue: copiedFile.name,
             });
         },
-        [copiedFile, openModalByReason]
+        [copiedFile, openModal]
     );
 
     return {

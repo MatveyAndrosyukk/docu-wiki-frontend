@@ -21,7 +21,6 @@ import {useResetPasswordModal} from "../../shared/lib/hooks/useResetPasswordModa
 import {useDocumentTitle} from "../../shared/lib/hooks/useDocumentTitle";
 import {useViewedUserLoader} from "../../shared/lib/hooks/useViewedUserLoader";
 import {useFetchFilesForViewedUser} from "../../shared/lib/hooks/useFetchFilesForViewedUser";
-import {ActionType} from "../../shared/lib/hooks/useModalActions";
 import {useAuth} from "../../shared/lib/hooks/useAuth";
 import {findFileById} from "../../store/utils/fileTreeActionUtils";
 import FeedbackButton from "../../shared/ui/feedback-button/FeedbackButton";
@@ -29,6 +28,7 @@ import FeedbackModal from "../../shared/ui/modal-windows/feedback-modal/Feedback
 import GlobalNotification from "../../shared/ui/global-notification/GlobalNotification";
 import {useWindowWidth} from "../../shared/lib/hooks/useWindowWidth";
 import PremiumModal from "../../shared/ui/modal-windows/premium-modal/PremiumModal";
+import {ActionType} from "../../shared/lib/hooks/modal-actions/types/ActionType";
 
 interface MainPageProps {
     viewedUserEmail?: string | undefined;
@@ -71,7 +71,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     } = authState;
 
     const {
-        handleOpenModalByReason,
+        actions,
         handleTryToOpenFile
     } = fileState;
 
@@ -152,7 +152,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                     e.preventDefault();
 
                     if (authStatus === 'authenticated') {
-                        handleOpenModalByReason(
+                        actions.open(
                             {
                                 reason: ActionType.AddRootFolder,
                                 id: null,
@@ -177,8 +177,9 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
         },
         [
             authStatus,
-            handleOpenModalByReason,
-            setIsLoginModalOpen
+            actions.open,
+            setIsLoginModalOpen,
+            actions
         ]
     );
 

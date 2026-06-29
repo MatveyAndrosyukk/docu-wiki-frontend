@@ -2,7 +2,7 @@ import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../store";
 import {ChangeFileLikesPayload, toggleFileLikes} from "../../../store/thunks/files/toggleFileLikes";
 import useDeleteFileActions, {DeleteFileState} from "./useDeleteFileActions";
-import useModalActions, {ModalActionsState} from "./useModalActions";
+import useModalActions, {ModalActionsState} from "./modal-actions/useModalActions";
 import useEditFileActions, {EditFileViewState} from "./useEditFileActions";
 import {useCallback} from "react";
 import {PremiumState} from "../../ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
