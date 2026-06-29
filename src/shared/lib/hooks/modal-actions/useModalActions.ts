@@ -1,5 +1,5 @@
 import {Ref, useCallback, useMemo, useReducer, useRef} from "react";
-import useCopyPasteActions, {CopyPasteState} from "../useCopyPasteActions";
+import useCopyPasteActions, {CopyPasteActions} from "../useCopyPasteActions";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../../store";
 import {UiFile} from "../../../../store/types/UiFile";
@@ -15,6 +15,8 @@ import {ActionType} from "./types/ActionType";
 import {OpenModalState} from "./types/OpenModalState";
 import {filesLimit} from "./constants/filesLimit";
 import {useNameLengthValidation} from "./effects/useNameLengthValidation";
+import {checkNameConflictInFolder} from "../../utils/modalUtils";
+import {pasteFileCase} from "./cases/pasteFileCase";
 
 export type ModalActionsState = {
     modal: {
@@ -36,11 +38,7 @@ export type ModalActionsState = {
         setError: (value: string) => void;
     };
 
-    copyPaste: CopyPasteState;
-
-    helpers: {
-        isNameConflictReason: boolean;
-    };
+    copyPaste: CopyPasteActions;
 };
 
 type ModalState = {
@@ -152,8 +150,6 @@ export default function useModalActions(
         (state: RootState) => state.user.loggedInUser
     );
 
-    const isNameConflictReason = modalState.error !== '';
-
     const openModal = useCallback(
         (openState: OpenModalState, value?: string) => {
 
@@ -172,11 +168,10 @@ export default function useModalActions(
         [files]
     );
 
-    const copyPasteActions = useCopyPasteActions(openModal);
+    const copyPasteActions = useCopyPasteActions();
 
     const {
         copiedFile,
-        handlePasteFile
     } = copyPasteActions;
 
     const closeModal = useCallback(() => {
@@ -245,6 +240,48 @@ export default function useModalActions(
 
     }, [openModal]);
 
+    const handlePasteFile = useCallback(
+        (parentId: number | null) => {
+
+            if (!copiedFile || parentId === null) {
+                return;
+            }
+
+            const hasConflict = checkNameConflictInFolder(
+                files,
+                parentId,
+                copiedFile.name
+            );
+
+            if (hasConflict) {
+                openModal(
+                    {
+                        reason: ActionType.PasteFile,
+                        id: parentId,
+                        title: "Paste file",
+                    },
+                    copiedFile.name
+                );
+
+                return;
+            }
+
+            pasteFileCase({
+                context: actionContext,
+                parentId,
+                title: copiedFile.name,
+                copiedFile,
+            });
+
+        },
+        [
+            copiedFile,
+            files,
+            actionContext,
+            openModal,
+        ]
+    );
+
     const setModalValue = useCallback((value: string) => {
         dispatchModal({
             type: "SET_VALUE",
@@ -312,18 +349,14 @@ export default function useModalActions(
         setError: setModalError,
     };
 
-    const copyPaste = {
+    const copyPaste: CopyPasteActions = {
         ...copyPasteActions,
-    };
-
-    const helpers = {
-        isNameConflictReason,
+        handlePasteFile,
     };
 
     return {
         modal,
         actions,
         copyPaste,
-        helpers,
     };
 }

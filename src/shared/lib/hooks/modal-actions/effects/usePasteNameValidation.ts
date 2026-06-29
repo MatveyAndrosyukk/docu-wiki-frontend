@@ -30,7 +30,7 @@ export function usePasteNameValidation(
         }
 
         if (
-            !modalOpenState.id ||
+            modalOpenState.id == null ||
             !copiedFile
         ) {
             return;

@@ -14,16 +14,9 @@ const EditModal: FC = () => {
         modal,
         copyPaste,
         actions,
-        helpers
     } = fileState;
 
-    const conflictMessage =
-        fileState.copyPaste.copiedFile?.type === FileType.Folder
-            ? "Folder with this name exists"
-            : "File with this name exists";
-
-    const errorMessage = modal.error
-        || (helpers.isNameConflictReason ? conflictMessage : "");
+    const errorMessage = modal.error;
 
     const errorClassName = `${modalStyles['modal__error']}
      ${styles['edit-modal__error']}

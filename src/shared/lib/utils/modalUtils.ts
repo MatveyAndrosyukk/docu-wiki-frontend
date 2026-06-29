@@ -2,7 +2,11 @@ import {FileType} from "../../../types/file";
 import {UiFile} from "../../../store/types/UiFile";
 import {CreateFilePayload} from "../../../types/CreateFilePayload";
 
-export function checkIfNameExistsInFolder(
+export function isNameExistsInRoot(files: UiFile[], name: string): boolean {
+    return files.some(file => file.name === name && file.parent === null);
+}
+
+export function checkNameConflictInFolder(
     files: UiFile[],
     folderId: number | null,
     name: string
@@ -26,21 +30,10 @@ export function checkIfNameExistsInFolder(
     }
 
     const targetFolder = findFolderById(files);
+
     return targetFolder
-        ? targetFolder.children.some(child => child.name === name)
+        ? targetFolder.children?.some(child => child.name === name) ?? false
         : false;
-}
-
-export function isNameExistsInRoot(files: UiFile[], name: string): boolean {
-    return files.some(file => file.name === name && file.parent === null);
-}
-
-export function checkNameConflictInFolder(
-    files: UiFile[],
-    folderId: number | null,
-    name: string
-): boolean {
-    return checkIfNameExistsInFolder(files, folderId, name);
 }
 
 export function createFilePayload(
