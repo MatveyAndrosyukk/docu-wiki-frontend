@@ -5,8 +5,7 @@ import {AppDispatch} from "../../../store";
 import {addUserWhoCanEdit} from "../../../store/thunks/user/addUserWhoCanEdit";
 import {deleteUserWhoCanEdit} from "../../../store/thunks/user/deleteUserWhoCanEdit";
 import {changeUserName} from "../../../store/thunks/user/changeUserName";
-import {LoginState} from "./useLoginActions";
-import {useAuth} from "./useAuth";
+import {useAuthContext} from "../../../context/auth-context/hooks/useAuthContext";
 
 export interface UserModalState {
     isAddingEditor: boolean;
@@ -39,7 +38,17 @@ export interface UserModalState {
     handleOpenUserModal: () => void;
 }
 
-export default function useUserModalActions(user: User | null, loginState: LoginState): UserModalState {
+type Props = {
+    user: User | null,
+    openLoginModal(): void,
+}
+
+export default function useUserModalActions(
+    {
+        user,
+        openLoginModal
+    }
+    : Props): UserModalState {
     const [isAddingEditor, setIsAddingEditor] = React.useState(false);
     const [isChangingName, setIsChangingName] = React.useState<boolean>(false);
     const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
@@ -53,14 +62,16 @@ export default function useUserModalActions(user: User | null, loginState: Login
     const [addEditorError, setAddEditorError] = React.useState<string>('');
     const [changeNameError, setChangeNameError] = React.useState<string>('');
 
-    const {authStatus} = useAuth();
+    const {
+        authStatus
+    } = useAuthContext();
 
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         setEditedName(user?.name || '');
     }, [user?.name]);
-    
+
     useEffect(() => {
         if (isEditingName && nameInputRef.current) {
             nameInputRef.current.focus();
@@ -68,7 +79,7 @@ export default function useUserModalActions(user: User | null, loginState: Login
             nameInputRef.current.disabled = false;
         }
     }, [isEditingName]);
-    
+
     useEffect(() => {
         if (editedName.length > 25) {
             setEditedNameError('Username is too long');
@@ -78,28 +89,33 @@ export default function useUserModalActions(user: User | null, loginState: Login
             setEditedNameError('');
         }
     }, [editedName]);
-    
+
     useEffect(() => {
         if (userModalValue.trim() === '' && user?.whoCanEdit) {
             setUsersWhoCanEdit([...user?.whoCanEdit].reverse());
         }
     }, [userModalValue, user?.whoCanEdit]);
-    
+
     const handleCloseUserModal = useCallback(() => {
         setIsUserModalOpen(false);
         setUserModalValue('');
         setAddEditorError('');
         setChangeNameError('');
     }, [setIsUserModalOpen, setUserModalValue, setAddEditorError, setChangeNameError]);
-    
+
     const handleOpenUserModal = useCallback(() => {
-        if (authStatus !== 'authenticated') {
-            loginState.handleOpenLoginModal();
-            return;
-        }
-        setIsUserModalOpen(true);
-    }, [authStatus, loginState]);
-    
+            if (authStatus !== 'authenticated') {
+                openLoginModal();
+                return;
+            }
+            setIsUserModalOpen(true);
+        },
+        [
+            authStatus,
+            openLoginModal
+        ]
+    );
+
     const handleAddUserWhoCanEdit = useCallback(() => {
         if (!userModalValue.trim()) return;
         const currentUserEmail = localStorage.getItem('email');

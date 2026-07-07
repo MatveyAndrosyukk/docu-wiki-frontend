@@ -11,12 +11,12 @@ import UserModal from '../../../../shared/ui/modal-windows/user-modal/UserModal'
 import useUserModalActions from "../../../../shared/lib/hooks/useUserModalActions";
 import {useNavigate} from "react-router-dom";
 import useFileSearchActions from "../../../../shared/lib/hooks/useFileSearchActions";
-import {useAuth} from "../../../../shared/lib/hooks/useAuth";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
-import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
+import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 
 interface Props {
     setIsFeedbackOpen: Dispatch<React.SetStateAction<boolean>>;
@@ -31,11 +31,17 @@ const Header: FC<Props> = ({
     const navigate = useNavigate();
 
     const {
+        premiumState,
         authState,
-        premiumState
     } = useAppContext();
 
-    const {authStatus} = useAuth();
+    const {
+        authStatus
+    } = useAuthContext();
+
+    const {
+        login,
+    } = authState;
 
     const loggedInUser = useSelector(
         (state: RootState) => state.user.loggedInUser
@@ -43,8 +49,10 @@ const Header: FC<Props> = ({
 
     const userModalState =
         useUserModalActions(
-            loggedInUser,
-            authState
+            {
+                user: loggedInUser,
+                openLoginModal: login.actions.openModal
+            }
         );
 
     const fileSearch = useFileSearchActions();
@@ -52,11 +60,6 @@ const Header: FC<Props> = ({
     const width = useWindowWidth();
 
     const {handleOpenUserModal} = userModalState
-
-    const {
-        handleLogout,
-        handleOpenLoginModal
-    } = authState;
 
     const {setIsPremiumModalOpen} = premiumState;
 
@@ -165,12 +168,14 @@ const Header: FC<Props> = ({
                                                     authStatus === 'authenticated' ? (
                                                         <div className={styles['header__burger-item']}>
                                                             <LogoutSvg
-                                                                onClick={handleLogout}
+                                                                onClick={
+                                                                    () => login.actions.logout()
+                                                                }
                                                             />
                                                         </div>
                                                     ) : (
                                                         <button
-                                                            onClick={handleOpenLoginModal}
+                                                            onClick={() => login.actions.openModal()}
                                                         >
                                                             Login
                                                         </button>
@@ -195,8 +200,8 @@ const Header: FC<Props> = ({
                                                     : styles['header__login']
                                                 }
                                                 onClick={authStatus === 'authenticated'
-                                                    ? handleLogout
-                                                    : handleOpenLoginModal
+                                                    ? () => login.actions.logout()
+                                                    : () => login.actions.openModal()
                                                 }
                                             >
                                                 {authStatus === 'authenticated'

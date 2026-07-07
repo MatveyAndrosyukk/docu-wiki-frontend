@@ -7,7 +7,7 @@ import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebounced
 import {UiFile} from "../../../../../../store/types/UiFile";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store";
-import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
+import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
 import {useEditorTextarea} from "../../../../../../shared/lib/hooks/useEditorTextarea";
 import {useEditorPreview} from "../../../../../../shared/lib/hooks/useEditorPreview";
 import {useEditorValidation} from "../../../../../../shared/lib/hooks/useEditorValidation";

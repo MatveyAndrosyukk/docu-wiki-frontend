@@ -1,7 +1,7 @@
 import React, {FC, useEffect} from 'react';
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {performVerificationAsync} from "../../shared/lib/services/performVerificationAsync";
-import {useAppContext} from "../../shared/lib/hooks/useAppContext";
+import {useAppContext} from "../../context/app-context/hooks/useAppContext";
 
 const VerifyPage: FC = () => {
     const [searchParams] = useSearchParams();
@@ -10,44 +10,61 @@ const VerifyPage: FC = () => {
     const {authState} = useAppContext();
 
     const {
-        setIsRegisterModal,
-        setIsLoginModalOpen,
-        setRegisterError,
-        setLoginError,
-        setLoginMessage,
+        login,
+        registration,
     } = authState;
 
     useEffect(() => {
-        async function verifyEmail() {
-            if (!token) {
-                navigate('/')
-                setIsRegisterModal(true)
-                setIsLoginModalOpen(true)
-                setRegisterError('Invalid confirmation link')
-                return;
-            }
-            performVerificationAsync(token)
-                .then(() => {
-                    navigate('/');
-                })
-                .catch(() => {
+            async function verifyEmail() {
+                if (!token) {
                     navigate('/')
-                })
-        }
 
-        verifyEmail()
-            .then(() => {
-                setIsLoginModalOpen(true);
-                setIsRegisterModal(false);
-                setLoginError(null);
-                setLoginMessage('Your email confirmed!');
-            })
-            .catch((error) => {
-                setIsLoginModalOpen(true);
-                setIsRegisterModal(true);
-                setRegisterError(error.message);
-            });
-    }, [authState, navigate, setIsLoginModalOpen, setIsRegisterModal, setLoginError, setLoginMessage, setRegisterError, token]);
+                    login.actions.openModal();
+
+                    registration.actions.setError(
+                        'Invalid confirmation link'
+                    );
+
+                    return;
+                }
+                performVerificationAsync(token)
+                    .then(() => {
+                        navigate('/');
+                    })
+                    .catch(() => {
+                        navigate('/')
+                    })
+            }
+
+            verifyEmail()
+                .then(() => {
+                    login.actions.openModal();
+
+                    registration.actions.setIsModal(false);
+
+                    login.actions.setError('');
+
+                    login.actions.setMessage(
+                        'Your email confirmed!'
+                    );
+                })
+                .catch((error) => {
+                    login.actions.openModal();
+
+                    registration.actions.setIsModal(true);
+
+                    registration.actions.setError(
+                        error.message
+                    );
+                });
+        }, [
+            authState,
+            login.actions,
+            navigate,
+            registration.actions,
+            token
+        ]
+    );
 
     return (
         <div>Confirming email...</div>

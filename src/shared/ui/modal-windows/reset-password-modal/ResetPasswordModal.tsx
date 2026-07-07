@@ -1,58 +1,45 @@
-import React, { FC, useCallback, useEffect } from 'react';
+import React, {FC, useCallback, useEffect} from 'react';
 import Modal from "../modal/Modal";
 import styles from "./ResetPasswordModal.module.scss";
 import modalStyles from "../modal/ModalContent.module.scss";
-import { ReactComponent as CloseModalSvg } from "./images/reset-password-modal-close.svg";
-import { useAppContext } from "../../../lib/hooks/useAppContext";
+import {ReactComponent as CloseModalSvg} from "./images/reset-password-modal-close.svg";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 interface ResetPasswordModalProps {
     resetToken: string | undefined;
 }
 
-const ResetPasswordModal: FC<ResetPasswordModalProps> = ({ resetToken }) => {
-    const { authState } = useAppContext();
+const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
+    const {authState} = useAppContext();
 
-    const {
-        isResetPasswordModalOpened,
-        setIsResetPasswordModalOpened,
-        resetPasswordError,
-        setResetPasswordError,
-        resetPasswordValue,
-        setResetPasswordValue,
-        resetPasswordLoading,
-        newPasswordInputRef,
-        resetPasswordMessage,
-        handleChangeNewPassword,
-        handleChangeRepeatPassword,
-        handleClickResetPassword,
-        handleBlurNewPassword,
-        handleBlurRepeatPassword,
-    } = authState;
+    const {reset} = authState;
 
-    const handleCloseResetPasswordModal = useCallback(() => {
-        setIsResetPasswordModalOpened(false);
-        setResetPasswordValue({ newPassword: '', repeatPassword: '' });
-        setResetPasswordError('');
-    }, [setIsResetPasswordModalOpened, setResetPasswordValue, setResetPasswordError]);
+    const closeModal = useCallback(() => {
+            reset.actions.reset();
+        },
+        [
+            reset.actions
+        ]
+    );
 
     useEffect(() => {
-        if (!isResetPasswordModalOpened) return;
-        const ref = newPasswordInputRef as React.RefObject<HTMLInputElement>;
+        if (!reset.state.isModal) return;
+        const ref = reset.state.newPasswordInputRef as React.RefObject<HTMLInputElement>;
         ref.current?.focus();
-        setResetPasswordError('');
-    }, [isResetPasswordModalOpened, newPasswordInputRef, setResetPasswordError]);
+        reset.actions.setError('');
+    }, [reset.actions, reset.state.isModal, reset.state.newPasswordInputRef]);
 
-    const messageText = resetPasswordMessage || resetPasswordError;
-    const messageClassName = resetPasswordMessage
+    const messageText = reset.state.message || reset.state.error;
+    const messageClassName = reset.state.message
         ? modalStyles.modal__message
-        : resetPasswordError
+        : reset.state.error
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
     return (
         <Modal
-            isOpen={isResetPasswordModalOpened}
-            onClose={handleCloseResetPasswordModal}
+            isOpen={reset.state.isModal}
+            onClose={closeModal}
         >
             <div className={modalStyles['modal__overlay']}>
                 <div className={modalStyles['modal__form']}>
@@ -62,7 +49,7 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({ resetToken }) => {
                         </p>
                         <CloseModalSvg
                             className={styles['reset-password-modal__close']}
-                            onClick={handleCloseResetPasswordModal}
+                            onClick={closeModal}
                         />
                     </div>
 
@@ -73,25 +60,25 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({ resetToken }) => {
                             type='password'
                             className={modalStyles['modal__input']}
                             placeholder="Enter a new password"
-                            value={resetPasswordValue.newPassword}
-                            ref={newPasswordInputRef}
-                            onBlur={handleBlurNewPassword}
-                            onChange={handleChangeNewPassword}
+                            value={reset.state.value.newPassword}
+                            ref={reset.state.newPasswordInputRef}
+                            onBlur={reset.actions.blurNewPassword}
+                            onChange={reset.actions.handleChangeNewPassword}
                         />
                         <input
                             type='password'
                             className={modalStyles['modal__input']}
                             placeholder="Repeat a new password"
-                            value={resetPasswordValue.repeatPassword}
-                            onBlur={handleBlurRepeatPassword}
-                            onChange={handleChangeRepeatPassword}
+                            value={reset.state.value.repeatPassword}
+                            onBlur={reset.actions.blurRepeatPassword}
+                            onChange={reset.actions.handleChangeRepeatPassword}
                         />
                         <button
                             className={`${modalStyles['modal__button']} ${styles['reset-password-modal__button-button']}`}
-                            disabled={resetPasswordLoading}
-                            onClick={() => handleClickResetPassword(resetToken)}
+                            disabled={reset.state.loading}
+                            onClick={() => reset.actions.resetPassword(resetToken)}
                         >
-                            {resetPasswordLoading ? 'Reset...' : 'Reset'}
+                            {reset.state.loading ? 'Reset...' : 'Reset'}
                         </button>
                     </div>
                 </div>

@@ -3,10 +3,10 @@ import './App.scss';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import MainPageWrapper from "./pages/main-page/MainPageWrapper";
 import VerifyPage from "./pages/verify-page/VerifyPage";
-import useAuthBootstrap from "./shared/lib/hooks/useAuthBootstrap";
+import useRefreshToken from "./shared/lib/hooks/useRefreshToken";
 
 function App() {
-    useAuthBootstrap();
+    useRefreshToken();
 
     return (
         <Router>

@@ -2,7 +2,7 @@ import React, {FC, useCallback} from 'react';
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './SwitchWhileEditModal.module.scss'
 import Modal from "../modal/Modal";
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 interface SwitchWhileEditModalProps {
     contentBeforeEdition: string;

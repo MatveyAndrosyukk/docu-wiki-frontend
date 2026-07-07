@@ -7,7 +7,7 @@ import { UserModalState } from "../../../lib/hooks/useUserModalActions";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 interface UserModalProps {
     userModalState: UserModalState

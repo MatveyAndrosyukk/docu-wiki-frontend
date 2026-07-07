@@ -3,18 +3,16 @@ import Modal from "../modal/Modal";
 import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './DeleteModal.module.scss'
 import {FileType} from "../../../../types/file";
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const DeleteModal: FC = () => {
     const {fileState} = useAppContext();
 
     const {
-        deleteModalState,
-        handleCancelDeleteFile,
-        handleConfirmDeleteFile,
+        deleteModal
     } = fileState;
 
-    const file = deleteModalState.file;
+    const file = deleteModal.state.file;
     const isFolder = file?.type === FileType.Folder;
 
     const deleteText = isFolder
@@ -26,8 +24,8 @@ const DeleteModal: FC = () => {
         : '?';
 
     return (
-        <Modal isOpen={deleteModalState.open}
-               onClose={handleCancelDeleteFile}>
+        <Modal isOpen={deleteModal.state.open}
+               onClose={deleteModal.actions.close}>
             <div
                 className={`${modalStyles['modal__overlay']} ${styles['delete-modal__overlay']}`}
             >
@@ -43,13 +41,13 @@ const DeleteModal: FC = () => {
                     <div className={modalStyles['modal__buttons']}>
                         <button
                             className={styles['delete-modal__buttons-delete']}
-                            onClick={handleConfirmDeleteFile}
+                            onClick={deleteModal.actions.confirm}
                         >
                             OK
                         </button>
                         <button
                             className={styles['delete-modal__buttons-cancel']}
-                            onClick={handleCancelDeleteFile}
+                            onClick={deleteModal.actions.close}
                         >
                             Cancel
                         </button>

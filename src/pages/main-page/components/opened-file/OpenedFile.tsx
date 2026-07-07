@@ -11,8 +11,8 @@ import {UiFile} from "../../../../store/types/UiFile";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 import {useFileLikes} from "../../../../shared/lib/hooks/useFileLikes";
 import {RootState} from "../../../../store";
-import {useAuth} from "../../../../shared/lib/hooks/useAuth";
-import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {formatDate} from "./utils/formatDate";
 import parseFileTextToHTML from "./utils/parse-file-content-utils/parseFileTextToHTML";
@@ -45,8 +45,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const contentRef =
         useRef<HTMLDivElement>(null);
 
-    const {fileState} = useAppContext();
-    const {authStatus} = useAuth();
+    const {
+        fileState,
+    } = useAppContext();
+
+    const {authStatus} = useAuthContext();
+
     const {
         isLiked,
         likes,
@@ -76,7 +80,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const {
         isEditing,
         setIsEditing,
-        handleOpenDeleteModal
+        deleteModal,
     } = fileState;
 
     useEffect(() => {
@@ -178,12 +182,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         (
             file: UiFile
         ) => {
-            handleOpenDeleteModal(file, viewedUser)
+            deleteModal.actions.open(file, viewedUser)
 
             setIsBurgerMenuOpened(false);
         },
         [
-            handleOpenDeleteModal,
+            deleteModal.actions,
             viewedUser
         ]
     );
@@ -258,7 +262,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 onTryToLikeFile={toggleLike}
                 onOpenEditionMode={handleOpenEditionMode}
                 onDeleteFile={handleDeleteFile}
-                onOpenDeleteModal={handleOpenDeleteModal}
+                onOpenDeleteModal={deleteModal.actions.open}
             />
 
             {

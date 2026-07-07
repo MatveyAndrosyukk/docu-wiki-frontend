@@ -1,16 +1,16 @@
 import React, {useCallback} from 'react';
 import styles from './FileList.module.scss';
 import {useDispatch, useSelector} from 'react-redux';
-import useContextMenuActions from '../../../../../../shared/lib/hooks/useContextMenuActions';
+import useContextMenuActions from '../../../../../../shared/ui/context-menu/hooks/useContextMenuActions';
 import ContextMenu from '../../../../../../shared/ui/context-menu/ContextMenu';
 import {TreeNode, useFlattenedTree} from '../../../../../../shared/lib/hooks/useFlattenedTree';
 import FileNode from './components/file-node/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
 import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../shared/assets/styles/Common.module.scss";
-import {useAuth} from "../../../../../../shared/lib/hooks/useAuth";
-import {useAppContext} from "../../../../../../shared/lib/hooks/useAppContext";
+import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
 import {AppDispatch, RootState} from "../../../../../../store";
+import {useAuthContext} from "../../../../../../context/auth-context/hooks/useAuthContext";
 
 interface FileListProps {
     viewedUserEmail: string | undefined;
@@ -27,9 +27,13 @@ const FileList: React.FC<FileListProps> = React.memo(
         const dispatch
             = useDispatch<AppDispatch>();
 
-        const {fileState} = useAppContext();
+        const {
+            fileState,
+        } = useAppContext();
 
-        const {authStatus} = useAuth();
+        const {
+            authStatus
+        } = useAuthContext();
 
         const files = useSelector(selectFileTree)
 
@@ -98,15 +102,21 @@ const FileList: React.FC<FileListProps> = React.memo(
                                 node: TreeNode
                             ) => (
                                 <FileNode
-                                    key={node.file.id}
-                                    node={node}
+                                    key={
+                                        node.file.id
+                                    }
+                                    node={
+                                        node
+                                    }
                                     emailParam={viewedUserEmail}
                                     onFolderClick={handleFolderClick}
                                     contextMenuState={contextMenu}
                                     viewedUser={viewedUser}
                                     loggedInUser={loggedInUser}
                                     handleTryToOpenFile={fileState.handleTryToOpenFile}
-                                    isLoggedIn={authStatus === 'authenticated'}
+                                    isLoggedIn={
+                                        authStatus === 'authenticated'
+                                    }
                                 />
                             )
                         )

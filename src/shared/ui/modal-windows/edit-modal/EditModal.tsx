@@ -2,9 +2,9 @@ import React, {FC} from 'react';
 import Modal from "../modal/Modal";
 import styles from './EditModal.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {ReactComponent as ArrowIcon} from './images/arrow.svg'
-import {ActionType} from "../../../lib/hooks/modal-actions/types/ActionType";
+import {ActionType} from "./hooks/edit-modal-actions/types/ActionType";
 
 const EditModal: FC = () => {
     const {fileState} = useAppContext();

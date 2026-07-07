@@ -1,12 +1,12 @@
 import {useCallback, useState} from "react";
 import {UiFile} from "../../../../store/types/UiFile";
-import {OpenModalState} from "../../../lib/hooks/modal-actions/types/OpenModalState";
-import {ModalActionContext} from "../../../lib/hooks/modal-actions/types/ModalActionContext";
+import {OpenModalState} from "../../modal-windows/edit-modal/hooks/edit-modal-actions/types/OpenModalState";
+import {ModalActionContext} from "../../modal-windows/edit-modal/hooks/edit-modal-actions/types/ModalActionContext";
 import {useSelector} from "react-redux";
 import {selectFileTree} from "../../../../store/selectors/selectFileTree";
 import {checkNameConflictInFolder} from "../../../lib/utils/modalUtils";
-import {ActionType} from "../../../lib/hooks/modal-actions/types/ActionType";
-import {pasteFileCase} from "../../../lib/hooks/modal-actions/cases/pasteFileCase";
+import {ActionType} from "../../modal-windows/edit-modal/hooks/edit-modal-actions/types/ActionType";
+import {pasteFileCase} from "../../modal-windows/edit-modal/hooks/edit-modal-actions/cases/pasteFileCase";
 import {User} from "../../../../store/slices/userSlice";
 import {RootState} from "../../../../store";
 

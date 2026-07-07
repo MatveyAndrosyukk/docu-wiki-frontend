@@ -1,7 +1,7 @@
 import React, {FC} from 'react';
 import Modal from '../modal/Modal';
 import styles from './PremiumModal.module.scss';
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const PremiumModal: FC = () => {
     const {premiumState} = useAppContext();

@@ -1,45 +1,29 @@
-import React, { FC } from 'react';
+import React, {FC} from 'react';
 import Modal from "../modal/Modal";
 import modalStyles from '../modal/ModalContent.module.scss';
 import styles from './EnterEmailModal.module.scss';
-import { useAppContext } from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const EnterEmailModal: FC = () => {
-    const { authState } = useAppContext();
+    const {authState} = useAppContext();
 
-    const {
-        isEnterEmailModalOpened,
-        setIsEnterEmailModalOpened,
-        emailModalMessage,
-        setEmailModalMessage,
-        emailModalError,
-        setEmailModalError,
-        emailModalInputRef,
-        emailModalValue,
-        setEmailModalValue,
-        emailModalLoading,
-        handleSendChangePasswordLink,
-        handleChangeEmailModalValue
-    } = authState;
+    const {email} = authState;
 
-    const handleCloseEnterEmailModal = () => {
-        setIsEnterEmailModalOpened(false);
-        setEmailModalMessage('');
-        setEmailModalError('');
-        setEmailModalValue('');
+    const closeModal = () => {
+        email.actions.reset();
     };
 
-    const messageText = emailModalMessage || emailModalError;
-    const messageClassName = emailModalMessage
+    const messageText = email.state.message || email.state.error;
+    const messageClassName = email.state.message
         ? modalStyles.modal__message
-        : emailModalError
+        : email.state.error
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
     return (
         <Modal
-            isOpen={isEnterEmailModalOpened}
-            onClose={handleCloseEnterEmailModal}
+            isOpen={email.state.isModal}
+            onClose={closeModal}
         >
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
                 <div className={`${modalStyles['modal__form']} ${styles['enter-email-modal__form']}`}>
@@ -51,21 +35,21 @@ const EnterEmailModal: FC = () => {
 
                     <div className={styles['enter-email-modal__body']}>
                         <input
-                            ref={emailModalInputRef}
+                            ref={email.state.inputRef}
                             type='text'
                             className={`${modalStyles['modal__input']} ${styles['enter-email-modal__input-input']}`}
                             placeholder="Enter your registered email"
-                            value={emailModalValue}
-                            disabled={emailModalLoading}
-                            onChange={(e) => handleChangeEmailModalValue(e)}
+                            value={email.state.value}
+                            disabled={email.state.loading}
+                            onChange={email.actions.handleChangeEmail}
                         />
 
                         <button
                             className={`${modalStyles['modal__button']} ${styles['enter-email-modal__button-button']}`}
-                            disabled={emailModalLoading || !emailModalValue.trim()}
-                            onClick={handleSendChangePasswordLink}
+                            disabled={email.state.loading || !email.state.value.trim()}
+                            onClick={email.actions.sendChangePasswordLink}
                         >
-                            {emailModalLoading ? 'Send...' : 'Send'}
+                            {email.state.loading ? 'Send...' : 'Send'}
                         </button>
                     </div>
                 </div>

@@ -12,12 +12,12 @@ import {isUserCanView} from "../../../../shared/lib/utils/permissions-utils/isUs
 import {isUserEqualsLoggedIn} from "../../../../shared/lib/utils/permissions-utils/isUserEqualsLoggedIn";
 import {isUserOwner} from "../../../../shared/lib/utils/permissions-utils/isUserOwner";
 import FileTreeSkeleton from "../../../../shared/ui/file-tree-skeleton/FileTreeSkeleton";
-import {useAuth} from "../../../../shared/lib/hooks/useAuth";
-import {useAppContext} from "../../../../shared/lib/hooks/useAppContext";
+import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useNotification} from "../../../../shared/lib/hooks/useNotification";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
-import {ActionType} from "../../../../shared/lib/hooks/modal-actions/types/ActionType";
+import {ActionType} from "../../../../shared/ui/modal-windows/edit-modal/hooks/edit-modal-actions/types/ActionType";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
@@ -37,13 +37,15 @@ const FileTree: FC<FileTreeProps> = React.memo(
             useDispatch<AppDispatch>();
 
         const {
-            authState,
             fileState,
             banState,
-            premiumState
+            premiumState,
+            authState,
         } = useAppContext();
 
-        const {authStatus} = useAuth();
+        const {
+            authStatus
+        } = useAuthContext();
 
         const viewedUser = useSelector(
             (state: RootState) => state.user.viewedUser
@@ -63,7 +65,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const {setIsBanModalOpened} = banState;
 
-        const {setIsLoginModalOpen} = authState;
+        const {login} = authState;
 
         const {actions} = fileState;
 
@@ -146,14 +148,14 @@ const FileTree: FC<FileTreeProps> = React.memo(
                         }
                     );
                 } else {
-                    setIsLoginModalOpen(true);
+                    login.actions.openModal();
                 }
 
             },
             [
                 actions,
                 authStatus,
-                setIsLoginModalOpen
+                login.actions
             ]
         );
 

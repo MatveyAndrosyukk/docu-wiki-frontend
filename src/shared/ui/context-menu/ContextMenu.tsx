@@ -2,7 +2,7 @@ import React, {FC} from 'react';
 import styles from './ContextMenu.module.scss'
 import {FileType} from "../../../types/file";
 import {UiFile} from "../../../store/types/UiFile";
-import {useAppContext} from "../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../context/app-context/hooks/useAppContext";
 import {useElementOutsideEvent} from "../../lib/hooks/useElementOutsideEvent";
 
 interface ContextMenuProps {

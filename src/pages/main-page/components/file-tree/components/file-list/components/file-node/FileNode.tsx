@@ -14,7 +14,7 @@ import {User} from "../../../../../../../../store/slices/userSlice";
 import FileLoader from "../../../../../../../../shared/ui/file-loader/FileLoader";
 import {useSelector} from "react-redux";
 import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
-import {ContextMenuState} from "../../../../../../../../shared/lib/hooks/useContextMenuActions";
+import {ContextMenuState} from "../../../../../../../../shared/ui/context-menu/hooks/useContextMenuActions";
 import {useNavigate} from "react-router-dom";
 
 interface Props {

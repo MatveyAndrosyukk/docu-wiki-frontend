@@ -4,7 +4,7 @@ import modalStyles from '../modal/ModalContent.module.scss'
 import styles from './BanModal.module.scss'
 import {ReactComponent as SwitchModeSvg} from './images/ban-modal-switch-auth.svg';
 import {BanMode} from "../../../lib/hooks/useEditorBan";
-import {useAppContext} from "../../../lib/hooks/useAppContext";
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 

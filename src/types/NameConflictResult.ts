@@ -1,4 +1,4 @@
-import {ActionType} from "../shared/lib/hooks/modal-actions/types/ActionType";
+import {ActionType} from "../shared/ui/modal-windows/edit-modal/hooks/edit-modal-actions/types/ActionType";
 
 
 export type NameConflictResult =

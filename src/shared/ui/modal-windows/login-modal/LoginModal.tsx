@@ -1,91 +1,87 @@
-import React, { FC, useCallback } from 'react';
+import React, {FC, useCallback} from 'react';
 import styles from './LoginModal.module.scss';
 import modalStyles from '../modal/ModalContent.module.scss';
 import Modal from "../modal/Modal";
 import GoogleButton from "../../google-button/GoogleButton";
-import { ReactComponent as SwitchAuthSvg } from './images/login-modal-switch-auth.svg';
-import { useAuth } from "../../../lib/hooks/useAuth";
-import { useAppContext } from "../../../lib/hooks/useAppContext";
+import {ReactComponent as SwitchAuthSvg} from './images/login-modal-switch-auth.svg';
+import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
+import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 
 const LoginModal: FC = () => {
-    const { authState } = useAppContext();
-    const { authStatus } = useAuth();
+    const {authState} = useAppContext();
 
     const {
-        isLoginModalOpen,
-        handleCloseAuthModal,
-        isRegisterModal,
-        registerError,
-        loginError,
-        loginModalInputRef,
-        loginLoading,
-        registerModalValue,
-        loginModalValue,
-        loginMessage,
-        registerMessage,
-        registerLoading,
-        setIsEnterEmailModalOpened,
-        handleChangeEmailInput,
-        handleChangePasswordInput,
-        handleChangeRePasswordInput,
-        handleSwitchAuthorization,
-        handleChangeUsernameInput,
-        handleAuthorize,
-        getAuthorizationText,
+        registration,
+        authorization,
+        login,
+        reset,
     } = authState;
 
+    const {
+        authStatus
+    } = useAuthContext();
+
     const handleOpenEnterEmailModal = useCallback(() => {
-        handleCloseAuthModal();
-        setIsEnterEmailModalOpened(true);
-    }, [handleCloseAuthModal, setIsEnterEmailModalOpened]);
+        login.actions.closeModal();
+        reset.actions.openModal();
+    }, [login.actions, reset.actions]);
 
-    if (!isLoginModalOpen) return null;
+    if (!login.state.isModalOpen) return null;
 
-    const messageText = loginMessage || registerMessage || loginError || registerError;
-    const messageClassName = loginMessage || registerMessage
+    const messageText = login.state.message
+        || registration.state.message
+        || login.state.error
+        || registration.state.error;
+
+    const messageClassName = login.state.message || registration.state.message
         ? modalStyles.modal__message
-        : loginError || registerError
+        : login.state.error || registration.state.error
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
-    const emailValue = isRegisterModal ? registerModalValue.email : loginModalValue.login;
-    const passwordValue = isRegisterModal ? registerModalValue.password : loginModalValue.password;
+    const emailValue = registration.state.isModal
+        ? registration.state.value.email
+        : login.state.value.login;
+
+    const passwordValue = registration.state.isModal
+        ? registration.state.value.password
+        : login.state.value.password;
 
     return (
         <Modal
-            isOpen={isLoginModalOpen}
-            onClose={handleCloseAuthModal}
+            isOpen={login.state.isModalOpen}
+            onClose={login.actions.closeModal}
         >
             <div className={`${modalStyles['modal__overlay']} ${styles['login-modal__overlay']}`}>
                 <div className={`${modalStyles['modal__form']} ${styles['login-modal__form']}`}>
 
                     <div className={styles['login-modal__header']}>
                         <p className={styles['login-modal__form-text']}>
-                            {isRegisterModal ? 'Register' : 'Login'}
+                            {registration.state.isModal ? 'Register' : 'Login'}
                         </p>
                         <SwitchAuthSvg
                             className={styles['login-modal__switch']}
-                            onClick={handleSwitchAuthorization}
+                            onClick={authorization.actions.switchAuthorization}
                         />
                     </div>
 
                     <p className={messageClassName}>{messageText}</p>
 
                     <input
-                        ref={loginModalInputRef}
+                        ref={login.state.inputRef}
                         type='text'
                         className={modalStyles['modal__input']}
                         placeholder="Enter your email"
                         value={emailValue}
-                        onChange={handleChangeEmailInput}
+                        onChange={authorization.actions.handleChangeEmail}
                     />
-                    {isRegisterModal && (
+                    {registration.state.isModal && (
                         <input
                             type='text'
                             className={modalStyles['modal__input']}
                             placeholder="Enter username"
-                            value={registerModalValue.username}
-                            onChange={handleChangeUsernameInput}
+                            value={registration.state.value.username}
+                            onChange={authorization.actions.handleChangeUsername}
                         />
                     )}
                     <input
@@ -93,16 +89,16 @@ const LoginModal: FC = () => {
                         className={modalStyles['modal__input']}
                         placeholder="Enter your password"
                         value={passwordValue}
-                        onChange={handleChangePasswordInput}
+                        onChange={authorization.actions.handleChangePassword}
                     />
 
-                    {isRegisterModal && (
+                    {registration.state.isModal && (
                         <input
                             type='password'
                             className={modalStyles['modal__input']}
                             placeholder="Repeat your password"
-                            value={registerModalValue.rePassword}
-                            onChange={handleChangeRePasswordInput}
+                            value={registration.state.value.rePassword}
+                            onChange={authorization.actions.handleChangeRePassword}
                         />
                     )}
 
@@ -119,15 +115,17 @@ const LoginModal: FC = () => {
                         <div className={styles['footer__center']}>
                             <button
                                 className={modalStyles.modal__button}
-                                disabled={loginLoading || authStatus === 'loading'}
-                                onClick={handleAuthorize}
+                                disabled={login.state.loading || authStatus === 'loading'}
+                                onClick={authorization.actions.authorize}
                             >
-                                {(loginLoading || registerLoading) ? <span className={styles['login-modal__loader']} /> : getAuthorizationText()}
+                                {(login.state.loading || registration.state.loading) ?
+                                    <span className={styles['login-modal__loader']}/> :
+                                    authorization.actions.getAuthorizationText()}
                             </button>
                         </div>
 
                         <div className={styles['footer__right']}>
-                            <GoogleButton />
+                            <GoogleButton/>
                         </div>
                     </div>
                 </div>
