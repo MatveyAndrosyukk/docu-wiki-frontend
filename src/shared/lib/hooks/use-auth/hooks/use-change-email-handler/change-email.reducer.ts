@@ -1,14 +1,6 @@
-import {initialState, ResetState, ResetValue} from "./reset.types";
+import {ChangeEmailState, initialState} from "./change-email.types";
 
-export type ResetAction =
-    |
-    {
-        type: "OPEN_MODAL";
-    }
-    |
-    {
-        type: "CLOSE_MODAL";
-    }
+export type EmailAction =
     |
     {
         type: "SET_LOADING";
@@ -26,37 +18,25 @@ export type ResetAction =
     }
     |
     {
-        type: "SET_IS_MODAL";
-        payload: boolean;
+        type: "SET_VALUE";
+        payload: string;
     }
     |
     {
-        type: "SET_VALUE";
-        payload: Partial<ResetValue>;
+        type: "SET_IS_MODAL";
+        payload: boolean;
     }
     |
     {
         type: "RESET";
     };
 
-export function resetReducer(
-    state: ResetState,
-    action: ResetAction
-): ResetState {
+export function changeEmailReducer(
+    state: ChangeEmailState,
+    action: EmailAction
+): ChangeEmailState {
 
     switch (action.type) {
-
-        case "OPEN_MODAL":
-            return {
-                ...state,
-                isModal: true,
-            };
-
-        case "CLOSE_MODAL":
-            return {
-                ...state,
-                isModal: false,
-            };
 
         case "SET_LOADING":
             return {
@@ -76,19 +56,16 @@ export function resetReducer(
                 message: action.payload,
             };
 
+        case "SET_VALUE":
+            return {
+                ...state,
+                value: action.payload,
+            };
+
         case "SET_IS_MODAL":
             return {
                 ...state,
                 isModal: action.payload,
-            };
-
-        case "SET_VALUE":
-            return {
-                ...state,
-                value: {
-                    ...state.value,
-                    ...action.payload,
-                },
             };
 
         case "RESET":

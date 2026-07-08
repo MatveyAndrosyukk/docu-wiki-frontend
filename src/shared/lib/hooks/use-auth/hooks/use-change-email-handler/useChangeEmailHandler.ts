@@ -1,13 +1,13 @@
 import {ChangeEvent, useCallback, useReducer, useRef} from "react";
 import {sendResetPasswordLinkAsync} from "../../../../services/sendResetPasswordLinkAsync";
-import {EmailActionsState, initialState} from "./email.types";
-import {emailReducer} from "./email.reducer";
+import {ChangeEmailActionsState, initialState} from "./change-email.types";
+import {changeEmailReducer} from "./change-email.reducer";
 
-export default function useEmailActions(): EmailActionsState {
+export default function useChangeEmailHandler(): ChangeEmailActionsState {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [state, dispatch] = useReducer(
-        emailReducer,
+        changeEmailReducer,
         {
             ...initialState,
             inputRef,

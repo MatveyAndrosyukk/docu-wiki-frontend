@@ -40,7 +40,7 @@ const Header: FC<Props> = ({
     } = useAuthContext();
 
     const {
-        login,
+        loginHandler,
     } = authState;
 
     const loggedInUser = useSelector(
@@ -51,7 +51,7 @@ const Header: FC<Props> = ({
         useUserModalActions(
             {
                 user: loggedInUser,
-                openLoginModal: login.actions.openModal
+                openLoginModal: loginHandler.actions.openModal
             }
         );
 
@@ -169,13 +169,13 @@ const Header: FC<Props> = ({
                                                         <div className={styles['header__burger-item']}>
                                                             <LogoutSvg
                                                                 onClick={
-                                                                    () => login.actions.logout()
+                                                                    () => loginHandler.actions.logout()
                                                                 }
                                                             />
                                                         </div>
                                                     ) : (
                                                         <button
-                                                            onClick={() => login.actions.openModal()}
+                                                            onClick={() => loginHandler.actions.openModal()}
                                                         >
                                                             Login
                                                         </button>
@@ -200,8 +200,8 @@ const Header: FC<Props> = ({
                                                     : styles['header__login']
                                                 }
                                                 onClick={authStatus === 'authenticated'
-                                                    ? () => login.actions.logout()
-                                                    : () => login.actions.openModal()
+                                                    ? () => loginHandler.actions.logout()
+                                                    : () => loginHandler.actions.openModal()
                                                 }
                                             >
                                                 {authStatus === 'authenticated'

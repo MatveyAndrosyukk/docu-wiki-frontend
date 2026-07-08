@@ -1,6 +1,14 @@
-import {EmailState, initialState} from "./email.types";
+import {initialState, ResetPasswordState, ResetPasswordValue} from "./reset-password.types";
 
-export type EmailAction =
+export type ResetAction =
+    |
+    {
+        type: "OPEN_MODAL";
+    }
+    |
+    {
+        type: "CLOSE_MODAL";
+    }
     |
     {
         type: "SET_LOADING";
@@ -18,25 +26,37 @@ export type EmailAction =
     }
     |
     {
-        type: "SET_VALUE";
-        payload: string;
+        type: "SET_IS_MODAL";
+        payload: boolean;
     }
     |
     {
-        type: "SET_IS_MODAL";
-        payload: boolean;
+        type: "SET_VALUE";
+        payload: Partial<ResetPasswordValue>;
     }
     |
     {
         type: "RESET";
     };
 
-export function emailReducer(
-    state: EmailState,
-    action: EmailAction
-): EmailState {
+export function resetPasswordReducer(
+    state: ResetPasswordState,
+    action: ResetAction
+): ResetPasswordState {
 
     switch (action.type) {
+
+        case "OPEN_MODAL":
+            return {
+                ...state,
+                isModal: true,
+            };
+
+        case "CLOSE_MODAL":
+            return {
+                ...state,
+                isModal: false,
+            };
 
         case "SET_LOADING":
             return {
@@ -56,16 +76,19 @@ export function emailReducer(
                 message: action.payload,
             };
 
-        case "SET_VALUE":
-            return {
-                ...state,
-                value: action.payload,
-            };
-
         case "SET_IS_MODAL":
             return {
                 ...state,
                 isModal: action.payload,
+            };
+
+        case "SET_VALUE":
+            return {
+                ...state,
+                value: {
+                    ...state.value,
+                    ...action.payload,
+                },
             };
 
         case "RESET":

@@ -1,6 +1,6 @@
 import {ChangeEvent, useCallback} from "react";
-import {LoginActionsState} from "../use-login-actions/login.types";
-import {RegisterActionsState} from "../use-registration-actions/registration.types";
+import {LoginActionsState} from "../use-login-handler/login.types";
+import {RegisterActionsState} from "../use-registration-handler/registration.types";
 import {AuthorizationActionsState} from "./authorization.types";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
     registration: RegisterActionsState
 }
 
-export default function useAuthorizationActions(
+export default function useAuthorizationHandler(
     {
         login,
         registration,

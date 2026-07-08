@@ -1,19 +1,19 @@
 import {ChangeEvent, useCallback, useReducer, useRef} from "react";
 import {resetPasswordAsync} from "../../../../services/resetPasswordAsync";
-import {LoginActionsState} from "../use-login-actions/login.types";
-import {RegisterActionsState} from "../use-registration-actions/registration.types";
-import {initialState, ResetActionsState, ResetValue} from "./reset.types";
-import {resetReducer} from "./reset.reducer";
+import {LoginActionsState} from "../use-login-handler/login.types";
+import {RegisterActionsState} from "../use-registration-handler/registration.types";
+import {initialState, ResetPasswordActionsState, ResetPasswordValue} from "./reset-password.types";
+import {resetPasswordReducer} from "./reset-password.reducer";
 
-export default function useResetActions(
+export default function useResetPasswordHandler(
     login: LoginActionsState,
     registration: RegisterActionsState,
-): ResetActionsState {
+): ResetPasswordActionsState {
 
     const newPasswordInputRef = useRef<HTMLInputElement>(null);
 
     const [state, dispatch] = useReducer(
-        resetReducer,
+        resetPasswordReducer,
         {
             ...initialState,
             newPasswordInputRef,
@@ -70,7 +70,7 @@ export default function useResetActions(
 
     const setValue = useCallback(
         (
-            value: Partial<ResetValue>
+            value: Partial<ResetPasswordValue>
         ) => {
             dispatch({
                 type: "SET_VALUE",

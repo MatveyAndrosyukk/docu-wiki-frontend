@@ -3,7 +3,7 @@ import {registrationReducer} from "./registration.reducer";
 import {performRegisterAsync} from "../../../../services/performRegisterAsync";
 import {initialState, RegisterActionsState, RegisterModalValue} from "./registration.types";
 
-export default function useRegisterActions(): RegisterActionsState {
+export default function useRegistrationHandler(): RegisterActionsState {
 
     const [state, dispatch] = useReducer(
         registrationReducer,

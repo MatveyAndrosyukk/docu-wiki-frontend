@@ -7,22 +7,22 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 const EnterEmailModal: FC = () => {
     const {authState} = useAppContext();
 
-    const {email} = authState;
+    const {changeEmailHandler} = authState;
 
     const closeModal = () => {
-        email.actions.reset();
+        changeEmailHandler.actions.reset();
     };
 
-    const messageText = email.state.message || email.state.error;
-    const messageClassName = email.state.message
+    const messageText = changeEmailHandler.state.message || changeEmailHandler.state.error;
+    const messageClassName = changeEmailHandler.state.message
         ? modalStyles.modal__message
-        : email.state.error
+        : changeEmailHandler.state.error
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
     return (
         <Modal
-            isOpen={email.state.isModal}
+            isOpen={changeEmailHandler.state.isModal}
             onClose={closeModal}
         >
             <div className={`${modalStyles.modal__overlay} ${styles.modal__overlay}`}>
@@ -35,21 +35,21 @@ const EnterEmailModal: FC = () => {
 
                     <div className={styles['enter-email-modal__body']}>
                         <input
-                            ref={email.state.inputRef}
+                            ref={changeEmailHandler.state.inputRef}
                             type='text'
                             className={`${modalStyles['modal__input']} ${styles['enter-email-modal__input-input']}`}
                             placeholder="Enter your registered email"
-                            value={email.state.value}
-                            disabled={email.state.loading}
-                            onChange={email.actions.handleChangeEmail}
+                            value={changeEmailHandler.state.value}
+                            disabled={changeEmailHandler.state.loading}
+                            onChange={changeEmailHandler.actions.handleChangeEmail}
                         />
 
                         <button
                             className={`${modalStyles['modal__button']} ${styles['enter-email-modal__button-button']}`}
-                            disabled={email.state.loading || !email.state.value.trim()}
-                            onClick={email.actions.sendChangePasswordLink}
+                            disabled={changeEmailHandler.state.loading || !changeEmailHandler.state.value.trim()}
+                            onClick={changeEmailHandler.actions.sendChangePasswordLink}
                         >
-                            {email.state.loading ? 'Send...' : 'Send'}
+                            {changeEmailHandler.state.loading ? 'Send...' : 'Send'}
                         </button>
                     </div>
                 </div>

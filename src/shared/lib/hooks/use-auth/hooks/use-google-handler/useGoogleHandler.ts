@@ -14,7 +14,7 @@ type Props = {
     closeLoginModal(): void;
 };
 
-export default function useGoogleActions(
+export default function useGoogleHandler(
     {
         closeLoginModal,
     }: Props): GoogleActionsState {

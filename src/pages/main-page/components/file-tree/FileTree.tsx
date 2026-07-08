@@ -38,7 +38,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const {
             fileState,
-            banState,
+            userBan,
             premiumState,
             authState,
         } = useAppContext();
@@ -63,9 +63,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
             (state: RootState) => state.user.isViewedUserLoading
         );
 
-        const {setIsBanModalOpened} = banState;
-
-        const {login} = authState;
+        const {loginHandler} = authState;
 
         const {actions} = fileState;
 
@@ -148,14 +146,14 @@ const FileTree: FC<FileTreeProps> = React.memo(
                         }
                     );
                 } else {
-                    login.actions.openModal();
+                    loginHandler.actions.openModal();
                 }
 
             },
             [
                 actions,
                 authStatus,
-                login.actions
+                loginHandler.actions
             ]
         );
 
@@ -226,7 +224,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                     {isUserOwner(loggedInUser) && (
                                                         <div
                                                             className={styles['file-tree__ban']}
-                                                            onClick={() => setIsBanModalOpened(true)}
+                                                            onClick={() => userBan.actions.open()}
                                                         >
                                                             <BanSvg/>
                                                         </div>

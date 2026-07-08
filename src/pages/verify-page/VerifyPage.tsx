@@ -10,8 +10,8 @@ const VerifyPage: FC = () => {
     const {authState} = useAppContext();
 
     const {
-        login,
-        registration,
+        loginHandler,
+        registrationHandler,
     } = authState;
 
     useEffect(() => {
@@ -19,9 +19,9 @@ const VerifyPage: FC = () => {
                 if (!token) {
                     navigate('/')
 
-                    login.actions.openModal();
+                    loginHandler.actions.openModal();
 
-                    registration.actions.setError(
+                    registrationHandler.actions.setError(
                         'Invalid confirmation link'
                     );
 
@@ -38,30 +38,30 @@ const VerifyPage: FC = () => {
 
             verifyEmail()
                 .then(() => {
-                    login.actions.openModal();
+                    loginHandler.actions.openModal();
 
-                    registration.actions.setIsModal(false);
+                    registrationHandler.actions.setIsModal(false);
 
-                    login.actions.setError('');
+                    loginHandler.actions.setError('');
 
-                    login.actions.setMessage(
+                    loginHandler.actions.setMessage(
                         'Your email confirmed!'
                     );
                 })
                 .catch((error) => {
-                    login.actions.openModal();
+                    loginHandler.actions.openModal();
 
-                    registration.actions.setIsModal(true);
+                    registrationHandler.actions.setIsModal(true);
 
-                    registration.actions.setError(
+                    registrationHandler.actions.setError(
                         error.message
                     );
                 });
         }, [
             authState,
-            login.actions,
+            loginHandler.actions,
             navigate,
-            registration.actions,
+            registrationHandler.actions,
             token
         ]
     );

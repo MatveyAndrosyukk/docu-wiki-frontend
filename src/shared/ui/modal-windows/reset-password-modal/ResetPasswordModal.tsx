@@ -12,33 +12,33 @@ interface ResetPasswordModalProps {
 const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
     const {authState} = useAppContext();
 
-    const {reset} = authState;
+    const {resetPasswordHandler} = authState;
 
     const closeModal = useCallback(() => {
-            reset.actions.reset();
+            resetPasswordHandler.actions.reset();
         },
         [
-            reset.actions
+            resetPasswordHandler.actions
         ]
     );
 
     useEffect(() => {
-        if (!reset.state.isModal) return;
-        const ref = reset.state.newPasswordInputRef as React.RefObject<HTMLInputElement>;
+        if (!resetPasswordHandler.state.isModal) return;
+        const ref = resetPasswordHandler.state.newPasswordInputRef as React.RefObject<HTMLInputElement>;
         ref.current?.focus();
-        reset.actions.setError('');
-    }, [reset.actions, reset.state.isModal, reset.state.newPasswordInputRef]);
+        resetPasswordHandler.actions.setError('');
+    }, [resetPasswordHandler.actions, resetPasswordHandler.state.isModal, resetPasswordHandler.state.newPasswordInputRef]);
 
-    const messageText = reset.state.message || reset.state.error;
-    const messageClassName = reset.state.message
+    const messageText = resetPasswordHandler.state.message || resetPasswordHandler.state.error;
+    const messageClassName = resetPasswordHandler.state.message
         ? modalStyles.modal__message
-        : reset.state.error
+        : resetPasswordHandler.state.error
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
     return (
         <Modal
-            isOpen={reset.state.isModal}
+            isOpen={resetPasswordHandler.state.isModal}
             onClose={closeModal}
         >
             <div className={modalStyles['modal__overlay']}>
@@ -60,25 +60,25 @@ const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
                             type='password'
                             className={modalStyles['modal__input']}
                             placeholder="Enter a new password"
-                            value={reset.state.value.newPassword}
-                            ref={reset.state.newPasswordInputRef}
-                            onBlur={reset.actions.blurNewPassword}
-                            onChange={reset.actions.handleChangeNewPassword}
+                            value={resetPasswordHandler.state.value.newPassword}
+                            ref={resetPasswordHandler.state.newPasswordInputRef}
+                            onBlur={resetPasswordHandler.actions.blurNewPassword}
+                            onChange={resetPasswordHandler.actions.handleChangeNewPassword}
                         />
                         <input
                             type='password'
                             className={modalStyles['modal__input']}
                             placeholder="Repeat a new password"
-                            value={reset.state.value.repeatPassword}
-                            onBlur={reset.actions.blurRepeatPassword}
-                            onChange={reset.actions.handleChangeRepeatPassword}
+                            value={resetPasswordHandler.state.value.repeatPassword}
+                            onBlur={resetPasswordHandler.actions.blurRepeatPassword}
+                            onChange={resetPasswordHandler.actions.handleChangeRepeatPassword}
                         />
                         <button
                             className={`${modalStyles['modal__button']} ${styles['reset-password-modal__button-button']}`}
-                            disabled={reset.state.loading}
-                            onClick={() => reset.actions.resetPassword(resetToken)}
+                            disabled={resetPasswordHandler.state.loading}
+                            onClick={() => resetPasswordHandler.actions.resetPassword(resetToken)}
                         >
-                            {reset.state.loading ? 'Reset...' : 'Reset'}
+                            {resetPasswordHandler.state.loading ? 'Reset...' : 'Reset'}
                         </button>
                     </div>
                 </div>

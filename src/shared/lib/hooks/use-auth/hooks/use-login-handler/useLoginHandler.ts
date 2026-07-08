@@ -11,7 +11,7 @@ import {initialState, LoginActionsState, LoginModalValue} from "./login.types";
 import {loginReducer} from "./login.reducer";
 import {useAuthContext} from "../../../../../../context/auth-context/hooks/useAuthContext";
 
-export default function useLoginActions(): LoginActionsState {
+export default function useLoginHandler(): LoginActionsState {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [state, dispatch] = useReducer(

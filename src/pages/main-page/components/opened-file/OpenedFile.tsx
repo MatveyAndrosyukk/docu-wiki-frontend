@@ -78,9 +78,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     const navigate = useNavigate();
 
     const {
-        isEditing,
-        setIsEditing,
-        deleteModal,
+        fileEditor,
+        deleteModal
     } = fileState;
 
     useEffect(() => {
@@ -173,10 +172,10 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const handleOpenEditionMode = useCallback(
         () => {
-            setIsEditing(true);
+            fileEditor.actions.setIsEditing(true);
 
             setIsBurgerMenuOpened(false);
-        }, [setIsEditing]);
+        }, [fileEditor.actions]);
 
     const handleDeleteFile = useCallback(
         (
@@ -218,20 +217,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 isEmpty &&
                 isCanEdit
             ) {
-                setIsEditing(true);
+                fileEditor.actions.setIsEditing(true);
             }
 
             setWasInitialized(true);
         },
-        [
-            file,
-            wasInitialized,
-            setIsEditing,
-            authStatus,
-            viewedUserEmail,
-            viewedUser,
-            loggedInUser
-        ]
+        [file, wasInitialized, authStatus, viewedUserEmail, viewedUser, loggedInUser, fileEditor.actions]
     );
 
     if (!file) {
@@ -254,10 +245,10 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 loggedInUser={loggedInUser}
                 files={files}
                 isBurgerMenuOpened={isBurgerMenuOpened}
-                isEditing={isEditing}
+                isEditing={fileEditor.state.isEditing}
                 isLoggedIn={authStatus === 'authenticated'}
                 emailParam={viewedUserEmail}
-                setIsEditing={setIsEditing}
+                setIsEditing={fileEditor.actions.setIsEditing}
                 setIsBurgerMenuOpened={setIsBurgerMenuOpened}
                 onTryToLikeFile={toggleLike}
                 onOpenEditionMode={handleOpenEditionMode}
@@ -296,7 +287,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 )}
 
             {
-                isEditing
+                fileEditor.state.isEditing
                     ? <EditMode
                         file={file}
                         parseFileTextToHTML={parseFileTextToHTMLMemo}

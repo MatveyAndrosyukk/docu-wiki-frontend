@@ -6,12 +6,12 @@ import {updateUserFilesCount, User} from "../../../../store/slices/userSlice";
 import {UiFile} from "../../../../store/types/UiFile";
 import {FileType} from "../../../../types/file";
 import {countFilesRecursively} from "../../utils/modalUtils";
-import {DeleteModalActionsState, initialState} from "./delete-file.types";
-import {deleteFileReducer} from "./delete-file.reducer";
+import {RemoveFileActionsState, initialState} from "./remove-file.types";
+import {removeFileReducer} from "./remove-file.reducer";
 
-export default function useDeleteModalActions(): DeleteModalActionsState {
+export default function useRemoveFileHandler(): RemoveFileActionsState {
     const [state, dispatch] = useReducer(
-        deleteFileReducer,
+        removeFileReducer,
         initialState
     );
 

@@ -1,14 +1,20 @@
 import {UiFile} from "../../../../store/types/UiFile";
 import {User} from "../../../../store/slices/userSlice";
 
-export type DeleteModalState = {
+export type RemoveFileState = {
+
     file: UiFile | null;
+
     user: User | null;
+
     open: boolean;
+
     isDeleting: boolean;
+
 };
 
-export type DeleteModalActions = {
+export type RemoveFileActions = {
+
     open(
         file: UiFile,
         user: User | null
@@ -17,14 +23,18 @@ export type DeleteModalActions = {
     close(): void;
 
     confirm(): Promise<void>;
+
 };
 
-export type DeleteModalActionsState = {
-    state: DeleteModalState;
-    actions: DeleteModalActions;
+export type RemoveFileActionsState = {
+
+    state: RemoveFileState;
+
+    actions: RemoveFileActions;
+
 };
 
-export const initialState: DeleteModalState = {
+export const initialState: RemoveFileState = {
     open: false,
     file: null,
     user: null,

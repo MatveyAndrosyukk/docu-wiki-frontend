@@ -1,12 +1,12 @@
 import {ChangeEvent, RefObject} from "react";
 
-export type ResetValue = {
+export type ResetPasswordValue = {
     newPassword: string;
 
     repeatPassword: string;
 };
 
-export type ResetState = {
+export type ResetPasswordState = {
     isModal: boolean;
 
     loading: boolean;
@@ -15,29 +15,12 @@ export type ResetState = {
 
     message: string;
 
-    value: ResetValue;
+    value: ResetPasswordValue;
 
     newPasswordInputRef: RefObject<HTMLInputElement | null>;
 };
 
-export const initialState: ResetState = {
-    isModal: false,
-
-    loading: false,
-
-    error: "",
-
-    message: "",
-
-    value: {
-        newPassword: "",
-        repeatPassword: "",
-    },
-
-    newPasswordInputRef: {current: null},
-};
-
-export type ResetActions = {
+export type ResetPasswordActions = {
     openModal(): void;
 
     closeModal(): void;
@@ -48,7 +31,7 @@ export type ResetActions = {
 
     setMessage(value: string): void;
 
-    setValue(value: Partial<ResetValue>): void;
+    setValue(value: Partial<ResetPasswordValue>): void;
 
     setIsModal(value: boolean): void;
 
@@ -71,8 +54,25 @@ export type ResetActions = {
     ): Promise<void>;
 }
 
-export type ResetActionsState = {
-    state: ResetState;
+export const initialState: ResetPasswordState = {
+    isModal: false,
 
-    actions: ResetActions;
+    loading: false,
+
+    error: "",
+
+    message: "",
+
+    value: {
+        newPassword: "",
+        repeatPassword: "",
+    },
+
+    newPasswordInputRef: {current: null},
+};
+
+export type ResetPasswordActionsState = {
+    state: ResetPasswordState;
+
+    actions: ResetPasswordActions;
 };

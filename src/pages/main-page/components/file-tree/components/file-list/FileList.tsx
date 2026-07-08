@@ -35,6 +35,10 @@ const FileList: React.FC<FileListProps> = React.memo(
             authStatus
         } = useAuthContext();
 
+        const {
+            fileEditor,
+        } = fileState;
+
         const files = useSelector(selectFileTree)
 
         const viewedUser = useSelector(
@@ -113,7 +117,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                                     contextMenuState={contextMenu}
                                     viewedUser={viewedUser}
                                     loggedInUser={loggedInUser}
-                                    handleTryToOpenFile={fileState.handleTryToOpenFile}
+                                    handleTryToOpenFile={fileEditor.actions.tryToOpenFile}
                                     isLoggedIn={
                                         authStatus === 'authenticated'
                                     }

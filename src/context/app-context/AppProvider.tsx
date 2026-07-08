@@ -1,13 +1,14 @@
 import {FC, ReactNode} from "react";
 import useFilesActions, {FileActionsState} from "../../shared/lib/hooks/useFilesActions";
-import useEditorBan, {BanState} from "../../shared/lib/hooks/useEditorBan";
+import useBanUserHandler from "../../shared/lib/hooks/use-ban-user-handler/useBanUserHandler";
 import usePremiumModal, {PremiumState} from "../../shared/ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 import {Context} from "./Context";
-import useAuth, {AuthState} from "../../shared/lib/hooks/use-auth/useAuth";
+import useAuthHandler, {AuthState} from "../../shared/lib/hooks/use-auth/useAuthHandler";
+import {BanUserActionsState} from "../../shared/lib/hooks/use-ban-user-handler/ban-user.types";
 
 export interface ProviderState {
     fileState: FileActionsState;
-    banState: BanState;
+    userBan: BanUserActionsState;
     premiumState: PremiumState;
     authState: AuthState;
 }
@@ -23,14 +24,14 @@ export const AppProvider: FC<Params> = (
 ) => {
     const premiumState = usePremiumModal();
     const fileState = useFilesActions(premiumState);
-    const banState = useEditorBan();
-    const authState = useAuth();
+    const userBan = useBanUserHandler();
+    const authState = useAuthHandler();
 
     return (
         <Context.Provider
             value={{
                 fileState,
-                banState,
+                userBan,
                 premiumState,
                 authState,
             }}>

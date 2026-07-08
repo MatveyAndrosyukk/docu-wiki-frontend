@@ -18,7 +18,7 @@ import {selectFileTree} from "../../store/selectors/selectFileTree";
 import {useAppContext} from "../../context/app-context/hooks/useAppContext";
 import {useResponsiveFileTree} from "../../shared/lib/hooks/useResponsiveFileTree";
 import {useResetPasswordModal} from "../../shared/ui/modal-windows/reset-password-modal/hooks/useResetPasswordModal";
-import {useDocumentTitle} from "../../shared/lib/hooks/useDocumentTitle";
+import {useSetDocumentTitle} from "../../shared/lib/hooks/useSetDocumentTitle";
 import {useViewedUserLoader} from "../../shared/lib/hooks/useViewedUserLoader";
 import {useFetchFilesForViewedUser} from "../../shared/lib/hooks/useFetchFilesForViewedUser";
 import {useAuthContext} from "../../context/auth-context/hooks/useAuthContext";
@@ -68,13 +68,13 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     const isMobile = width < 1066;
 
     const {
-        reset,
-        login,
+        resetPasswordHandler,
+        loginHandler,
     } = authState;
 
     const {
         actions,
-        handleTryToOpenFile
+        fileEditor,
     } = fileState;
 
     const currentUserEmail =
@@ -105,10 +105,10 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
 
     useResetPasswordModal(
         resetToken,
-        reset.actions.openModal
+        resetPasswordHandler.actions.openModal
     );
 
-    useDocumentTitle(
+    useSetDocumentTitle(
         title ||
         "Docuwiki Studio"
     );
@@ -131,16 +131,10 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             );
 
             if (file) {
-                handleTryToOpenFile(file.id)
+                fileEditor.actions.tryToOpenFile(file.id)
             }
         },
-        [
-            fileId,
-            files,
-            dispatch,
-            handleTryToOpenFile,
-            openedFile?.id
-        ]);
+        [fileId, files, dispatch, openedFile?.id, fileEditor.actions]);
 
     useEffect(() => {
             const handleKeyDown = (
@@ -162,7 +156,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                             }
                         );
                     } else {
-                        login.actions.openModal();
+                        loginHandler.actions.openModal();
                     }
                 }
             };
@@ -181,7 +175,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             authStatus,
             actions.open,
             actions,
-            login.actions
+            loginHandler.actions
         ]
     );
 

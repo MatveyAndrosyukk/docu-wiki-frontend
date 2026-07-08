@@ -9,13 +9,12 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../../../../../store";
 import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
 import {useEditorTextarea} from "../../../../../../shared/lib/hooks/useEditorTextarea";
-import {useEditorPreview} from "../../../../../../shared/lib/hooks/useEditorPreview";
 import {useEditorValidation} from "../../../../../../shared/lib/hooks/useEditorValidation";
-import {useEditorImages} from "../../../../../../shared/lib/hooks/useEditorImages";
 import {createEditorToolbar} from "../../../../../../shared/lib/utils/createEditorToolbar";
 import EditorToolbar from "../../../../../../shared/ui/editor-toolbar/EditorToolbar";
+import useFileImagesHandler from "../../../../../../shared/lib/hooks/use-file-images-handler/useFileImagesHandler";
 
-interface EditFileViewProps {
+interface Params {
     file: UiFile;
     parseFileTextToHTML: (
         content: string,
@@ -30,7 +29,7 @@ interface EditFileViewProps {
     ) => void | null;
 }
 
-const EditMode: React.FC<EditFileViewProps> = (
+const EditMode: React.FC<Params> = (
     {
         file,
         parseFileTextToHTML,
@@ -49,11 +48,7 @@ const EditMode: React.FC<EditFileViewProps> = (
     );
 
     const {
-        contentError,
-        setIsFileContentChanged,
-        setContentError,
-        handleSaveEditedFileChanges,
-        handleCancelEditedFileChanges,
+        fileEditor
     } = fileState
 
 
@@ -66,7 +61,7 @@ const EditMode: React.FC<EditFileViewProps> = (
         handleChangeTextareaContent
     } = useEditorTextarea(
         file.content ?? '',
-        setIsFileContentChanged
+        fileEditor.actions.setIsFileContentChanged
     );
 
     const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
@@ -76,18 +71,26 @@ const EditMode: React.FC<EditFileViewProps> = (
         [debouncedTextareaContent]
     );
 
-    const previewContent = useEditorPreview(
-        debouncedTextareaContent,
-        parseFileTextToHTML,
-        onImageClick,
-        isFileTreeOpened
+    const previewContent = useMemo(
+        () =>
+            parseFileTextToHTML(
+                debouncedTextareaContent,
+                onImageClick,
+                isFileTreeOpened
+            ),
+        [
+            debouncedTextareaContent,
+            parseFileTextToHTML,
+            onImageClick,
+            isFileTreeOpened,
+        ]
     );
 
     useEditorValidation(
         textareaContent,
         amountOfImagesInTextArea,
         loggedInUser,
-        setContentError
+        fileEditor.actions.setContentError,
     );
 
     const replaceImageTag = useCallback(
@@ -106,18 +109,12 @@ const EditMode: React.FC<EditFileViewProps> = (
         [setTextareaContent]
     );
 
-    const {
-        fileInputRef,
-        addedImagesWhileEditing,
-        setAddedImagesWhileEditing,
-        handleOpenFileDialog,
-        changeFileHandler
-    } = useEditorImages(
+    const fileImagesHandler = useFileImagesHandler(
         {
             fileId: file.id,
             pasteTag,
             replaceImageTag,
-            contentError,
+            contentError: fileEditor.state.contentError,
             initialContent: file.content ?? '',
         }
     );
@@ -125,7 +122,7 @@ const EditMode: React.FC<EditFileViewProps> = (
     const toolbar = createEditorToolbar(
         wrapSelection,
         pasteTag,
-        handleOpenFileDialog
+        fileImagesHandler.actions.openDialog
     );
 
     const handleSaveEdition = useCallback(
@@ -136,25 +133,21 @@ const EditMode: React.FC<EditFileViewProps> = (
             if (!file) return;
 
             try {
-                handleSaveEditedFileChanges(
+                fileEditor.actions.saveChanges(
                     file.id as number,
                     newContent,
                     addedImages,
                     loggedInUser?.name
                 );
 
-                setAddedImagesWhileEditing([])
+
+                fileImagesHandler.actions.reset([]);
             } catch (error) {
                 console.error('Save failed:', error);
             }
         }
         ,
-        [
-            file,
-            handleSaveEditedFileChanges,
-            loggedInUser?.name,
-            setAddedImagesWhileEditing
-        ]
+        [file, fileEditor.actions, fileImagesHandler.actions, loggedInUser?.name]
     );
 
     const handleCancelEdition = useCallback(
@@ -163,20 +156,17 @@ const EditMode: React.FC<EditFileViewProps> = (
             contentBeforeEdition: string,
         ) => {
             try {
-                await handleCancelEditedFileChanges(
+                await fileEditor.actions.cancelChanges(
                     contentBeforeEdition,
                     addedImages
                 );
 
-                setAddedImagesWhileEditing([])
+                fileImagesHandler.actions.reset([]);
             } catch (error) {
                 console.error('Cancel failed:', error);
             }
         },
-        [
-            handleCancelEditedFileChanges,
-            setAddedImagesWhileEditing
-        ]
+        [fileEditor.actions, fileImagesHandler.actions]
     );
 
     return (
@@ -190,8 +180,8 @@ const EditMode: React.FC<EditFileViewProps> = (
                         type="file"
                         accept="image/*"
                         style={{display: 'none'}}
-                        ref={fileInputRef}
-                        onChange={changeFileHandler}
+                        ref={fileImagesHandler.state.inputRef}
+                        onChange={fileImagesHandler.actions.changeFile}
                     />
 
                 </div>
@@ -203,7 +193,7 @@ const EditMode: React.FC<EditFileViewProps> = (
                         onClick={
                             () => handleSaveEdition(
                                 textareaContent,
-                                addedImagesWhileEditing)}
+                                fileImagesHandler.state.addedImages)}
                         disabled={isSaving}
                     >
                         {isSaving ? 'Saving…' : 'Save'}
@@ -213,7 +203,7 @@ const EditMode: React.FC<EditFileViewProps> = (
                         className={styles['header__action-buttons-cancel']}
                         onClick={
                             () => handleCancelEdition(
-                                addedImagesWhileEditing,
+                                fileImagesHandler.state.addedImages,
                                 file.content ?? '')}
                     >
                         Cancel
@@ -230,7 +220,7 @@ const EditMode: React.FC<EditFileViewProps> = (
                     />
 
                 <div className={styles['edit-mode__error']}>
-                    {contentError}
+                    {fileEditor.state.contentError}
                 </div>
 
                 <div className={styles['body__preview']}>
@@ -247,7 +237,7 @@ const EditMode: React.FC<EditFileViewProps> = (
             <SwitchWhileEditModal
                 contentBeforeEdition={file.content ?? ''}
                 onCancelEditedFileChange={handleCancelEdition}
-                addedImagesWhileEditing={addedImagesWhileEditing}
+                addedImagesWhileEditing={fileImagesHandler.state.addedImages}
             />
         </div>
     );

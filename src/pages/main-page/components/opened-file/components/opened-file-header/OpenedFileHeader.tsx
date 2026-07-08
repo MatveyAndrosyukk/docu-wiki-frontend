@@ -28,7 +28,7 @@ interface OpenedFileHeaderProps {
     isLoggedIn: boolean;
     emailParam: string | undefined;
     loggedInUser: User | null;
-    setIsEditing: Dispatch<SetStateAction<boolean>>;
+    setIsEditing: (value: boolean) => void;
     onOpenDeleteModal: (
         file: UiFile,
         user: User | null

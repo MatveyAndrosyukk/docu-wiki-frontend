@@ -1,6 +1,6 @@
 import {ChangeEvent, RefObject} from "react";
 
-export type EmailState = {
+export type ChangeEmailState = {
 
     error: string;
 
@@ -15,7 +15,7 @@ export type EmailState = {
     value: string;
 };
 
-export type EmailActions = {
+export type ChangeEmailActions = {
     setLoading(
         value: boolean
     ): void;
@@ -45,13 +45,13 @@ export type EmailActions = {
     sendChangePasswordLink(): Promise<void>;
 }
 
-export type EmailActionsState = {
-    state: EmailState;
+export type ChangeEmailActionsState = {
+    state: ChangeEmailState;
 
-    actions: EmailActions;
+    actions: ChangeEmailActions;
 };
 
-export const initialState: EmailState = {
+export const initialState: ChangeEmailState = {
     isModal: false,
     loading: false,
     error: "",

@@ -1,11 +1,11 @@
-import {DeleteModalState, initialState} from "./delete-file.types";
+import {RemoveFileState, initialState} from "./remove-file.types";
 
 export type DeleteModalAction =
     | {
     type: "OPEN";
     payload: {
-        file: DeleteModalState["file"];
-        user: DeleteModalState["user"];
+        file: RemoveFileState["file"];
+        user: RemoveFileState["user"];
     };
 }
     | {
@@ -16,10 +16,10 @@ export type DeleteModalAction =
     payload: boolean;
 };
 
-export function deleteFileReducer(
-    state: DeleteModalState,
+export function removeFileReducer(
+    state: RemoveFileState,
     action: DeleteModalAction
-): DeleteModalState {
+): RemoveFileState {
 
     switch (action.type) {
 
