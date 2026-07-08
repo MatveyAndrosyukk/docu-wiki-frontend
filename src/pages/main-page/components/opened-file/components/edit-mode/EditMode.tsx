@@ -1,35 +1,45 @@
-import React, {useCallback, useMemo} from 'react';
-import styles from './EditMode.module.scss';
+import React, {FC, useCallback, useMemo,} from "react";
+
+import styles from "./EditMode.module.scss";
+
 import SwitchWhileEditModal
     from "../../../../../../shared/ui/modal-windows/switch-while-edit-modal/SwitchWhileEditModal";
-import extractImagesName from "../../../../../../shared/lib/utils/extractImageNames";
-import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebouncedValue";
+
 import {UiFile} from "../../../../../../store/types/UiFile";
+
 import {useSelector} from "react-redux";
+
 import {RootState} from "../../../../../../store";
+
 import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
-import {useEditorTextarea} from "../../../../../../shared/lib/hooks/useEditorTextarea";
-import {useEditorValidation} from "../../../../../../shared/lib/hooks/useEditorValidation";
-import {createEditorToolbar} from "../../../../../../shared/lib/utils/createEditorToolbar";
+
+import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebouncedValue";
 import EditorToolbar from "../../../../../../shared/ui/editor-toolbar/EditorToolbar";
-import useFileImagesHandler from "../../../../../../shared/lib/hooks/use-file-images-handler/useFileImagesHandler";
+import useEditorHandler from "../../../../../../shared/lib/hooks/use-editor-handler/useEditorHandler";
+
 
 interface Params {
+
     file: UiFile;
+
     parseFileTextToHTML: (
         content: string,
         onImageClick: (
             imageUrl: string
-        ) => void | null,
+        ) => void,
         isFileTreeOpened: boolean
-    ) => React.ReactNode[],
-    isFileTreeOpened: boolean,
+    ) => React.ReactNode[];
+
+    isFileTreeOpened: boolean;
+
     onImageClick: (
         imageUrl: string
-    ) => void | null;
+    ) => void;
+
 }
 
-const EditMode: React.FC<Params> = (
+
+const EditMode: FC<Params> = (
     {
         file,
         parseFileTextToHTML,
@@ -37,210 +47,285 @@ const EditMode: React.FC<Params> = (
         isFileTreeOpened,
     }
 ) => {
-    const {fileState} = useAppContext();
-
-    const loggedInUser = useSelector(
-        (state: RootState) => state.user.loggedInUser
-    );
-
-    const isSaving = useSelector(
-        (state: RootState) => state.fileUi.isSaving
-    );
 
     const {
-        fileEditor
-    } = fileState
+        fileState,
+    } = useAppContext();
 
 
-    const {
-        textareaRef,
-        textareaContent,
-        setTextareaContent,
-        pasteTag,
-        wrapSelection,
-        handleChangeTextareaContent
-    } = useEditorTextarea(
-        file.content ?? '',
-        fileEditor.actions.setIsFileContentChanged
-    );
+    const loggedInUser =
+        useSelector(
+            (state: RootState) =>
+                state.user.loggedInUser
+        );
 
-    const debouncedTextareaContent = useDebouncedValue(textareaContent, 300);
 
-    const amountOfImagesInTextArea = useMemo(
-        () => extractImagesName(debouncedTextareaContent),
-        [debouncedTextareaContent]
-    );
+    const isSaving =
+        useSelector(
+            (state: RootState) =>
+                state.fileUi.isSaving
+        );
 
-    const previewContent = useMemo(
-        () =>
-            parseFileTextToHTML(
-                debouncedTextareaContent,
+
+    const editorHandler =
+        useEditorHandler({
+
+            editHandler:
+            fileState.fileEditor,
+
+            fileId:
+            file.id,
+
+            initialContent:
+                file.content ?? "",
+
+            contentError:
+            fileState.fileEditor.state.contentError,
+
+            loggedInUser,
+
+        });
+
+
+    const debouncedContent =
+        useDebouncedValue(
+            editorHandler.textareaHandler.state.content,
+            300
+        );
+
+
+    const previewContent =
+        useMemo(
+            () =>
+                parseFileTextToHTML(
+                    debouncedContent,
+                    onImageClick,
+                    isFileTreeOpened
+                ),
+            [
+                debouncedContent,
+                parseFileTextToHTML,
                 onImageClick,
-                isFileTreeOpened
-            ),
-        [
-            debouncedTextareaContent,
-            parseFileTextToHTML,
-            onImageClick,
-            isFileTreeOpened,
-        ]
-    );
+                isFileTreeOpened,
+            ]
+        );
 
-    useEditorValidation(
-        textareaContent,
-        amountOfImagesInTextArea,
-        loggedInUser,
-        fileEditor.actions.setContentError,
-    );
 
-    const replaceImageTag = useCallback(
-        (
-            tempName: string,
-            realName: string
-        ) => {
-            setTextareaContent(
-                prev =>
-                    prev.replace(
-                        `[image/${tempName}]`,
-                        `[image/${realName}]`
-                    )
-            );
-        },
-        [setTextareaContent]
-    );
+    const handleSaveEdition =
+        useCallback(
+            () => {
 
-    const fileImagesHandler = useFileImagesHandler(
-        {
-            fileId: file.id,
-            pasteTag,
-            replaceImageTag,
-            contentError: fileEditor.state.contentError,
-            initialContent: file.content ?? '',
-        }
-    );
-
-    const toolbar = createEditorToolbar(
-        wrapSelection,
-        pasteTag,
-        fileImagesHandler.actions.openDialog
-    );
-
-    const handleSaveEdition = useCallback(
-        (
-            newContent: string,
-            addedImages: string[],
-        ) => {
-            if (!file) return;
-
-            try {
-                fileEditor.actions.saveChanges(
-                    file.id as number,
-                    newContent,
-                    addedImages,
+                editorHandler.editHandler.actions.saveChanges(
+                    file.id,
+                    editorHandler.textareaHandler.state.content,
+                    editorHandler.imagesHandler.state.addedImages,
                     loggedInUser?.name
                 );
 
+                editorHandler.imagesHandler.actions.reset([]);
 
-                fileImagesHandler.actions.reset([]);
-            } catch (error) {
-                console.error('Save failed:', error);
-            }
-        }
-        ,
-        [file, fileEditor.actions, fileImagesHandler.actions, loggedInUser?.name]
-    );
+            },
+            [
+                editorHandler,
+                file.id,
+                loggedInUser?.name,
+            ]
+        );
 
-    const handleCancelEdition = useCallback(
-        async (
-            addedImages: string[],
-            contentBeforeEdition: string,
-        ) => {
-            try {
-                await fileEditor.actions.cancelChanges(
-                    contentBeforeEdition,
-                    addedImages
+
+    const handleCancelEdition =
+        useCallback(
+            async () => {
+
+                await editorHandler.editHandler.actions.cancelChanges(
+                    file.content ?? "",
+                    editorHandler.imagesHandler.state.addedImages
                 );
 
-                fileImagesHandler.actions.reset([]);
-            } catch (error) {
-                console.error('Cancel failed:', error);
-            }
-        },
-        [fileEditor.actions, fileImagesHandler.actions]
-    );
+
+                editorHandler.imagesHandler.actions.reset([]);
+
+            },
+            [
+                editorHandler,
+                file.content,
+            ]
+        );
+
 
     return (
-        <div className={styles['edit-mode']}>
-            <div className={styles['edit-mode__header']}>
-                <div className={styles['header__edit-buttons']}>
 
-                    <EditorToolbar toolbar={toolbar}/>
+        <div className={styles["edit-mode"]}>
+
+
+            <div className={styles["edit-mode__header"]}>
+
+
+                <div className={styles["header__edit-buttons"]}>
+
+
+                    <EditorToolbar
+                        toolbar={
+                            editorHandler.toolbar
+                        }
+                    />
+
 
                     <input
+
                         type="file"
+
                         accept="image/*"
-                        style={{display: 'none'}}
-                        ref={fileImagesHandler.state.inputRef}
-                        onChange={fileImagesHandler.actions.changeFile}
+
+                        style={{
+                            display: "none"
+                        }}
+
+                        ref={
+                            editorHandler.imagesHandler.state.inputRef
+                        }
+
+                        onChange={
+                            editorHandler.imagesHandler.actions.changeFile
+                        }
+
                     />
+
 
                 </div>
 
-                <div className={styles['header__action-buttons']}>
+
+                <div className={styles["header__action-buttons"]}>
+
 
                     <button
-                        className={styles['header__action-buttons-save']}
+
+                        className={
+                            styles["header__action-buttons-save"]
+                        }
+
                         onClick={
-                            () => handleSaveEdition(
-                                textareaContent,
-                                fileImagesHandler.state.addedImages)}
-                        disabled={isSaving}
+                            handleSaveEdition
+                        }
+
+                        disabled={
+                            isSaving
+                        }
+
                     >
-                        {isSaving ? 'Saving…' : 'Save'}
+
+                        {
+                            isSaving
+                                ? "Saving…"
+                                : "Save"
+                        }
+
                     </button>
 
+
                     <button
-                        className={styles['header__action-buttons-cancel']}
+
+                        className={
+                            styles["header__action-buttons-cancel"]
+                        }
+
                         onClick={
-                            () => handleCancelEdition(
-                                fileImagesHandler.state.addedImages,
-                                file.content ?? '')}
+                            handleCancelEdition
+                        }
+
                     >
+
                         Cancel
+
                     </button>
+
+
                 </div>
+
+
             </div>
 
-            <div className={styles['edit-mode__body']}>
-                    <textarea
-                        ref={textareaRef}
-                        className={styles['body__textarea']}
-                        value={textareaContent}
-                        onChange={handleChangeTextareaContent}
-                    />
 
-                <div className={styles['edit-mode__error']}>
-                    {fileEditor.state.contentError}
+            <div className={styles["edit-mode__body"]}>
+
+
+                <textarea
+
+                    ref={
+                        editorHandler.textareaHandler.state.textareaRef
+                    }
+
+                    className={
+                        styles["body__textarea"]
+                    }
+
+                    value={
+                        editorHandler.textareaHandler.state.content
+                    }
+
+                    onChange={
+                        editorHandler.textareaHandler.actions.handleChangeTextarea
+                    }
+
+                />
+
+
+                <div className={styles["edit-mode__error"]}>
+
+                    {
+                        editorHandler.editHandler.state.contentError
+                    }
+
                 </div>
 
-                <div className={styles['body__preview']}>
-                    <div className={styles['body__preview-title']}>
+
+                <div className={styles["body__preview"]}>
+
+
+                    <div className={styles["body__preview-title"]}>
+
                         Preview
+
                     </div>
 
-                    <div className={styles['body__preview-content']}>
-                        {previewContent}
+
+                    <div className={styles["body__preview-content"]}>
+
+                        {
+                            previewContent
+                        }
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
 
             <SwitchWhileEditModal
-                contentBeforeEdition={file.content ?? ''}
-                onCancelEditedFileChange={handleCancelEdition}
-                addedImagesWhileEditing={fileImagesHandler.state.addedImages}
+
+                contentBeforeEdition={
+                    file.content ?? ""
+                }
+
+                onCancelEditedFileChange={
+                    handleCancelEdition
+                }
+
+                addedImagesWhileEditing={
+                    editorHandler.imagesHandler.state.addedImages
+                }
+
             />
+
+
         </div>
+
     );
+
 };
+
 
 export default EditMode;

@@ -5,7 +5,7 @@ import FileTree from "./components/file-tree/FileTree";
 import OpenedFile from "./components/opened-file/OpenedFile";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import EditModal from "../../shared/ui/modal-windows/edit-modal/EditModal";
+import ActionsModal from "../../shared/ui/modal-windows/actions-modal/ActionsModal";
 import DeleteModal from "../../shared/ui/modal-windows/delete-modal/DeleteModal";
 import LoginModal from "../../shared/ui/modal-windows/login-modal/LoginModal";
 import EnterEmailModal from "../../shared/ui/modal-windows/enter-email-modal/EnterEmailModal";
@@ -28,7 +28,7 @@ import FeedbackModal from "../../shared/ui/modal-windows/feedback-modal/Feedback
 import GlobalNotification from "../../shared/ui/global-notification/GlobalNotification";
 import {useWindowWidth} from "../../shared/lib/hooks/useWindowWidth";
 import PremiumModal from "../../shared/ui/modal-windows/premium-modal/PremiumModal";
-import {ActionType} from "../../shared/ui/modal-windows/edit-modal/hooks/edit-modal-actions/types/ActionType";
+import {ActionType} from "../../shared/lib/hooks/use-file-actions-modal-handler/types/ActionType";
 
 interface MainPageProps {
     viewedUserEmail?: string | undefined;
@@ -228,7 +228,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                 userEmail={loggedInUser?.email}
             />
 
-            <EditModal/>
+            <ActionsModal/>
 
             <DeleteModal/>
 

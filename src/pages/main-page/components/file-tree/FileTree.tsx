@@ -17,7 +17,7 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useNotification} from "../../../../shared/lib/hooks/useNotification";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
-import {ActionType} from "../../../../shared/ui/modal-windows/edit-modal/hooks/edit-modal-actions/types/ActionType";
+import {ActionType} from "../../../../shared/lib/hooks/use-file-actions-modal-handler/types/ActionType";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;

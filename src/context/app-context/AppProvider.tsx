@@ -1,5 +1,5 @@
 import {FC, ReactNode} from "react";
-import useFilesActions, {FileActionsState} from "../../shared/lib/hooks/useFilesActions";
+import useFilesHandler, {FileActionsState} from "../../shared/lib/hooks/useFilesHandler";
 import useBanUserHandler from "../../shared/lib/hooks/use-ban-user-handler/useBanUserHandler";
 import usePremiumModal, {PremiumState} from "../../shared/ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 import {Context} from "./Context";
@@ -23,7 +23,7 @@ export const AppProvider: FC<Params> = (
     }
 ) => {
     const premiumState = usePremiumModal();
-    const fileState = useFilesActions(premiumState);
+    const fileState = useFilesHandler(premiumState);
     const userBan = useBanUserHandler();
     const authState = useAuthHandler();
 
