@@ -1,85 +1,43 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import styles from './FileList.module.scss';
-import {useDispatch, useSelector} from 'react-redux';
-import useContextMenuActions from '../../../../../../shared/ui/context-menu/hooks/useContextMenuActions';
+import {useSelector} from 'react-redux';
 import ContextMenu from '../../../../../../shared/ui/context-menu/ContextMenu';
 import {TreeNode, useFlattenedTree} from '../../../../../../shared/lib/hooks/useFlattenedTree';
 import FileNode from './components/file-node/FileNode';
 import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
-import {toggleFolder} from "../../../../../../store/slices/fileUiSlice";
 import commonStyles from "../../../../../../shared/assets/styles/Common.module.scss";
 import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
-import {AppDispatch, RootState} from "../../../../../../store";
-import {useAuthContext} from "../../../../../../context/auth-context/hooks/useAuthContext";
+import {useWindowWidth} from "../../../../../../shared/lib/hooks/useWindowWidth";
 
 interface FileListProps {
     viewedUserEmail: string | undefined;
-    windowWidth: number;
 }
 
 const FileList: React.FC<FileListProps> = React.memo(
     (
         {
             viewedUserEmail,
-            windowWidth
         }
     ) => {
-        const dispatch
-            = useDispatch<AppDispatch>();
-
         const {
-            fileState,
+            filesHandler,
         } = useAppContext();
 
         const {
-            authStatus
-        } = useAuthContext();
+            fileActionsHandler
+        } = filesHandler;
 
-        const {
-            fileEditor,
-        } = fileState;
-
-        const files = useSelector(selectFileTree)
-
-        const viewedUser = useSelector(
-            (state: RootState) => state.user.viewedUser
+        const files = useSelector(
+            selectFileTree
         );
 
-        const loggedInUser = useSelector(
-            (state: RootState) => state.user.loggedInUser
-        );
-
-        const contextMenu = useContextMenuActions();
-
         const {
-            state,
-            handleCloseContextMenu,
-            menuRef
-        } = contextMenu;
+            contextMenuHandler,
+        } = filesHandler;
 
         const flattenedNodes = useFlattenedTree(files);
 
-        const {
-            isLimitError
-        } = fileState.modal
-
-        const handleFolderClick = useCallback(
-            (
-                id: number
-            ) => {
-                dispatch(toggleFolder(
-                        {
-                            id,
-                            tree: files
-                        }
-                    )
-                );
-            },
-            [
-                dispatch,
-                files
-            ],
-        );
+        const windowWidth = useWindowWidth();
 
         const maxHeight = windowWidth < 1270
             ? '300px'
@@ -91,7 +49,7 @@ const FileList: React.FC<FileListProps> = React.memo(
                 style={{maxHeight}}
             >
                 {
-                    isLimitError && (
+                    fileActionsHandler.state.isLimitError && (
                         <div className={commonStyles['common__notification']}>
                             You've reached the free plan limit of 20 files.
                             Upgrade to Premium to create more.
@@ -106,21 +64,12 @@ const FileList: React.FC<FileListProps> = React.memo(
                                 node: TreeNode
                             ) => (
                                 <FileNode
-                                    key={
-                                        node.file.id
-                                    }
-                                    node={
-                                        node
-                                    }
+
+                                    key={node.file.id}
+
+                                    node={node}
+
                                     emailParam={viewedUserEmail}
-                                    onFolderClick={handleFolderClick}
-                                    contextMenuState={contextMenu}
-                                    viewedUser={viewedUser}
-                                    loggedInUser={loggedInUser}
-                                    handleTryToOpenFile={fileEditor.actions.tryToOpenFile}
-                                    isLoggedIn={
-                                        authStatus === 'authenticated'
-                                    }
                                 />
                             )
                         )
@@ -128,22 +77,16 @@ const FileList: React.FC<FileListProps> = React.memo(
                 </div>
 
                 {
-                    (state.visible && state.file) && (
-                        <ContextMenu
-                            clickX={state.clickX}
-                            clickY={state.clickY}
-                            file={state.file}
-                            onCloseContextMenu={handleCloseContextMenu}
-                            menuRef={menuRef}
-                        />
+                    (contextMenuHandler.state.visible
+                        && contextMenuHandler.state.file) && (
+                        <ContextMenu/>
                     )
                 }
             </div>
         );
     },
     (prev, next) =>
-        prev.viewedUserEmail === next.viewedUserEmail &&
-        prev.windowWidth === next.windowWidth,
+        prev.viewedUserEmail === next.viewedUserEmail
 );
 
 export default FileList;

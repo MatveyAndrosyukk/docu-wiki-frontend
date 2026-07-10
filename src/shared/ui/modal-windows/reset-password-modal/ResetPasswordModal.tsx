@@ -10,9 +10,9 @@ interface ResetPasswordModalProps {
 }
 
 const ResetPasswordModal: FC<ResetPasswordModalProps> = ({resetToken}) => {
-    const {authState} = useAppContext();
+    const {authHandler} = useAppContext();
 
-    const {resetPasswordHandler} = authState;
+    const {resetPasswordHandler} = authHandler;
 
     const closeModal = useCallback(() => {
             resetPasswordHandler.actions.reset();

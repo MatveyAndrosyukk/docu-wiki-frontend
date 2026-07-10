@@ -7,12 +7,12 @@ const VerifyPage: FC = () => {
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token");
     const navigate = useNavigate();
-    const {authState} = useAppContext();
+    const {authHandler} = useAppContext();
 
     const {
         loginHandler,
         registrationHandler,
-    } = authState;
+    } = authHandler;
 
     useEffect(() => {
             async function verifyEmail() {
@@ -58,7 +58,7 @@ const VerifyPage: FC = () => {
                     );
                 });
         }, [
-            authState,
+            authHandler,
             loginHandler.actions,
             navigate,
             registrationHandler.actions,

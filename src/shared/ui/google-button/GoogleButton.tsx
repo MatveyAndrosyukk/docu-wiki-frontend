@@ -4,9 +4,9 @@ import {ReactComponent as CustomGoogleButtonSvg} from './images/custom-google-bu
 import {useAppContext} from "../../../context/app-context/hooks/useAppContext";
 
 const GoogleButton = () => {
-    const {authState} = useAppContext();
+    const {authHandler} = useAppContext();
 
-    const {googleHandler} = authState;
+    const {googleHandler} = authHandler;
 
     const handleGoogleAuthResult = useGoogleLogin({
         flow: 'auth-code',

@@ -8,27 +8,20 @@ import useFileImagesHandler
 import useValidationHandler
     from "./hooks/use-validation-handler/useValidationHandler";
 import {
-    EditorParams,
     EditorState,
 } from "./editor.types";
 import {createEditorToolbar} from "../../utils/createEditorToolbar";
+import useEditModeHandler from "./hooks/use-edit-mode-handler/useEditModeHandler";
 
-export default function useEditorHandler(
-    {
-        editHandler,
-        fileId,
-        initialContent,
-        contentError,
-        loggedInUser,
-    }: EditorParams
-): EditorState {
+export default function useEditorHandler(): EditorState {
+
+    const editModeHandler = useEditModeHandler();
 
     const textareaHandler =
         useTextareaHandler(
             {
-                initialContent,
                 setIsFileContentChanged:
-                editHandler.actions.setIsFileContentChanged,
+                editModeHandler.actions.setIsFileContentChanged,
             }
         );
 
@@ -50,12 +43,9 @@ export default function useEditorHandler(
     const imagesHandler =
         useFileImagesHandler(
             {
-                fileId,
-                pasteTag:
-                textareaHandler.actions.pasteTag,
+                pasteTag: textareaHandler.actions.pasteTag,
                 replaceImageTag,
-                contentError,
-                initialContent,
+                contentError: editModeHandler.state.contentError,
             }
         );
 
@@ -75,9 +65,8 @@ export default function useEditorHandler(
                 content:
                 textareaHandler.state.content,
                 images,
-                loggedInUser,
                 setContentError:
-                editHandler.actions.setContentError,
+                editModeHandler.actions.setContentError,
             }
         );
 
@@ -98,7 +87,7 @@ export default function useEditorHandler(
 
     return {
 
-        editHandler,
+        editModeHandler,
 
         textareaHandler,
 

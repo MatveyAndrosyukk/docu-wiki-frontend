@@ -110,7 +110,7 @@ const fileUiSlice = createSlice({
         },
         addPendingImage(
             state,
-            action: PayloadAction<{ fileId: number; imageName: string }>
+            action: PayloadAction<{ fileId: number | undefined; imageName: string }>
         ) {
             state.pendingImages[action.payload.imageName] = {
                 status: 'pending',

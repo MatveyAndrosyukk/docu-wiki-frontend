@@ -8,14 +8,14 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 
 const LoginModal: FC = () => {
-    const {authState} = useAppContext();
+    const {authHandler} = useAppContext();
 
     const {
         registrationHandler,
         authorizationHandler,
         loginHandler,
         resetPasswordHandler,
-    } = authState;
+    } = authHandler;
 
     const {
         authStatus

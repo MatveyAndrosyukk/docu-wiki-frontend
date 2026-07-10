@@ -28,7 +28,6 @@ import FeedbackModal from "../../shared/ui/modal-windows/feedback-modal/Feedback
 import GlobalNotification from "../../shared/ui/global-notification/GlobalNotification";
 import {useWindowWidth} from "../../shared/lib/hooks/useWindowWidth";
 import PremiumModal from "../../shared/ui/modal-windows/premium-modal/PremiumModal";
-import {ActionType} from "../../shared/lib/hooks/use-file-actions-modal-handler/types/ActionType";
 
 interface MainPageProps {
     viewedUserEmail?: string | undefined;
@@ -41,13 +40,27 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
         useState(false);
 
     const {
-        fileState,
-        authState,
+        filesHandler,
+        authHandler,
+        editorHandler,
     } = useAppContext();
 
     const {
         authStatus
     } = useAuthContext();
+    
+    const {
+        contextMenuHandler,
+    } = filesHandler;
+
+    const {
+        editModeHandler
+    } = editorHandler;
+
+    const {
+        resetPasswordHandler,
+        loginHandler,
+    } = authHandler;
 
     const dispatch = useDispatch();
 
@@ -66,16 +79,6 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     );
 
     const isMobile = width < 1066;
-
-    const {
-        resetPasswordHandler,
-        loginHandler,
-    } = authState;
-
-    const {
-        actions,
-        fileEditor,
-    } = fileState;
 
     const currentUserEmail =
         viewedUserEmail ??
@@ -99,8 +102,8 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     }, [openedFile, files, loggedInUser]);
 
     const {
-        isOpened,
-        setIsOpened
+        isFileTreeOpened,
+        setIsFileTreeOpened
     } = useResponsiveFileTree();
 
     useResetPasswordModal(
@@ -116,8 +119,10 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     useViewedUserLoader(currentUserEmail);
 
     useFetchFilesForViewedUser(
-        viewedUser,
-        loggedInUser
+        {
+            viewedUser,
+            loggedInUser
+        }
     );
 
     useEffect(() => {
@@ -131,10 +136,12 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             );
 
             if (file) {
-                fileEditor.actions.tryToOpenFile(file.id)
+                editModeHandler.actions.tryToOpenFile(
+                    file.id
+                );
             }
         },
-        [fileId, files, dispatch, openedFile?.id, fileEditor.actions]);
+        [fileId, files, dispatch, openedFile?.id, editModeHandler.actions]);
 
     useEffect(() => {
             const handleKeyDown = (
@@ -148,13 +155,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                     e.preventDefault();
 
                     if (authStatus === 'authenticated') {
-                        actions.open(
-                            {
-                                reason: ActionType.AddRootFolder,
-                                id: null,
-                                title: "Add root folder",
-                            }
-                        );
+                        contextMenuHandler.actions.addRootFolder()
                     } else {
                         loginHandler.actions.openModal();
                     }
@@ -171,12 +172,7 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                 handleKeyDown
             );
         },
-        [
-            authStatus,
-            actions.open,
-            actions,
-            loginHandler.actions
-        ]
+        [authStatus, loginHandler.actions, contextMenuHandler.actions]
     );
 
     return (
@@ -189,15 +185,15 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             <div className={styles['container']}>
 
                 <FileTree
-                    isOpened={isOpened}
-                    setIsOpened={setIsOpened}
+                    isOpened={isFileTreeOpened}
+                    setIsOpened={setIsFileTreeOpened}
                     viewedUserEmail={viewedUserEmail}
                 />
 
                 <OpenedFile
                     isFileLoading={isFileLoading}
-                    isFileTreeOpened={isOpened}
-                    setIsFileTreeOpened={setIsOpened}
+                    isFileTreeOpened={isFileTreeOpened}
+                    setIsFileTreeOpened={setIsFileTreeOpened}
                     viewedUserEmail={viewedUserEmail}
                     file={openedFile}
                 />
@@ -205,11 +201,11 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             </div>
 
             {
-                (isOpened && window.innerWidth < 1270) &&
+                (isFileTreeOpened && window.innerWidth < 1270) &&
                 (
                     <div
                         className={styles.overlay}
-                        onClick={() => setIsOpened(false)}
+                        onClick={() => setIsFileTreeOpened(false)}
                     />
 
                 )

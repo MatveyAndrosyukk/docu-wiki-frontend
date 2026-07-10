@@ -4,25 +4,11 @@ import {FileImagesActionsState}
     from "./hooks/use-file-images-handler/file-images.types";
 import {ValidationActionsState}
     from "./hooks/use-validation-handler/validation.types";
-import { EditFileActionsState } from "../use-edit-file-handler/edit-file.types";
-
-export interface EditorParams {
-
-    editHandler: EditFileActionsState;
-
-    fileId: number;
-
-    initialContent: string;
-
-    contentError: string;
-
-    loggedInUser: any;
-
-}
+import { EditFileActionsState } from "./hooks/use-edit-mode-handler/edit-mode.types";
 
 export interface EditorState {
 
-    editHandler: EditFileActionsState;
+    editModeHandler: EditFileActionsState;
 
     textareaHandler: TextareaActionsState;
 

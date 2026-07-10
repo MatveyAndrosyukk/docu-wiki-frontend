@@ -46,7 +46,8 @@ const OpenedFile: React.FC<OpenedFileProps> = (
         useRef<HTMLDivElement>(null);
 
     const {
-        fileState,
+        filesHandler,
+        editorHandler,
     } = useAppContext();
 
     const {authStatus} = useAuthContext();
@@ -76,11 +77,6 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     );
 
     const navigate = useNavigate();
-
-    const {
-        fileEditor,
-        deleteModal
-    } = fileState;
 
     useEffect(() => {
         document.body.style.overflow = openedImage ? 'hidden' : '';
@@ -172,23 +168,20 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const handleOpenEditionMode = useCallback(
         () => {
-            fileEditor.actions.setIsEditing(true);
+            editorHandler.editModeHandler.actions.setIsEditing(true);
 
             setIsBurgerMenuOpened(false);
-        }, [fileEditor.actions]);
+        }, [editorHandler.editModeHandler.actions]);
 
     const handleDeleteFile = useCallback(
         (
             file: UiFile
         ) => {
-            deleteModal.actions.open(file, viewedUser)
+            filesHandler.fileRemoveHandler.actions.open(file, viewedUser)
 
             setIsBurgerMenuOpened(false);
         },
-        [
-            deleteModal.actions,
-            viewedUser
-        ]
+        [filesHandler.fileRemoveHandler.actions, viewedUser]
     );
 
     useEffect(() => {
@@ -217,12 +210,12 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 isEmpty &&
                 isCanEdit
             ) {
-                fileEditor.actions.setIsEditing(true);
+                editorHandler.editModeHandler.actions.setIsEditing(true);
             }
 
             setWasInitialized(true);
         },
-        [file, wasInitialized, authStatus, viewedUserEmail, viewedUser, loggedInUser, fileEditor.actions]
+        [file, wasInitialized, authStatus, viewedUserEmail, viewedUser, loggedInUser, editorHandler.editModeHandler.actions]
     );
 
     if (!file) {
@@ -245,15 +238,15 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 loggedInUser={loggedInUser}
                 files={files}
                 isBurgerMenuOpened={isBurgerMenuOpened}
-                isEditing={fileEditor.state.isEditing}
+                isEditing={editorHandler.editModeHandler.state.isEditing}
                 isLoggedIn={authStatus === 'authenticated'}
                 emailParam={viewedUserEmail}
-                setIsEditing={fileEditor.actions.setIsEditing}
+                setIsEditing={editorHandler.editModeHandler.actions.setIsEditing}
                 setIsBurgerMenuOpened={setIsBurgerMenuOpened}
                 onTryToLikeFile={toggleLike}
                 onOpenEditionMode={handleOpenEditionMode}
                 onDeleteFile={handleDeleteFile}
-                onOpenDeleteModal={deleteModal.actions.open}
+                onOpenDeleteModal={filesHandler.fileRemoveHandler.actions.open}
             />
 
             {
@@ -287,7 +280,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
                 )}
 
             {
-                fileEditor.state.isEditing
+                editorHandler.editModeHandler.state.isEditing
                     ? <EditMode
                         file={file}
                         parseFileTextToHTML={parseFileTextToHTMLMemo}

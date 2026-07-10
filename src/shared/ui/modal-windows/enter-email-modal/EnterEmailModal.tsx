@@ -5,9 +5,9 @@ import styles from './EnterEmailModal.module.scss';
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const EnterEmailModal: FC = () => {
-    const {authState} = useAppContext();
+    const {authHandler} = useAppContext();
 
-    const {changeEmailHandler} = authState;
+    const {changeEmailHandler} = authHandler;
 
     const closeModal = () => {
         changeEmailHandler.actions.reset();

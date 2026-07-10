@@ -6,13 +6,13 @@ import {FileType} from "../../../../types/file";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const DeleteModal: FC = () => {
-    const {fileState} = useAppContext();
+    const {filesHandler} = useAppContext();
 
     const {
-        deleteModal
-    } = fileState;
+        fileRemoveHandler
+    } = filesHandler;
 
-    const file = deleteModal.state.file;
+    const file = fileRemoveHandler.state.file;
     const isFolder = file?.type === FileType.Folder;
 
     const deleteText = isFolder
@@ -24,8 +24,8 @@ const DeleteModal: FC = () => {
         : '?';
 
     return (
-        <Modal isOpen={deleteModal.state.open}
-               onClose={deleteModal.actions.close}>
+        <Modal isOpen={fileRemoveHandler.state.open}
+               onClose={fileRemoveHandler.actions.close}>
             <div
                 className={`${modalStyles['modal__overlay']} ${styles['delete-modal__overlay']}`}
             >
@@ -41,13 +41,13 @@ const DeleteModal: FC = () => {
                     <div className={modalStyles['modal__buttons']}>
                         <button
                             className={styles['delete-modal__buttons-delete']}
-                            onClick={deleteModal.actions.confirm}
+                            onClick={fileRemoveHandler.actions.confirm}
                         >
                             OK
                         </button>
                         <button
                             className={styles['delete-modal__buttons-cancel']}
-                            onClick={deleteModal.actions.close}
+                            onClick={fileRemoveHandler.actions.close}
                         >
                             Cancel
                         </button>

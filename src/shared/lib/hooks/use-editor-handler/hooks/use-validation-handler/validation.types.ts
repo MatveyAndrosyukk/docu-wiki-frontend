@@ -4,8 +4,6 @@ export interface ValidationParams {
 
     images: string[];
 
-    loggedInUser: any;
-
     setContentError(
         value: string
     ): void;

@@ -1,71 +1,67 @@
 import React, {FC} from 'react';
 import styles from './ContextMenu.module.scss'
 import {FileType} from "../../../types/file";
-import {UiFile} from "../../../store/types/UiFile";
 import {useAppContext} from "../../../context/app-context/hooks/useAppContext";
 import {useElementOutsideEvent} from "../../lib/hooks/useElementOutsideEvent";
 
-interface ContextMenuProps {
-    clickX: number;
-    clickY: number;
-    file: UiFile;
-    onCloseContextMenu: () => void;
-    menuRef: React.RefObject<HTMLUListElement | null>;
-}
+const ContextMenu: FC = () => {
 
-const ContextMenu: FC<ContextMenuProps> = (
-    {
-        clickX,
-        clickY,
-        file,
-        onCloseContextMenu,
-        menuRef,
-    }) => {
+    const {
+        filesHandler
+    } = useAppContext();
 
-    const {fileState} = useAppContext();
+    const {
+        contextMenuHandler
+    } = filesHandler;
 
-    const contextMenu = fileState.contextMenu;
+    const contextMenuFile = contextMenuHandler.state.file;
 
     useElementOutsideEvent(
-        menuRef,
-        "click",
-        onCloseContextMenu
+        {
+            ref: contextMenuHandler.state.menuRef,
+            eventType: "click",
+            handler: contextMenuHandler.actions.close
+        }
     );
+
+    if (!contextMenuFile) {
+        return null;
+    }
 
     return (
         <div>
             <ul className={styles['context-menu']}
-                style={{top: clickY, left: clickX}}
-                ref={menuRef}
-                onClick={onCloseContextMenu}>
-                {file.type === FileType.Folder && (
+                style={{top: contextMenuHandler.state.clickY, left: contextMenuHandler.state.clickX}}
+                ref={contextMenuHandler.state.menuRef}
+                onClick={contextMenuHandler.actions.close}>
+                {contextMenuFile.type === FileType.Folder && (
                     <>
-                        {contextMenu.copiedFile && (
+                        {contextMenuHandler.state.copiedFile && (
                             <li className={styles['context-menu__item']}
-                                onClick={() => contextMenu.paste(file.id)}>
+                                onClick={() => contextMenuHandler.actions.paste(contextMenuFile.id)}>
                                 Paste
                             </li>
                         )}
                         <li className={styles['context-menu__item']}
-                            onClick={() => contextMenu.addFile(file.id)}>
+                            onClick={() => contextMenuHandler.actions.addFile(contextMenuFile.id)}>
                             Add File
                         </li>
                         <li className={styles['context-menu__item']}
-                            onClick={() => contextMenu.addFolder(file.id)}>
+                            onClick={() => contextMenuHandler.actions.addFolder(contextMenuFile.id)}>
                             Add Folder
                         </li>
                     </>
                 )}
                 <li className={styles['context-menu__item']}
-                    onClick={() => contextMenu.rename(file)}>
+                    onClick={() => contextMenuHandler.actions.rename(contextMenuFile)}>
                     Rename
                 </li>
                 <li className={styles['context-menu__item']}
-                    onClick={() => contextMenu.copy(file)}>
+                    onClick={() => contextMenuHandler.actions.copy(contextMenuFile)}>
                     Copy
                 </li>
                 <li className={`${styles['context-menu__item']} ${styles['context-menu__item-delete']}`}
-                    onClick={() => contextMenu.remove(file)}
+                    onClick={() => contextMenuHandler.actions.remove(contextMenuFile)}
                 >
                     Delete
                 </li>

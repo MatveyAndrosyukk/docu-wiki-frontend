@@ -15,7 +15,6 @@ import {useAppContext} from "../../../../../../context/app-context/hooks/useAppC
 
 import {useDebouncedValue} from "../../../../../../shared/lib/hooks/useDebouncedValue";
 import EditorToolbar from "../../../../../../shared/ui/editor-toolbar/EditorToolbar";
-import useEditorHandler from "../../../../../../shared/lib/hooks/use-editor-handler/useEditorHandler";
 
 
 interface Params {
@@ -49,7 +48,7 @@ const EditMode: FC<Params> = (
 ) => {
 
     const {
-        fileState,
+        editorHandler,
     } = useAppContext();
 
 
@@ -65,27 +64,6 @@ const EditMode: FC<Params> = (
             (state: RootState) =>
                 state.fileUi.isSaving
         );
-
-
-    const editorHandler =
-        useEditorHandler({
-
-            editHandler:
-            fileState.fileEditor,
-
-            fileId:
-            file.id,
-
-            initialContent:
-                file.content ?? "",
-
-            contentError:
-            fileState.fileEditor.state.contentError,
-
-            loggedInUser,
-
-        });
-
 
     const debouncedContent =
         useDebouncedValue(
@@ -115,7 +93,7 @@ const EditMode: FC<Params> = (
         useCallback(
             () => {
 
-                editorHandler.editHandler.actions.saveChanges(
+                editorHandler.editModeHandler.actions.saveChanges(
                     file.id,
                     editorHandler.textareaHandler.state.content,
                     editorHandler.imagesHandler.state.addedImages,
@@ -137,7 +115,7 @@ const EditMode: FC<Params> = (
         useCallback(
             async () => {
 
-                await editorHandler.editHandler.actions.cancelChanges(
+                await editorHandler.editModeHandler.actions.cancelChanges(
                     file.content ?? "",
                     editorHandler.imagesHandler.state.addedImages
                 );
@@ -273,7 +251,7 @@ const EditMode: FC<Params> = (
                 <div className={styles["edit-mode__error"]}>
 
                     {
-                        editorHandler.editHandler.state.contentError
+                        editorHandler.editModeHandler.state.contentError
                     }
 
                 </div>

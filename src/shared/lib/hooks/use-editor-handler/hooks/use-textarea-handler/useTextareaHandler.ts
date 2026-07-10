@@ -10,10 +10,10 @@ import {
     TextareaActionsState,
 } from "./textarea.types";
 import {textareaReducer} from "./textarea.reducer";
+import {useSelector} from "react-redux";
+import {selectOpenedFile} from "../../../../../../store/selectors/selectOpenedFile";
 
 interface Params {
-
-    initialContent: string;
 
     setIsFileContentChanged(
         value: boolean
@@ -23,7 +23,6 @@ interface Params {
 
 export default function useTextareaHandler(
     {
-        initialContent,
         setIsFileContentChanged,
     }: Params
 ): TextareaActionsState {
@@ -31,12 +30,14 @@ export default function useTextareaHandler(
     const inputRef =
         useRef<HTMLTextAreaElement>(null);
 
+    const openedFile = useSelector(selectOpenedFile);
+
     const [state, dispatch] = useReducer(
         textareaReducer,
         {
             ...initialState,
             textareaRef: inputRef,
-            content: initialContent,
+            content: openedFile?.content ?? "",
         }
     );
 
@@ -46,7 +47,7 @@ export default function useTextareaHandler(
             dispatch(
                 {
                     type: "RESET",
-                    payload: initialContent,
+                    payload: openedFile?.content ?? "",
                 }
             );
 
@@ -54,7 +55,7 @@ export default function useTextareaHandler(
 
         },
         [
-            initialContent,
+            openedFile?.content,
             setIsFileContentChanged,
         ]
     );

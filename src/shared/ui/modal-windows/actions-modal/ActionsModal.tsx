@@ -4,66 +4,71 @@ import styles from './ActionsModal.module.scss'
 import modalStyles from '../modal/ModalContent.module.scss'
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {ReactComponent as ArrowIcon} from './images/arrow.svg'
-import {ActionType} from "../../../lib/hooks/use-file-actions-modal-handler/types/ActionType";
+import {
+    ActionType
+} from "../../../lib/hooks/use-files-handler/hooks/use-file-actions-hanler/file-actions-handler.types";
 
 const ActionsModal: FC = () => {
-    const {fileState} = useAppContext();
+    const {filesHandler} = useAppContext();
 
     const {
-        modal,
-        actions,
-    } = fileState;
+        fileActionsHandler
+    } = filesHandler;
 
-    const errorMessage = modal.error;
+    const {
+        modalState
+    } = fileActionsHandler.state;
 
     const errorClassName = `${modalStyles['modal__error']}
      ${styles['edit-modal__error']}
-      ${!errorMessage ? modalStyles['modal__hidden'] : ''}
+      ${!fileActionsHandler.state.error ? modalStyles['modal__hidden'] : ''}
 `;
 
     const handleConfirm = () => {
-        actions.confirm({
-            title: modal.value,
-            id: modal.openState.id,
-            reason: modal.openState.reason as ActionType
-        });
+        filesHandler.fileActionsHandler.actions.confirm(
+            {
+                title: fileActionsHandler.state.value,
+                id: modalState.id,
+                reason: modalState.reason as ActionType
+            }
+        );
     };
 
     return (
         <Modal
-            isOpen={modal.isOpen}
-            onClose={actions.close}
+            isOpen={fileActionsHandler.state.isOpen}
+            onClose={fileActionsHandler.actions.close}
         >
             <div className={modalStyles['modal__overlay']}>
                 <div className={modalStyles['modal__form']}>
 
                     <div className={`${styles['edit-modal__title']} ${modalStyles['modal__title']}`}>
-                        {modal.openState.title}
+                        {modalState.title}
                     </div>
 
                     <p className={errorClassName}>
-                        {errorMessage || "placeholder"}
+                        {fileActionsHandler.state.error || "placeholder"}
                     </p>
 
                     <div className={styles['edit-modal__input-wrapper']}>
 
                         <input
-                            ref={modal.inputRef}
+                            ref={fileActionsHandler.state.inputRef}
                             type="text"
                             className={styles['edit-modal__input']}
                             placeholder="Enter the title"
-                            value={modal.value}
-                            onChange={(e) => actions.setValue(e.currentTarget.value)}
+                            value={fileActionsHandler.state.value}
+                            onChange={(e) => filesHandler.fileActionsHandler.actions.setValue(e.currentTarget.value)}
                             onKeyDown={(e) => {
                                 if (e.key !== 'Enter') return;
                                 e.preventDefault();
-                                if (!modal.error) handleConfirm();
+                                if (!fileActionsHandler.state.error) handleConfirm();
                             }}
                         />
 
                         <button
                             className={styles['edit-modal__submit']}
-                            disabled={!modal.value.trim() || !!modal.error}
+                            disabled={!fileActionsHandler.state.value.trim() || !!fileActionsHandler.state.error}
                             onClick={handleConfirm}
                         >
                             <ArrowIcon/>

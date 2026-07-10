@@ -17,7 +17,6 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useNotification} from "../../../../shared/lib/hooks/useNotification";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
-import {ActionType} from "../../../../shared/lib/hooks/use-file-actions-modal-handler/types/ActionType";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
@@ -37,10 +36,10 @@ const FileTree: FC<FileTreeProps> = React.memo(
             useDispatch<AppDispatch>();
 
         const {
-            fileState,
-            userBan,
-            premiumState,
-            authState,
+            filesHandler,
+            banHandler,
+            premiumHandler,
+            authHandler,
         } = useAppContext();
 
         const {
@@ -63,11 +62,9 @@ const FileTree: FC<FileTreeProps> = React.memo(
             (state: RootState) => state.user.isViewedUserLoading
         );
 
-        const {loginHandler} = authState;
+        const {loginHandler} = authHandler;
 
-        const {actions} = fileState;
-
-        const {setIsPremiumModalOpen} = premiumState;
+        const {setIsPremiumModalOpen} = premiumHandler;
 
         const fileTreeRef =
             useRef<HTMLDivElement>(null);
@@ -77,10 +74,12 @@ const FileTree: FC<FileTreeProps> = React.memo(
         const notification = useNotification();
 
         useElementOutsideEvent(
-            fileTreeRef,
-            'dblclick',
-            () => setIsOpened(false),
-            (isOpened && windowWidth < 1270)
+            {
+                ref: fileTreeRef,
+                eventType: "dblclick",
+                handler: () => setIsOpened(true),
+                enabled: (isOpened && windowWidth < 1270)
+            }
         );
 
         const filesCount =
@@ -138,21 +137,15 @@ const FileTree: FC<FileTreeProps> = React.memo(
         const handleCreateRootFolder = useCallback(
             () => {
                 if (authStatus === 'authenticated') {
-                    actions.open(
-                        {
-                            reason: ActionType.AddRootFolder,
-                            id: null,
-                            title: "Add root folder",
-                        }
-                    );
+                    filesHandler.contextMenuHandler.actions.addRootFolder();
                 } else {
                     loginHandler.actions.openModal();
                 }
 
             },
             [
-                actions,
                 authStatus,
+                filesHandler.contextMenuHandler.actions,
                 loginHandler.actions
             ]
         );
@@ -224,7 +217,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                     {isUserOwner(loggedInUser) && (
                                                         <div
                                                             className={styles['file-tree__ban']}
-                                                            onClick={() => userBan.actions.open()}
+                                                            onClick={() => banHandler.actions.open()}
                                                         >
                                                             <BanSvg/>
                                                         </div>
@@ -321,7 +314,6 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                         (viewedUser && !isBanned && canView) && (
                                             <div className={styles['file-tree__files']}>
                                                 <FileList
-                                                    windowWidth={windowWidth}
                                                     viewedUserEmail={viewedUserEmail}
                                                 />
                                             </div>

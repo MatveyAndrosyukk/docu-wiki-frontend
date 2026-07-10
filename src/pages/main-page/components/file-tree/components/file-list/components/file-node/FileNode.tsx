@@ -1,5 +1,5 @@
 import {TreeNode} from "../../../../../../../../shared/lib/hooks/useFlattenedTree";
-import React, {useRef} from "react";
+import React, {useCallback, useRef} from "react";
 import styles from "../../FileList.module.scss";
 import nodeStyles from './FileNode.module.scss';
 import {isUserCanEdit} from "../../../../../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
@@ -10,26 +10,20 @@ import {ReactComponent as LastChildLineSvg} from '../../images/file-list-last-ch
 import {ReactComponent as OpenedSvg} from '../../images/file-list-opened.svg';
 import {ReactComponent as ClosedSvg} from '../../images/file-list-closed.svg';
 import {ReactComponent as FileImg} from '../../images/file-list-file.svg';
-import {User} from "../../../../../../../../store/slices/userSlice";
 import FileLoader from "../../../../../../../../shared/ui/file-loader/FileLoader";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectOpenedFile} from "../../../../../../../../store/selectors/selectOpenedFile";
-import {ContextMenuState} from "../../../../../../../../shared/ui/context-menu/hooks/useContextMenuActions";
 import {useNavigate} from "react-router-dom";
+import {useAppContext} from "../../../../../../../../context/app-context/hooks/useAppContext";
+import {AppDispatch, RootState} from "../../../../../../../../store";
+import {useAuthContext} from "../../../../../../../../context/auth-context/hooks/useAuthContext";
+import {toggleFolder} from "../../../../../../../../store/slices/fileUiSlice";
+import {selectFileTree} from "../../../../../../../../store/selectors/selectFileTree";
 
 interface Props {
     node: TreeNode;
+
     emailParam: string | undefined;
-    onFolderClick: (
-        id: number
-    ) => void;
-    contextMenuState: ContextMenuState;
-    isLoggedIn: boolean;
-    handleTryToOpenFile: (
-        id: number
-    ) => void;
-    viewedUser: User | null;
-    loggedInUser: User | null;
 }
 
 const FileNode: React.FC<Props> = React.memo(
@@ -37,24 +31,55 @@ const FileNode: React.FC<Props> = React.memo(
         {
             node,
             emailParam,
-            onFolderClick,
-            contextMenuState,
-            isLoggedIn,
-            handleTryToOpenFile,
-            viewedUser,
-            loggedInUser,
         }
     ) => {
         const {
             file,
+
             depth,
+
             isLastChild,
+
             hasNextOnLevel
         } = node;
 
+        const {
+            filesHandler,
+
+            editorHandler,
+        } = useAppContext();
+
+        const {
+            authStatus,
+        } = useAuthContext();
+
+        const {
+            contextMenuHandler,
+        } = filesHandler;
+
+        const {
+            editModeHandler
+        } = editorHandler;
+
+        const reduxDispatch = useDispatch<AppDispatch>();
+
         const navigate = useNavigate();
 
-        const openedFile = useSelector(selectOpenedFile);
+        const openedFile = useSelector(
+            selectOpenedFile
+        );
+
+        const files = useSelector(
+            selectFileTree
+        );
+
+        const loggedInUser = useSelector(
+            (state: RootState) => state.user.loggedInUser
+        );
+
+        const viewedUser = useSelector(
+            (state: RootState) => state.user.viewedUser
+        );
 
         const longPressTimer =
             useRef<NodeJS.Timeout | null>(null);
@@ -115,11 +140,29 @@ const FileNode: React.FC<Props> = React.memo(
             </span>
         );
 
+        const handleFolderClick = useCallback(
+            (
+                id: number
+            ) => {
+                reduxDispatch(toggleFolder(
+                        {
+                            id,
+                            tree: files
+                        }
+                    )
+                );
+            },
+            [
+                reduxDispatch,
+                files
+            ],
+        );
+
         const handleTouchStart = (
             e: React.TouchEvent<HTMLDivElement>
         ) => {
             if (!isUserCanEdit(
-                isLoggedIn,
+                authStatus === 'authenticated',
                 emailParam,
                 viewedUser,
                 loggedInUser
@@ -128,7 +171,7 @@ const FileNode: React.FC<Props> = React.memo(
             const touch = e.touches[0];
 
             longPressTimer.current = setTimeout(() => {
-                contextMenuState.handleOpenContextMenu(
+                contextMenuHandler.actions.open(
                     {
                         preventDefault: () => {
                         },
@@ -152,32 +195,24 @@ const FileNode: React.FC<Props> = React.memo(
             e: React.MouseEvent<HTMLDivElement>
         ) => {
             if (isUserCanEdit(
-                isLoggedIn,
+                authStatus === 'authenticated',
                 emailParam,
                 viewedUser,
                 loggedInUser
             )) {
-                contextMenuState.handleOpenContextMenu(e, file);
+                contextMenuHandler.actions.open(e, file);
             }
         };
 
         const isFolder = file.type === FileType.Folder;
 
         const clickHandler = isFolder
-            ? () => onFolderClick(file.id)
+            ? () => handleFolderClick(file.id)
             : () => {
-                handleTryToOpenFile(file.id);
+                editModeHandler.actions.tryToOpenFile(file.id);
 
                 navigate(`/${viewedUser?.name}/file/${file.id}`);
             };
-
-        const contextMenuHandler = !file.isPending
-            ? handleOpenContextMenu
-            : undefined;
-
-        const touchStartHandler = !file.isPending
-            ? handleTouchStart
-            : undefined;
 
         return (
             <div
@@ -232,8 +267,16 @@ const FileNode: React.FC<Props> = React.memo(
                                             ? styles['file-list__node-text--opened']
                                             : ''
                                         }`}
-                                        onContextMenu={contextMenuHandler}
-                                        onTouchStart={touchStartHandler}
+                                        onContextMenu={
+                                            !file.isPending
+                                                ? handleOpenContextMenu
+                                                : undefined
+                                        }
+                                        onTouchStart={
+                                            !file.isPending
+                                                ? handleTouchStart
+                                                : undefined
+                                        }
                                         onTouchEnd={cancelLongPress}
                                         onTouchMove={cancelLongPress}
                                     >

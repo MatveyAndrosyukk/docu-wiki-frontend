@@ -31,8 +31,8 @@ const Header: FC<Props> = ({
     const navigate = useNavigate();
 
     const {
-        premiumState,
-        authState,
+        premiumHandler,
+        authHandler,
     } = useAppContext();
 
     const {
@@ -41,7 +41,7 @@ const Header: FC<Props> = ({
 
     const {
         loginHandler,
-    } = authState;
+    } = authHandler;
 
     const loggedInUser = useSelector(
         (state: RootState) => state.user.loggedInUser
@@ -61,7 +61,7 @@ const Header: FC<Props> = ({
 
     const {handleOpenUserModal} = userModalState
 
-    const {setIsPremiumModalOpen} = premiumState;
+    const {setIsPremiumModalOpen} = premiumHandler;
 
     const {
         searchType,
@@ -78,11 +78,13 @@ const Header: FC<Props> = ({
         useRef<HTMLButtonElement | null>(null);
 
     useElementOutsideEvent(
-        menuRef,
-        'click',
-        () => setBurgerOpen(false),
-        burgerOpen,
-        burgerButtonRef
+        {
+            ref: menuRef,
+            eventType: 'click',
+            handler: () => setBurgerOpen(false),
+            enabled: burgerOpen,
+            excludeRef: burgerButtonRef,
+        }
     );
 
     const handleToggleBurgerMenu = () => {

@@ -1,15 +1,20 @@
 import {useEffect} from "react";
 import {ValidationActionsState, ValidationParams,} from "./validation.types";
 import {isUserAdminOrOwner} from "../../../../utils/permissions-utils/isUserAdminOrOwner";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../../../../store";
 
 export default function useValidationHandler(
     {
         content,
         images,
-        loggedInUser,
         setContentError,
     }: ValidationParams
 ): ValidationActionsState {
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
 
     useEffect(
         () => {

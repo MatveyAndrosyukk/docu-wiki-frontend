@@ -47,10 +47,11 @@ const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
         );
 
     useElementOutsideEvent(
-        searchInputBlockRef,
-        'mousedown',
-        () => setIsInputFocused(true),
-        true
+        {
+            ref: searchInputBlockRef,
+            eventType: "mousedown",
+            handler: () => setIsInputFocused(true),
+        }
     );
 
     return (

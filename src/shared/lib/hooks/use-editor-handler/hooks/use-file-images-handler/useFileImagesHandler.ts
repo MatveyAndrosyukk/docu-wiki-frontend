@@ -1,32 +1,31 @@
 import {ChangeEvent, useCallback, useReducer, useRef,} from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch} from "../../../../../../store";
 import {addPendingImage, markImageError, removePendingImage,} from "../../../../../../store/slices/fileUiSlice";
 import {uploadImageAsync} from "../../../../services/uploadImageAsync";
 import extractImagesName from "../../../../utils/extractImageNames";
 import {FileImagesActionsState, initialState,} from "./file-images.types";
 import {fileImagesReducer} from "./file-images.reducer";
+import {selectOpenedFile} from "../../../../../../store/selectors/selectOpenedFile";
 
 interface Params {
-    fileId: number;
     pasteTag: (tag: string) => void;
     replaceImageTag: (temp: string, real: string) => void;
     contentError: string;
-    initialContent: string;
 }
 
 export default function useFileImagesHandler(
     {
-        fileId,
         pasteTag,
         replaceImageTag,
         contentError,
-        initialContent,
     }: Params): FileImagesActionsState {
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     const reduxDispatch = useDispatch<AppDispatch>();
+
+    const openedFile = useSelector(selectOpenedFile);
 
     const [state, dispatch] = useReducer(
         fileImagesReducer,
@@ -34,7 +33,7 @@ export default function useFileImagesHandler(
             ...initialState,
             inputRef,
             addedImages: extractImagesName(
-                initialContent
+                openedFile?.content ?? ""
             ),
         }
     );
@@ -90,7 +89,7 @@ export default function useFileImagesHandler(
             reduxDispatch(
                 addPendingImage(
                     {
-                        fileId,
+                        fileId: openedFile?.id,
                         imageName: tempName,
                     }
                 )
@@ -145,10 +144,10 @@ export default function useFileImagesHandler(
         },
         [
             contentError,
-            fileId,
-            pasteTag,
-            replaceImageTag,
             reduxDispatch,
+            openedFile?.id,
+            pasteTag,
+            replaceImageTag
         ]
     );
 

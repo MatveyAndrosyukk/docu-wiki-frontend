@@ -18,20 +18,16 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
         addedImagesWhileEditing,
         contentBeforeEdition,
     }) => {
-    const {fileState} = useAppContext();
-
-    const {
-        fileEditor
-    } = fileState;
+    const {editorHandler} = useAppContext();
 
     const confirmSwitchHandler = useCallback(() => {
-        fileEditor.actions.confirmSwitch()
+        editorHandler.editModeHandler.actions.confirmSwitch()
         onCancelEditedFileChange(addedImagesWhileEditing, contentBeforeEdition)
-    }, [addedImagesWhileEditing, contentBeforeEdition, fileEditor.actions, onCancelEditedFileChange])
+    }, [addedImagesWhileEditing, contentBeforeEdition, editorHandler.editModeHandler.actions, onCancelEditedFileChange])
 
     return (
-        <Modal isOpen={fileEditor.state.isTryToSwitchWhileEditing}
-               onClose={fileEditor.actions.rejectSwitch}>
+        <Modal isOpen={editorHandler.editModeHandler.state.isTryToSwitchWhileEditing}
+               onClose={editorHandler.editModeHandler.actions.rejectSwitch}>
             <div
                 className={`${modalStyles['modal__overlay']} ${styles['switch-modal__overlay']}`}
             >
@@ -51,7 +47,7 @@ const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
                         </button>
                         <button
                             className={`${styles['switch-modal__buttons-reject']} ${styles['switch-modal__button']}`}
-                            onClick={fileEditor.actions.rejectSwitch}
+                            onClick={editorHandler.editModeHandler.actions.rejectSwitch}
                         >
                             Cancel
                         </button>

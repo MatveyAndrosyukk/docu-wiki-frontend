@@ -4,12 +4,12 @@ import styles from './PremiumModal.module.scss';
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
 const PremiumModal: FC = () => {
-    const {premiumState} = useAppContext();
+    const {premiumHandler} = useAppContext();
 
     const {
         isPremiumModalOpen,
         setIsPremiumModalOpen,
-    } = premiumState;
+    } = premiumHandler;
 
     const handleUpgrade = () => {
         console.log('OPEN STRIPE');

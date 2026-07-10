@@ -13,57 +13,57 @@ interface BanModalProps {
 }
 
 const BanModal: FC<BanModalProps> = () => {
-    const {userBan} = useAppContext();
+    const {banHandler} = useAppContext();
 
     const viewedUser = useSelector((state: RootState) => state.user.viewedUser);
 
     const messageClass =
-        userBan.state.message
+        banHandler.state.message
             ? modalStyles.modal__message
-            : userBan.state.error
+            : banHandler.state.error
                 ? modalStyles.modal__error
                 : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
-    const isBanMode = userBan.state.mode === BanMode.ban;
+    const isBanMode = banHandler.state.mode === BanMode.ban;
 
     const isButtonDisabled =
-        isBanMode && (userBan.state.loading || !userBan.state.value.trim());
+        isBanMode && (banHandler.state.loading || !banHandler.state.value.trim());
 
     return (
         <Modal
-            isOpen={userBan.state.isOpened}
-            onClose={userBan.actions.close}
+            isOpen={banHandler.state.isOpened}
+            onClose={banHandler.actions.close}
         >
             <div className={`${['modalStyles.modal__overlay']} ${styles['ban-modal__overlay']}`}>
                 <div className={`${modalStyles['modal__form']} ${styles['ban-modal__form']}`}>
                     <div className={modalStyles['modal__header']}>
                         <p className={`${modalStyles['modal__title']} ${styles['ban-modal__title']}`}>
-                            {userBan.state.mode === BanMode.ban ? 'Ban user' : 'Unban user'}{' '}
+                            {banHandler.state.mode === BanMode.ban ? 'Ban user' : 'Unban user'}{' '}
                             <span className={styles['ban-modal__user']}>{viewedUser?.email}</span>
                         </p>
                         <p className={messageClass}>
-                            {userBan.state.message || userBan.state.error}
+                            {banHandler.state.message || banHandler.state.error}
                         </p>
                         <SwitchModeSvg
                             className={styles['ban-modal__switch']}
-                            onClick={userBan.actions.switchMode}/>
+                            onClick={banHandler.actions.switchMode}/>
                     </div>
                     <div className={`${styles['ban-modal__body']}`}>
                         {isBanMode &&
                             <input
-                                ref={userBan.state.inputRef}
+                                ref={banHandler.state.inputRef}
                                 type='text'
                                 className={`${modalStyles['modal__input']} ${styles['ban-modal__input-input']}`}
                                 placeholder={"Enter a ban reason"}
-                                value={userBan.state.value}
-                                disabled={userBan.state.loading}
-                                onChange={(e) => userBan.actions.handleChangeValue(e)}
+                                value={banHandler.state.value}
+                                disabled={banHandler.state.loading}
+                                onChange={(e) => banHandler.actions.handleChangeValue(e)}
                             />}
                         <button
                             className={`${modalStyles['modal__button']} ${styles['ban-modal__button-button']}`}
                             disabled={isButtonDisabled}
-                            onClick={userBan.actions.toggleBan}>
-                            {userBan.actions.getButtonText()}
+                            onClick={banHandler.actions.toggleBan}>
+                            {banHandler.actions.getButtonText()}
                         </button>
                     </div>
                 </div>

@@ -16,7 +16,7 @@ interface UserModalProps {
 const UserModal: FC<UserModalProps> = ({ userModalState }) => {
     const navigate = useNavigate();
 
-    const {premiumState} = useAppContext();
+    const {premiumHandler} = useAppContext();
 
     const loggedInUser = useSelector(
         (state: RootState) => state.user.loggedInUser
@@ -53,7 +53,7 @@ const UserModal: FC<UserModalProps> = ({ userModalState }) => {
 
     const handlePromoteClick = () => {
         if (!loggedInUser?.isPremium) {
-            premiumState.setIsPremiumModalOpen(true);
+            premiumHandler.setIsPremiumModalOpen(true);
             return;
         }
 

@@ -23,7 +23,7 @@ export const useResponsiveFileTree = () => {
     }, []);
 
     return {
-        isOpened,
-        setIsOpened
+        isFileTreeOpened: isOpened,
+        setIsFileTreeOpened: setIsOpened
     };
 };
