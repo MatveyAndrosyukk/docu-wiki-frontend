@@ -6,61 +6,75 @@ import {ReactComponent as LikedHeartBtn} from '../../images/opened-file-red-hear
 import {ReactComponent as EditFileSvg} from '../../images/opened-file-edit.svg'
 import {ReactComponent as DeleteFileSvg} from '../../images/opened-file-delete.svg'
 import {ReactComponent as OpenButtonsSvg} from '../../images/opened-file-open.svg'
-import {User} from "../../../../../../store/slices/userSlice";
 import findPathToFile from "../../../../../../shared/lib/utils/findFilePath";
 import {UiFile} from "../../../../../../store/types/UiFile";
 import {useWindowWidth} from "../../../../../../shared/lib/hooks/useWindowWidth";
+import {useSelector} from "react-redux";
+import {selectOpenedFile} from "../../../../../../store/selectors/selectOpenedFile";
+import {selectFileTree} from "../../../../../../store/selectors/selectFileTree";
+import {RootState} from "../../../../../../store";
+import {useAuthContext} from "../../../../../../context/auth-context/hooks/useAuthContext";
+import {useAppContext} from "../../../../../../context/app-context/hooks/useAppContext";
 
-interface OpenedFileHeaderProps {
-    file: UiFile;
-    isLiked: boolean | null | undefined;
-    onTryToLikeFile: () => void;
-    viewedUser: User | null;
-    files: UiFile[];
-    likes: number;
+interface Params {
     isBurgerMenuOpened: boolean;
     setIsBurgerMenuOpened: Dispatch<SetStateAction<boolean>>;
-    isEditing: boolean;
     onOpenEditionMode: () => void;
     onDeleteFile: (
         file: UiFile
     ) => void;
-    isLoggedIn: boolean;
     emailParam: string | undefined;
-    loggedInUser: User | null;
-    setIsEditing: (value: boolean) => void;
-    onOpenDeleteModal: (
-        file: UiFile,
-        user: User | null
-    ) => void;
 }
 
-const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
+const OpenedFileHeader: React.FC<Params> = (
     {
-        file,
-        isLiked,
-        onTryToLikeFile,
-        viewedUser,
-        files,
-        likes,
         isBurgerMenuOpened,
         setIsBurgerMenuOpened,
-        isEditing,
         onOpenEditionMode,
         onDeleteFile,
-        isLoggedIn,
         emailParam,
-        loggedInUser,
-        setIsEditing,
-        onOpenDeleteModal,
     }
 ) => {
-    const [copied, setCopied] =
-        useState(false);
+    const {
+        authStatus
+    } = useAuthContext();
+
+    const {
+        editorHandler,
+        filesHandler,
+    } = useAppContext();
+
+    const {
+        editModeHandler
+    } = editorHandler;
+
+    const {
+        fileRemoveHandler,
+        fileLikesHandler
+    } = filesHandler;
+
+    const [copied, setCopied] = useState(false);
+
+    const file = useSelector(selectOpenedFile);
+
+    const files = useSelector(selectFileTree)
+
+    const viewedUser = useSelector(
+        (state: RootState) => state.user.viewedUser
+    );
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
+
 
     const width = useWindowWidth();
 
+    const isLoggedIn = authStatus === "authenticated";
+
     const isMobile = width < 435;
+
+    const isLiked = Boolean(file?.isLiked);
 
     const likesStyle = useMemo(
         () => {
@@ -85,6 +99,10 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
         setTimeout(() => setCopied(false), 1500);
     };
 
+    if (!file) {
+        return null;
+    }
+
     return (
         <div className={styles['opened-file__header']}>
             <div className={styles['header__left-side']}>
@@ -92,19 +110,19 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                     <div
                         className={`${styles['header__likes-amount']} ${styles[likesStyle]}`}
                     >
-                        {likes}
+                        {file.likes}
                     </div>
 
                     {
                         isLiked ?
                             <LikedHeartBtn
                                 onClick={
-                                    () => onTryToLikeFile()
+                                    () => fileLikesHandler.actions.toggleLike()
                                 }
                             /> :
                             <HeartBtn
                                 onClick={
-                                    () => onTryToLikeFile()
+                                    () => fileLikesHandler.actions.toggleLike()
                                 }
                             />
                     }
@@ -149,7 +167,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                         />
 
                                         {
-                                            isBurgerMenuOpened && !isEditing && (
+                                            isBurgerMenuOpened && !editModeHandler.state.isEditing && (
                                                 <div className={styles['buttons-menu']}>
 
                                                     <EditFileSvg
@@ -168,7 +186,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                                 </div>
                                             )}
 
-                                        {isBurgerMenuOpened && isEditing && (
+                                        {isBurgerMenuOpened && editModeHandler.state.isEditing && (
                                             <div className={styles['buttons-menu']}>
                                                 <DeleteFileSvg
                                                     className={`${styles['buttons-menu-item']}`}
@@ -182,7 +200,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                 ) : (
                                     <div className={styles['header__links']}>
                                         <div className={styles['links__container']}>
-                                            {!isEditing && (
+                                            {!editModeHandler.state.isEditing && (
                                                 <>
                                                     <div
                                                         className={styles['links__copy']}
@@ -193,7 +211,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                                     <div
                                                         className={styles['links__edit']}
                                                         onClick={
-                                                            () => setIsEditing(true)
+                                                            () => editModeHandler.actions.setIsEditing(true)
                                                         }
                                                     >
                                                         Edit
@@ -201,7 +219,7 @@ const OpenedFileHeader: React.FC<OpenedFileHeaderProps> = (
                                                     <div
                                                         className={styles['links__delete']}
                                                         onClick={
-                                                            () => onOpenDeleteModal(file, viewedUser)
+                                                            () => fileRemoveHandler.actions.open(file, viewedUser)
                                                         }
                                                     >
                                                         Delete

@@ -195,7 +195,6 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
                     isFileTreeOpened={isFileTreeOpened}
                     setIsFileTreeOpened={setIsFileTreeOpened}
                     viewedUserEmail={viewedUserEmail}
-                    file={openedFile}
                 />
 
             </div>

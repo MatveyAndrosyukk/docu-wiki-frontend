@@ -8,17 +8,15 @@ import EmptyFile from "../../../../shared/ui/empty-file/EmptyFile";
 import OpenedFileHeader from "./components/opened-file-header/OpenedFileHeader";
 import {useSelector} from "react-redux";
 import {UiFile} from "../../../../store/types/UiFile";
-import {selectFileTree} from "../../../../store/selectors/selectFileTree";
-import {useFileLikes} from "../../../../shared/lib/hooks/useFileLikes";
 import {RootState} from "../../../../store";
 import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUserCanEdit";
 import {formatDate} from "./utils/formatDate";
 import parseFileTextToHTML from "./utils/parse-file-content-utils/parseFileTextToHTML";
+import {selectOpenedFile} from "../../../../store/selectors/selectOpenedFile";
 
 interface OpenedFileProps {
-    file?: UiFile | null
     viewedUserEmail: string | undefined
     isFileTreeOpened: boolean
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>
@@ -27,7 +25,6 @@ interface OpenedFileProps {
 
 const OpenedFile: React.FC<OpenedFileProps> = (
     {
-        file = null,
         viewedUserEmail,
         isFileTreeOpened,
         setIsFileTreeOpened,
@@ -52,17 +49,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     const {authStatus} = useAuthContext();
 
-    const {
-        isLiked,
-        likes,
-        toggleLike
-    } = useFileLikes(
-        {
-            fileId: file?.id as number
-        }
-    );
-
-    const files = useSelector(selectFileTree)
+    const openedFile = useSelector(selectOpenedFile);
 
     const viewedUser = useSelector(
         (state: RootState) => state.user.viewedUser
@@ -97,7 +84,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             '--scrollbar-width',
             `${scrollbarWidth}px`
         );
-    }, [file]);
+    }, [openedFile]);
 
     useEffect(() => {
         const handleKeyDown = (
@@ -140,17 +127,17 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     );
 
     const contentElements = useMemo(() => {
-            if (!file?.content) return [];
+            if (!openedFile?.content) return [];
 
             return parseFileTextToHTML(
-                file.content,
+                openedFile.content,
                 handleOpenImage,
                 isFileTreeOpened,
                 pendingImages
             );
         },
         [
-            file?.content,
+            openedFile?.content,
             handleOpenImage,
             isFileTreeOpened,
             pendingImages
@@ -186,18 +173,18 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
     useEffect(() => {
         setWasInitialized(false);
-    }, [file?.id]);
+    }, [openedFile?.id]);
 
     useEffect(
         () => {
             if (
-                !file ||
+                !openedFile ||
                 wasInitialized
             ) return;
 
             const isEmpty =
-                !file.content ||
-                file.content.trim() === '';
+                !openedFile.content ||
+                openedFile.content.trim() === '';
 
             let isCanEdit = isUserCanEdit(
                 authStatus === 'authenticated',
@@ -215,10 +202,10 @@ const OpenedFile: React.FC<OpenedFileProps> = (
 
             setWasInitialized(true);
         },
-        [file, wasInitialized, authStatus, viewedUserEmail, viewedUser, loggedInUser, editorHandler.editModeHandler.actions]
+        [openedFile, wasInitialized, authStatus, viewedUserEmail, viewedUser, loggedInUser, editorHandler.editModeHandler.actions]
     );
 
-    if (!file) {
+    if (!openedFile) {
         return (
             <EmptyFile
                 isFileLoading={isFileLoading}
@@ -231,22 +218,11 @@ const OpenedFile: React.FC<OpenedFileProps> = (
     return (
         <div className={styles['opened-file']}>
             <OpenedFileHeader
-                file={file}
-                isLiked={isLiked}
-                likes={likes}
-                viewedUser={viewedUser}
-                loggedInUser={loggedInUser}
-                files={files}
                 isBurgerMenuOpened={isBurgerMenuOpened}
-                isEditing={editorHandler.editModeHandler.state.isEditing}
-                isLoggedIn={authStatus === 'authenticated'}
                 emailParam={viewedUserEmail}
-                setIsEditing={editorHandler.editModeHandler.actions.setIsEditing}
                 setIsBurgerMenuOpened={setIsBurgerMenuOpened}
-                onTryToLikeFile={toggleLike}
                 onOpenEditionMode={handleOpenEditionMode}
                 onDeleteFile={handleDeleteFile}
-                onOpenDeleteModal={filesHandler.fileRemoveHandler.actions.open}
             />
 
             {
@@ -282,7 +258,7 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             {
                 editorHandler.editModeHandler.state.isEditing
                     ? <EditMode
-                        file={file}
+                        file={openedFile}
                         parseFileTextToHTML={parseFileTextToHTMLMemo}
                         onImageClick={handleOpenImage}
                         isFileTreeOpened={isFileTreeOpened}
@@ -296,15 +272,15 @@ const OpenedFile: React.FC<OpenedFileProps> = (
             }
 
             <div className={styles['opened-file__footer']}>
-                Last edited {formatDate(file.updatedAt)} -
+                Last edited {formatDate(openedFile.updatedAt)} -
 
                 <span
                     className={styles['footer__editor']}
                     onClick={
-                        () => handleGoToUsersPage(file.lastEditor as string)
+                        () => handleGoToUsersPage(openedFile.lastEditor as string)
                     }
                 >
-                    {file.lastEditor}
+                    {openedFile.lastEditor}
                 </span>
             </div>
 

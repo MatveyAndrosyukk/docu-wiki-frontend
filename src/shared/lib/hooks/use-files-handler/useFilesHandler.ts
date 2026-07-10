@@ -1,62 +1,34 @@
-import {useCallback} from "react";
-import {useDispatch} from "react-redux";
-
-import {AppDispatch} from "../../../../store";
-
-import {
-    ChangeFileLikesPayload,
-    toggleFileLikes,
-} from "../../../../store/thunks/files/toggleFileLikes";
-
 import {PremiumState} from "../../../ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 
 import {FilesState} from "./files.types";
 
-import useRemoveFileHandler
-    from "./hooks/use-remove-file-handler/useRemoveFileHandler";
+import useRemoveFileHandler from "./hooks/use-remove-file-handler/useRemoveFileHandler";
 
-import useFileActionsHandler
-    from "./hooks/use-file-actions-hanler/useFileActionsHandler";
+import useFileActionsHandler from "./hooks/use-file-actions-hanler/useFileActionsHandler";
+import {useFileLikesHandler} from "./hooks/use-file-likes-handler/useFileLikesHandler";
 
 export default function useFilesHandler(
     premiumState: PremiumState
 ): FilesState {
+    const fileRemoveHandler = useRemoveFileHandler();
 
-    const reduxDispatch = useDispatch<AppDispatch>();
-
-    const removeHandler = useRemoveFileHandler();
-
-    const actionsHandler = useFileActionsHandler(
+    const fileActionsHandler = useFileActionsHandler(
         premiumState,
-        removeHandler.actions.open
+        fileRemoveHandler.actions.open
     );
 
-    const like = useCallback(
-        (
-            dto: ChangeFileLikesPayload
-        ) => {
-
-            return reduxDispatch(
-                toggleFileLikes(dto)
-            );
-
-        },
-        [
-            reduxDispatch,
-        ]
-    );
+    const fileLikesHandler = useFileLikesHandler();
 
     return {
 
-        fileRemoveHandler: removeHandler,
+        fileRemoveHandler,
 
-        fileActionsHandler: actionsHandler,
+        fileActionsHandler,
+
+        fileLikesHandler,
 
         contextMenuHandler:
-        actionsHandler.contextMenuHandler,
-
-        like,
-
+        fileActionsHandler.contextMenuHandler,
     };
 
 }
