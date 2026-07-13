@@ -8,9 +8,9 @@ import {ReactComponent as LogoutSvg} from './images/header-logout.svg';
 import {ReactComponent as PremiumSvg} from './images/premium.svg';
 import SearchInput from "./components/search-input/SearchInput";
 import UserModal from '../../../../shared/ui/modal-windows/user-modal/UserModal';
-import useUserModalActions from "../../../../shared/lib/hooks/useUserModalActions";
+import useUserHandler from "../../../../shared/lib/hooks/use-user-handler/useUserHandler";
 import {useNavigate} from "react-router-dom";
-import useFileSearchActions from "../../../../shared/lib/hooks/useFileSearchActions";
+import useFileSearchHandler from "../../../../shared/lib/hooks/use-file-search-handler/useFileSearchHandler";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
@@ -48,26 +48,20 @@ const Header: FC<Props> = ({
     );
 
     const userModalState =
-        useUserModalActions(
+        useUserHandler(
             {
                 user: loggedInUser,
                 openLoginModal: loginHandler.actions.openModal
             }
         );
 
-    const fileSearch = useFileSearchActions();
+    const searchFileHandler = useFileSearchHandler();
 
     const width = useWindowWidth();
 
     const {handleOpenUserModal} = userModalState
 
     const {setIsPremiumModalOpen} = premiumHandler;
-
-    const {
-        searchType,
-        handleSwitchSearchType,
-        handleOpenPathToSelectedFile
-    } = fileSearch;
 
     const isMobile = width < 1066;
 
@@ -121,15 +115,15 @@ const Header: FC<Props> = ({
                         <div className={styles['header__search']}>
                             <div className={styles['header__search-input']}>
                                 <SearchInput
-                                    onClick={handleOpenPathToSelectedFile}
-                                    searchType={searchType}
+                                    onClick={searchFileHandler.actions.openPathToSelectedFile}
+                                    searchType={searchFileHandler.state.searchType}
                                 />
 
                                 <SearchSvg className={styles['header__search-icon']}/>
                             </div>
 
                             <SwapSvg className={styles['header__search-swap']}
-                                     onClick={handleSwitchSearchType}
+                                     onClick={searchFileHandler.actions.switchSearchType}
                             />
                         </div>
 

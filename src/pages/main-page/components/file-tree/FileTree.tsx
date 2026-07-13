@@ -15,21 +15,21 @@ import FileTreeSkeleton from "../../../../shared/ui/file-tree-skeleton/FileTreeS
 import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
-import {useNotification} from "../../../../shared/lib/hooks/useNotification";
+import {useNotificationHandler} from "../../../../shared/lib/hooks/use-notification-handler/useNotificationHandler";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
-    isOpened: boolean;
-    setIsOpened: Dispatch<SetStateAction<boolean>>;
+    isFileTreeOpened: boolean;
+    setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>;
 }
 
 const FileTree: FC<FileTreeProps> = React.memo(
     (
         {
             viewedUserEmail,
-            isOpened,
-            setIsOpened,
+            isFileTreeOpened,
+            setIsFileTreeOpened,
         }
     ) => {
         const dispatch =
@@ -71,14 +71,14 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const windowWidth = useWindowWidth();
 
-        const notification = useNotification();
+        const notificationHandler = useNotificationHandler();
 
         useElementOutsideEvent(
             {
                 ref: fileTreeRef,
                 eventType: "dblclick",
-                handler: () => setIsOpened(true),
-                enabled: (isOpened && windowWidth < 1270)
+                handler: () => setIsFileTreeOpened(true),
+                enabled: (isFileTreeOpened && windowWidth < 1270)
             }
         );
 
@@ -92,7 +92,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const fileTreeStyles = useMemo(
             () => {
-                if (!isOpened) return styles['file-tree-closed'];
+                if (!isFileTreeOpened) return styles['file-tree-closed'];
 
                 if (windowWidth < 1270) {
                     return `${styles['file-tree']} ${styles['file-tree--fixed']}`;
@@ -101,7 +101,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 return styles['file-tree'];
             },
             [
-                isOpened,
+                isFileTreeOpened,
                 windowWidth
             ]
         );
@@ -116,7 +116,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                     return;
                 }
 
-                notification.show();
+                notificationHandler.actions.show();
 
                 try {
                     await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
@@ -128,7 +128,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
             [
                 dispatch,
                 viewedUser,
-                notification,
+                notificationHandler,
                 loggedInUser,
                 setIsPremiumModalOpen
             ]
@@ -178,14 +178,14 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 ref={fileTreeRef}
             >
                 {
-                    notification.visible && (
+                    notificationHandler.state.visible && (
                         <div
-                            className={`${commonStyles.common__notification} ${notification.closing
+                            className={`${commonStyles.common__notification} ${notificationHandler.state.closing
                                 ? commonStyles['common__notification--closing']
                                 : ''
                             }`}
-                            key={notification.id}
-                            onClick={notification.close}
+                            key={notificationHandler.state.id}
+                            onClick={notificationHandler.actions.close}
                         >
                             You
                             {viewedUser?.isViewBlocked
@@ -346,7 +346,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
         );
 
     }, (prev, next) =>
-        prev.isOpened === next.isOpened &&
+        prev.isFileTreeOpened === next.isFileTreeOpened &&
         prev.viewedUserEmail === next.viewedUserEmail
 );
 

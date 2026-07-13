@@ -1,6 +1,16 @@
 import {SearchType} from "../../../types/searchType";
 
-export const useSelectPlaceholderText = (isNarrowScreen: boolean, searchType: SearchType) => {
+interface Props {
+    isNarrowScreen: boolean;
+    searchType: SearchType;
+}
+
+export const useSearchPlaceholderText = (
+    {
+        isNarrowScreen,
+        searchType
+    }: Props
+) => {
     if (isNarrowScreen) {
         return searchType === SearchType.InFileNames
             ? "Files..."

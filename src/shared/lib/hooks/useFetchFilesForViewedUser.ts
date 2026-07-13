@@ -6,7 +6,7 @@ import {clearServerFiles} from "../../../store/slices/fileServerSlice";
 import {clearUiState} from "../../../store/slices/fileUiSlice";
 import {fetchFilesByEmail} from "../../../store/thunks/files/fetchFilesByEmail";
 
-interface Params {
+interface Props {
     viewedUser: User | null;
     loggedInUser: User | null;
 }
@@ -15,7 +15,7 @@ export const useFetchFilesForViewedUser = (
     {
         viewedUser,
         loggedInUser,
-    }: Params) => {
+    }: Props) => {
 
     const reduxDispatch = useDispatch<AppDispatch>();
 

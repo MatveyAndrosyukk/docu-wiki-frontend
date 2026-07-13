@@ -7,14 +7,23 @@ import useRemoveFileHandler from "./hooks/use-remove-file-handler/useRemoveFileH
 import useFileActionsHandler from "./hooks/use-file-actions-hanler/useFileActionsHandler";
 import {useFileLikesHandler} from "./hooks/use-file-likes-handler/useFileLikesHandler";
 
+interface Props {
+    premiumHandler: PremiumState
+}
+
 export default function useFilesHandler(
-    premiumState: PremiumState
+    {
+        premiumHandler,
+    }: Props
 ): FilesState {
+
     const fileRemoveHandler = useRemoveFileHandler();
 
     const fileActionsHandler = useFileActionsHandler(
-        premiumState,
-        fileRemoveHandler.actions.open
+        {
+            premiumHandler,
+            openDeleteModal: fileRemoveHandler.actions.open,
+        }
     );
 
     const fileLikesHandler = useFileLikesHandler();

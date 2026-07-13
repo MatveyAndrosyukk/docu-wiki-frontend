@@ -16,7 +16,7 @@ import findPathToFile from "../../shared/lib/utils/findFilePath";
 import {selectOpenedFile} from "../../store/selectors/selectOpenedFile";
 import {selectFileTree} from "../../store/selectors/selectFileTree";
 import {useAppContext} from "../../context/app-context/hooks/useAppContext";
-import {useResponsiveFileTree} from "../../shared/lib/hooks/useResponsiveFileTree";
+import {useFileTreeVisionState} from "../../shared/lib/hooks/useFileTreeVisionState";
 import {useResetPasswordModal} from "../../shared/ui/modal-windows/reset-password-modal/hooks/useResetPasswordModal";
 import {useSetDocumentTitle} from "../../shared/lib/hooks/useSetDocumentTitle";
 import {useViewedUserLoader} from "../../shared/lib/hooks/useViewedUserLoader";
@@ -102,9 +102,9 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
     }, [openedFile, files, loggedInUser]);
 
     const {
-        isFileTreeOpened,
-        setIsFileTreeOpened
-    } = useResponsiveFileTree();
+        isOpened,
+        setIsOpened
+    } = useFileTreeVisionState();
 
     useResetPasswordModal(
         resetToken,
@@ -116,7 +116,11 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
         "Docuwiki Studio"
     );
 
-    useViewedUserLoader(currentUserEmail);
+    useViewedUserLoader(
+        {
+            email: currentUserEmail,
+        }
+    );
 
     useFetchFilesForViewedUser(
         {
@@ -185,26 +189,26 @@ const MainPage: FC<MainPageProps> = ({viewedUserEmail, resetToken, fileId}) => {
             <div className={styles['container']}>
 
                 <FileTree
-                    isOpened={isFileTreeOpened}
-                    setIsOpened={setIsFileTreeOpened}
+                    isFileTreeOpened={isOpened}
+                    setIsFileTreeOpened={setIsOpened}
                     viewedUserEmail={viewedUserEmail}
                 />
 
                 <OpenedFile
                     isFileLoading={isFileLoading}
-                    isFileTreeOpened={isFileTreeOpened}
-                    setIsFileTreeOpened={setIsFileTreeOpened}
+                    isFileTreeOpened={isOpened}
+                    setIsFileTreeOpened={setIsOpened}
                     viewedUserEmail={viewedUserEmail}
                 />
 
             </div>
 
             {
-                (isFileTreeOpened && window.innerWidth < 1270) &&
+                (isOpened && window.innerWidth < 1270) &&
                 (
                     <div
                         className={styles.overlay}
-                        onClick={() => setIsFileTreeOpened(false)}
+                        onClick={() => setIsOpened(false)}
                     />
 
                 )

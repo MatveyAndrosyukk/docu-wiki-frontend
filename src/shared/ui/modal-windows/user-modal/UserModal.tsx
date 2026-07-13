@@ -3,7 +3,7 @@ import styles from './UserModal.module.scss';
 import commonStyles from '../../../assets/styles/Common.module.scss'
 import Modal from "../modal/Modal";
 import { User } from "../../../../store/slices/userSlice";
-import { UserModalState } from "../../../lib/hooks/useUserModalActions";
+import { UserModalState } from "../../../lib/hooks/use-user-handler/useUserHandler";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";

@@ -9,7 +9,7 @@ import {ReactComponent as FolderIcon} from './images/search-input-folder.svg'
 import {useWindowWidth} from "../../../../../../shared/lib/hooks/useWindowWidth";
 import {useFileSearch} from "../../../../../../shared/lib/hooks/useFileSearch";
 import {useElementOutsideEvent} from "../../../../../../shared/lib/hooks/useElementOutsideEvent";
-import {useSelectPlaceholderText} from "../../../../../../shared/lib/hooks/useSelectPlaceholderText";
+import {useSearchPlaceholderText} from "../../../../../../shared/lib/hooks/useSearchPlaceholderText";
 
 interface SearchProps {
     onClick: (
@@ -35,15 +35,19 @@ const SearchInput: React.FC<SearchProps> = ({onClick, searchType}) => {
     const isNarrowScreen = width < 457;
 
     const results = useFileSearch(
-        query,
-        files,
-        searchType
+        {
+            query,
+            files,
+            searchType
+        }
     );
 
     const placeholderText =
-        useSelectPlaceholderText(
-            isNarrowScreen,
-            searchType
+        useSearchPlaceholderText(
+            {
+                isNarrowScreen,
+                searchType
+            }
         );
 
     useElementOutsideEvent(

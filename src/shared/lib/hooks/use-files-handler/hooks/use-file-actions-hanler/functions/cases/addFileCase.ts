@@ -37,7 +37,7 @@ export function addFileCase(
 
         loggedInUser,
 
-        premiumState,
+        premiumHandler,
 
         closeModal,
 
@@ -72,7 +72,7 @@ export function addFileCase(
 
         closeModal();
 
-        premiumState.setIsPremiumModalOpen(
+        premiumHandler.setIsPremiumModalOpen(
             true
         );
 

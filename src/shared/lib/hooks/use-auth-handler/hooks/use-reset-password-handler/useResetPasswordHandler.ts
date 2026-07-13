@@ -5,9 +5,16 @@ import {RegisterActionsState} from "../use-registration-handler/registration.typ
 import {initialState, ResetPasswordActionsState, ResetPasswordValue} from "./reset-password.types";
 import {resetPasswordReducer} from "./reset-password.reducer";
 
+interface Props {
+    loginHandler: LoginActionsState,
+    registrationHandler: RegisterActionsState,
+}
+
 export default function useResetPasswordHandler(
-    login: LoginActionsState,
-    registration: RegisterActionsState,
+    {
+        loginHandler,
+        registrationHandler
+    }: Props
 ): ResetPasswordActionsState {
 
     const newPasswordInputRef = useRef<HTMLInputElement>(null);
@@ -279,19 +286,19 @@ export default function useResetPasswordHandler(
                     resetToken
                 );
 
-                login.actions.setValue(loginModalInitialValue)
+                loginHandler.actions.setValue(loginModalInitialValue)
 
-                login.actions.setError(null);
+                loginHandler.actions.setError(null);
 
-                login.actions.setMessage(
+                loginHandler.actions.setMessage(
                     'Password was reset successfully'
                 );
 
                 closeModal();
 
-                registration.actions.setIsModal(false);
+                registrationHandler.actions.setIsModal(false);
 
-                login.actions.openModal();
+                loginHandler.actions.openModal();
 
             } catch (error) {
 
@@ -304,9 +311,9 @@ export default function useResetPasswordHandler(
         },
         [
             changePassword,
-            login.actions,
+            loginHandler.actions,
             closeModal,
-            registration.actions
+            registrationHandler.actions
         ]
     );
 

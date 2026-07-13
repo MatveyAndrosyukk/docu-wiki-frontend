@@ -6,20 +6,50 @@ import {fetchViewedUserByEmail} from "../../../store/thunks/user/fetchViewedUser
 import {clearServerFiles} from "../../../store/slices/fileServerSlice";
 import {clearUiState} from "../../../store/slices/fileUiSlice";
 
-export const useViewedUserLoader = (
-    email: string | null,
-) => {
-    const dispatch = useDispatch<AppDispatch>();
+interface Props {
+    email: string | null;
+}
 
-    useEffect(() => {
-        if (email && email.trim() !== '') {
-            dispatch(fetchViewedUserByEmail(email));
-        } else {
-            dispatch(clearServerFiles());
-            dispatch(clearUiState())
-            dispatch(clearViewedUser());
-            dispatch(clearLoggedInUser());
-        }
-    }, [email, dispatch]);
+export const useViewedUserLoader = (
+    {
+        email,
+    }: Props
+) => {
+
+    const reduxDispatch = useDispatch<AppDispatch>();
+
+    useEffect(
+        () => {
+
+            if (email && email.trim() !== '') {
+
+                reduxDispatch(fetchViewedUserByEmail(
+                        email
+                    )
+                );
+            } else {
+
+                reduxDispatch(
+                    clearServerFiles()
+                );
+
+                reduxDispatch(
+                    clearUiState()
+                );
+
+                reduxDispatch(
+                    clearViewedUser()
+                );
+
+                reduxDispatch(
+                    clearLoggedInUser()
+                );
+            }
+        },
+        [
+            email,
+            reduxDispatch
+        ]
+    );
 
 };

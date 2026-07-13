@@ -7,13 +7,15 @@ import {jwtDecode} from "jwt-decode";
 import {useAuthContext} from "../../../context/auth-context/hooks/useAuthContext";
 
 export default function useRefreshToken() {
+
     const reduxDispatch = useDispatch<AppDispatch>();
 
     const {
         setAuthStatus
     } = useAuthContext();
 
-    useEffect(() => {
+    useEffect(
+        () => {
 
             const refreshToken = localStorage.getItem(
                 'refreshToken'

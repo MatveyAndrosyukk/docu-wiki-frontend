@@ -3,7 +3,7 @@ import {LoginActionsState} from "../use-login-handler/login.types";
 import {RegisterActionsState} from "../use-registration-handler/registration.types";
 import {AuthorizationActionsState} from "./authorization.types";
 
-type Props = {
+interface Props {
     login: LoginActionsState;
     registration: RegisterActionsState
 }

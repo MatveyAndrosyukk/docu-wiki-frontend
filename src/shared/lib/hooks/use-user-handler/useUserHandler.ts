@@ -1,11 +1,11 @@
 import React, {Dispatch, RefObject, SetStateAction, useCallback, useEffect, useRef} from "react";
-import {User} from "../../../store/slices/userSlice";
+import {User} from "../../../../store/slices/userSlice";
 import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../store";
-import {addUserWhoCanEdit} from "../../../store/thunks/user/addUserWhoCanEdit";
-import {deleteUserWhoCanEdit} from "../../../store/thunks/user/deleteUserWhoCanEdit";
-import {changeUserName} from "../../../store/thunks/user/changeUserName";
-import {useAuthContext} from "../../../context/auth-context/hooks/useAuthContext";
+import {AppDispatch} from "../../../../store";
+import {addUserWhoCanEdit} from "../../../../store/thunks/user/addUserWhoCanEdit";
+import {deleteUserWhoCanEdit} from "../../../../store/thunks/user/deleteUserWhoCanEdit";
+import {changeUserName} from "../../../../store/thunks/user/changeUserName";
+import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 
 export interface UserModalState {
     isAddingEditor: boolean;
@@ -43,7 +43,7 @@ type Props = {
     openLoginModal(): void,
 }
 
-export default function useUserModalActions(
+export default function useUserHandler(
     {
         user,
         openLoginModal

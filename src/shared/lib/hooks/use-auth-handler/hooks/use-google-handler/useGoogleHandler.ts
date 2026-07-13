@@ -10,14 +10,15 @@ import {GoogleActionsState, initialState} from "./google.types";
 import {googleReducer} from "./google.reducer";
 import {useAuthContext} from "../../../../../../context/auth-context/hooks/useAuthContext";
 
-type Props = {
+interface Props {
     closeLoginModal(): void;
-};
+}
 
 export default function useGoogleHandler(
     {
         closeLoginModal,
     }: Props): GoogleActionsState {
+
     const {setAuthStatus} = useAuthContext();
 
     const reduxDispatch = useDispatch<AppDispatch>();

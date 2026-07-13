@@ -25,9 +25,16 @@ import useContextMenuHandler from "../use-context-menu-handler/useContextMenuHan
 import {fileActionsHandlerReducer} from "./file-actions-handler.reducer";
 import {filesLimit} from "./file-actions-handler.constants";
 
-export default function useFileActionsHandler(
-    premiumState: PremiumState,
+interface Props {
+    premiumHandler: PremiumState,
     openDeleteModal: any,
+}
+
+export default function useFileActionsHandler(
+    {
+        premiumHandler,
+        openDeleteModal,
+    }: Props
 ): FileActionsHandlerStateActions {
 
     const inputRef =
@@ -158,7 +165,7 @@ export default function useFileActionsHandler(
                 loggedInUser,
                 totalFiles,
                 filesLimit,
-                premiumState,
+                premiumHandler,
                 closeModal: close,
                 setModalError: setError,
             }),
@@ -168,7 +175,7 @@ export default function useFileActionsHandler(
                 viewedUser?.email,
                 loggedInUser,
                 totalFiles,
-                premiumState,
+                premiumHandler,
                 close,
                 setError,
             ]

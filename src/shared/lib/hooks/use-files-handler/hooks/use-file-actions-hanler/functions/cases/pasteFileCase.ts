@@ -43,7 +43,7 @@ export function pasteFileCase(
 
         closeModal,
 
-        premiumState,
+        premiumHandler,
 
         dispatch,
 
@@ -86,7 +86,7 @@ export function pasteFileCase(
 
         closeModal();
 
-        premiumState.setIsPremiumModalOpen(true);
+        premiumHandler.setIsPremiumModalOpen(true);
 
         return;
     }

@@ -2,7 +2,7 @@ import {RefObject, useEffect} from "react";
 
 type EventType = "click" | "dblclick" | "mousedown" | "mouseup";
 
-interface Params {
+interface Props {
     ref: RefObject<HTMLElement | null>;
 
     eventType: EventType;
@@ -21,7 +21,7 @@ export const useElementOutsideEvent = (
         handler,
         enabled = true,
         excludeRef,
-    }: Params
+    }: Props
 ) => {
 
     useEffect(

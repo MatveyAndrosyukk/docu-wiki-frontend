@@ -3,11 +3,12 @@ import useFilesHandler from "../../shared/lib/hooks/use-files-handler/useFilesHa
 import useBanUserHandler from "../../shared/lib/hooks/use-ban-user-handler/useBanUserHandler";
 import usePremiumModal, {PremiumState} from "../../shared/ui/modal-windows/premium-modal/utils/hooks/usePremiumModal";
 import {Context} from "./Context";
-import useAuthHandler, {AuthState} from "../../shared/lib/hooks/use-auth-handler/useAuthHandler";
+import useAuthHandler from "../../shared/lib/hooks/use-auth-handler/useAuthHandler";
 import {BanUserActionsState} from "../../shared/lib/hooks/use-ban-user-handler/ban-user.types";
 import useEditorHandler from "../../shared/lib/hooks/use-editor-handler/useEditorHandler";
 import {EditorState} from "../../shared/lib/hooks/use-editor-handler/editor.types";
 import {FilesState} from "../../shared/lib/hooks/use-files-handler/files.types";
+import {AuthState} from "../../shared/lib/hooks/use-auth-handler/auth-handler.types";
 
 export interface ProviderState {
     filesHandler: FilesState;
@@ -17,19 +18,28 @@ export interface ProviderState {
     editorHandler: EditorState;
 }
 
-export interface Params {
+export interface Props {
     children: ReactNode;
 }
 
-export const AppProvider: FC<Params> = (
+export const AppProvider: FC<Props> = (
     {
         children
     }
 ) => {
+
     const premiumHandler = usePremiumModal();
-    const filesHandler = useFilesHandler(premiumHandler);
+
+    const filesHandler = useFilesHandler(
+        {
+            premiumHandler
+        }
+    );
+
     const banHandler = useBanUserHandler();
+
     const authHandler = useAuthHandler();
+
     const editorHandler = useEditorHandler();
 
     return (

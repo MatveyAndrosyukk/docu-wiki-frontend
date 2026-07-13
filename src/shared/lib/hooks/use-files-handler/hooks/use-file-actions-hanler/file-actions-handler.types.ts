@@ -98,14 +98,24 @@ export const initialState: FileActionsHandlerState = {
 };
 
 export interface FileActionsHandlerContext {
+
     files: UiFile[];
+
     dispatch: AppDispatch;
+
     viewedUserEmail: string;
+
     loggedInUser: User | null;
+
     totalFiles: number;
+
     filesLimit: number;
-    premiumState: PremiumState;
+
+    premiumHandler: PremiumState;
+
     closeModal: () => void;
+
     setModalError: (value: string) => void;
+
     loggedInUserEmail: string | null;
 }

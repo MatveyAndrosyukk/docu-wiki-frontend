@@ -4,6 +4,7 @@ import {ChangeEmailActionsState, initialState} from "./change-email.types";
 import {changeEmailReducer} from "./change-email.reducer";
 
 export default function useChangeEmailHandler(): ChangeEmailActionsState {
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [state, dispatch] = useReducer(
