@@ -2,7 +2,7 @@
   background-color: #191a1a;
   border-radius: 8px;
 
-  overflow: hidden;
+  overflow: visible;
 
   font-family: "DM Mono", monospace;
   font-weight: 300;
@@ -19,13 +19,15 @@
 
 
   &__header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
     height: 40px;
 
     display: flex;
     align-items: center;
     justify-content: center;
-
-    position: relative;
 
     border-bottom: 1px solid #2b2c2d;
 

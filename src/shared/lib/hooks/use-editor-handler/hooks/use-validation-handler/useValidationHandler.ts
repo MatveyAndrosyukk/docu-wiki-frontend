@@ -18,6 +18,7 @@ export default function useValidationHandler(
 
     useEffect(
         () => {
+            console.log("Validation", content.length);
 
             const contentLength = content.length;
 
@@ -39,14 +40,14 @@ export default function useValidationHandler(
             }
 
             if (
-                imagesLength > 5 &&
+                imagesLength > 3 &&
                 !isUserAdminOrOwner(
                     loggedInUser
                 )
             ) {
 
                 setContentError(
-                    `You have inserted too many pictures (${imagesLength}/5).`
+                    `You have inserted too many pictures (${imagesLength}/3).`
                 );
 
                 return;

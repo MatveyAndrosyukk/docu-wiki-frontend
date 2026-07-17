@@ -1,7 +1,7 @@
 import React, {Dispatch, SetStateAction} from 'react';
 import styles from "../../../pages/main-page/components/opened-file/OpenedFile.module.scss";
 import emptyStyles from "./EmplyFile.module.scss";
-import {ReactComponent as BurgerSvg} from '../../../pages/main-page/components/opened-file/images/empty-file-burger.svg'
+import {ReactComponent as BurgerSvg} from '../../../pages/main-page/components/opened-file/images/burger.svg'
 import commonStyles from '../../assets/styles/Common.module.scss';
 
 interface EmptyFileProps {

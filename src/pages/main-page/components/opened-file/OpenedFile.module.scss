@@ -126,7 +126,7 @@
       position: relative;
 
       &::before {
-        content: url("./images/opened-file-ellipse.svg");
+        content: url("images/ellipse.svg");
         position: absolute;
         top: -3px;
         left: 20px;
@@ -152,8 +152,8 @@
     font-weight: 400;
     font-size: 13px;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    justify-content: end;
     color: #8D9191;
     padding: 7px 11px;
     border-top: 1px solid #2B2C2D;
@@ -521,4 +521,27 @@
   cursor: pointer;
   backdrop-filter: blur(4px);
   transition: all 0.2s ease;
+}
+
+.report-file {
+  margin-left: 20px;
+  margin-right: 10px;
+
+  cursor: pointer;
+
+  color: #8D9191;
+  transition: color .2s ease;
+
+  &:hover {
+    color: #EF4444;
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.last-editor{
+
 }

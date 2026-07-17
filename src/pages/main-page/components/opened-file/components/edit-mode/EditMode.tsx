@@ -83,7 +83,7 @@ const EditMode: FC<Params> = (
     );
 
 
-    const handleSaveEdition =
+    const saveEdition =
         useCallback(
             () => {
 
@@ -107,7 +107,7 @@ const EditMode: FC<Params> = (
         );
 
 
-    const handleCancelEdition =
+    const cancelEdition =
         useCallback(
             async () => {
 
@@ -181,7 +181,7 @@ const EditMode: FC<Params> = (
                         }
 
                         onClick={
-                            handleSaveEdition
+                            saveEdition
                         }
 
                         disabled={
@@ -200,7 +200,7 @@ const EditMode: FC<Params> = (
                         }
 
                         onClick={
-                            handleCancelEdition
+                            cancelEdition
                         }
                     >
                         Cancel
@@ -265,7 +265,7 @@ const EditMode: FC<Params> = (
                 }
 
                 onCancelEditedFileChange={
-                    handleCancelEdition
+                    cancelEdition
                 }
 
                 addedImagesWhileEditing={

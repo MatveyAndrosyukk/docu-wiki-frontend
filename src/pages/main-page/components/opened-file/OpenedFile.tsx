@@ -1,7 +1,8 @@
 import React, {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import styles from './OpenedFile.module.scss'
 import emptyStyles from '../../../../shared/ui/empty-file/EmplyFile.module.scss'
-import {ReactComponent as BurgerSvg} from './images/empty-file-burger.svg'
+import {ReactComponent as BurgerSvg} from './images/burger.svg'
+import {ReactComponent as ReportSvg} from './images/report.svg'
 import EditMode from './components/edit-mode/EditMode'
 import {useNavigate} from "react-router-dom";
 import EmptyFile from "../../../../shared/ui/empty-file/EmptyFile";
@@ -422,32 +423,47 @@ const OpenedFile: React.FC<Props> = (
                     styles['opened-file__footer']
                 }
             >
-                Last edited
-
-                {
-                    formatDate(
-                        openedFile.updatedAt
-                    )
-                }
-
-                -
-                <span
+                <div
                     className={
-                        styles['footer__editor']
-                    }
-
-                    onClick={
-                        () => handleGoToUsersPage(
-                            openedFile.lastEditor as string
-                        )
+                        styles['last-editor']
                     }
                 >
+                    Last edited
+
+                    {
+                        " " +
+                        formatDate(
+                            openedFile.updatedAt
+                        ) + " -"
+                    }
+                    <span
+                        className={
+                            styles['footer__editor']
+                        }
+
+                        onClick={
+                            () => handleGoToUsersPage(
+                                openedFile.lastEditor as string
+                            )
+                        }
+                    >
                     {
                         openedFile.lastEditor
                     }
                 </span>
+                </div>
+                <div
+                    className={
+                        styles['report-file']
+                    }
+                >
+                    <ReportSvg
+                        className={
+                            styles['report-file__icon']
+                        }
+                    />
+                </div>
             </div>
-
             <div
                 style={
                     {
