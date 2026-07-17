@@ -42,7 +42,7 @@ const CodeBlock: FC<Props> = (
         ]
     );
 
-    const maxHeight = isCodeHidden ? '35px' : 'none';
+    const codeDisplay = isCodeHidden ? 'none' : 'block';
 
     const HideIcon = isCodeHidden
         ? ShowCodeSvg
@@ -74,13 +74,8 @@ const CodeBlock: FC<Props> = (
 
     return (
         <div
-            style={
-                {
-                    maxHeight
-                }
-            }
             className={
-                `${styles['code-block']}`
+                styles['code-block']
             }
         >
             <div
@@ -132,6 +127,11 @@ const CodeBlock: FC<Props> = (
                 </div>
             </div>
             <div
+                style={
+                    {
+                        display: codeDisplay
+                    }
+                }
                 className={`
                 ${styles['code-block-wrapper']} 
                 ${isCodeHidden

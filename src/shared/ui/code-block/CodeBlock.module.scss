@@ -1,7 +1,7 @@
 .code-block {
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 6px;
   scrollbar-width: thin;
   scrollbar-color: #8D9191 #191A1A;
@@ -76,7 +76,8 @@
     position: sticky;
     top: 0;
 
-    height: 34px;
+    height: 40px;
+    flex-shrink: 0;
 
     display: flex;
     align-items: center;
@@ -85,6 +86,8 @@
     padding: 0 8px;
 
     background: #191A1A;
+
+    border-radius: 6px !important;
 
     z-index: 10;
   }
