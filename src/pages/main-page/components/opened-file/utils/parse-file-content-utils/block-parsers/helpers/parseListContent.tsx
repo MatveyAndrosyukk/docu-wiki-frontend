@@ -9,13 +9,12 @@ import parseDividerBlock from "../parseDividerBlock";
 
 import styles from "../../../../OpenedFile.module.scss";
 
-import {PendingImages, NumberingRef} from "../../types";
+import {NumberingRef, PendingImages} from "../../types";
 
 export default function parseListContent(
     lines: string[],
     startIndex: number,
     onImageClick: (url: string) => void,
-    isFileTreeOpened: boolean,
     pendingImages: PendingImages,
     numberingRef: NumberingRef
 ) {
@@ -33,7 +32,6 @@ export default function parseListContent(
             const result = parseCodeBlock(
                 lines,
                 i,
-                isFileTreeOpened
             );
 
             elements.push(result.element);

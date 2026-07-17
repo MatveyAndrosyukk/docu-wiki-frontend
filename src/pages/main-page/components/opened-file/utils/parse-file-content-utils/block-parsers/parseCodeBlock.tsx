@@ -5,9 +5,15 @@ import CodeBlock from "../../../../../../../shared/ui/code-block/CodeBlock";
 export default function parseCodeBlock(
     lines: string[],
     startIndex: number,
-    isFileTreeOpened: boolean
 ) {
     const codeLines: string[] = [];
+
+    const firstLine = lines[startIndex];
+
+    const match =
+        firstLine.match(/\[C(?:\s+name="([^"]*)")?]/);
+
+    const fileName = match?.[1] ?? "";
 
     let i = startIndex + 1;
 
@@ -30,8 +36,8 @@ export default function parseCodeBlock(
                 }
             >
                 <CodeBlock
+                    fileName={fileName}
                     code={codeLines.join('\n')}
-                    isFileTreeOpened={isFileTreeOpened}
                 />
             </div>
         )

@@ -177,8 +177,7 @@ export default function useTextareaHandler(
             end: string,
         ) => {
 
-            const textarea =
-                state.textareaRef?.current;
+            const textarea = state.textareaRef?.current;
 
             if (!textarea) {
                 return;
@@ -190,24 +189,41 @@ export default function useTextareaHandler(
                 value,
             } = textarea;
 
-            const newText =
-                value.substring(
-                    0,
-                    selectionStart
-                )
-                + start
-                + value.substring(
-                    selectionStart,
-                    selectionEnd
-                )
-                + end
-                + value.substring(
-                    selectionEnd
-                );
+            const selectedText =
+                value.substring(selectionStart, selectionEnd);
 
-            setContent(
-                newText
-            );
+            const newText =
+                value.substring(0, selectionStart) +
+                start +
+                selectedText +
+                end +
+                value.substring(selectionEnd);
+
+            setContent(newText);
+
+            requestAnimationFrame(() => {
+
+                textarea.focus();
+
+                if (selectionStart === selectionEnd) {
+
+                    const cursor =
+                        selectionStart + start.length;
+
+                    textarea.setSelectionRange(
+                        cursor,
+                        cursor
+                    );
+
+                } else {
+
+                    textarea.setSelectionRange(
+                        selectionStart + start.length,
+                        selectionEnd + start.length
+                    );
+
+                }
+            });
 
         },
         [

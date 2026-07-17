@@ -2,23 +2,29 @@ import React, {FC, useCallback, useMemo, useState} from 'react';
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import {darcula} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import styles from './CodeBlock.module.scss';
-import {ReactComponent as ExpandCodeSvg} from './images/code-block-expand-code.svg';
+import {ReactComponent as HideCodeSvg} from './images/hide-code.svg';
+import {ReactComponent as ShowCodeSvg} from './images/show-code.svg';
+import {ReactComponent as CopyCodeSvg} from './images/copy-code.svg';
+import {ReactComponent as CheckSvg} from './images/check.svg'; // или любая галочка
 import {getLanguage} from "../../lib/utils/getLanguage";
 import {useDebouncedValue} from "../../lib/hooks/useDebouncedValue";
-import useCheckIsMobile from "../../lib/hooks/useCheckIsMobile";
 
 interface Props {
     code: string;
 
-    isFileTreeOpened: boolean;
+    fileName?: string;
 }
 
 const CodeBlock: FC<Props> = (
     {
         code,
-        isFileTreeOpened
+        fileName,
     }) => {
-    const [isCodeExpanded, setIsCodeExpanded] = useState(
+    const [isCodeHidden, setIsCodeHidden] = useState(
+        false
+    );
+
+    const [isCopied, setIsCopied] = useState(
         false
     );
 
@@ -36,35 +42,35 @@ const CodeBlock: FC<Props> = (
         ]
     );
 
-    const isMobile = useCheckIsMobile();
+    const maxHeight = isCodeHidden ? '35px' : 'none';
 
-    const maxHeight = useMemo(
+    const HideIcon = isCodeHidden
+        ? ShowCodeSvg
+        : HideCodeSvg;
+
+    const CopyIcon = isCopied
+        ? CheckSvg
+        : CopyCodeSvg;
+
+    const hideCode = useCallback(
         () => {
 
-            if (isMobile) return 'none';
-
-            if (isCodeExpanded) return isFileTreeOpened
-                ? '21em'
-                : '22em';
-
-            return 'none';
-        },
-        [
-            isMobile,
-            isCodeExpanded,
-            isFileTreeOpened
-        ]
-    );
-
-    const handleExpandCode = useCallback(
-        () => {
-
-            setIsCodeExpanded(
+            setIsCodeHidden(
                 prev => !prev
             );
         },
         []
     );
+
+    const copyCode = useCallback(async () => {
+        await navigator.clipboard.writeText(code);
+
+        setIsCopied(true);
+
+        setTimeout(() => {
+            setIsCopied(false);
+        }, 1500);
+    }, [code]);
 
     return (
         <div
@@ -78,9 +84,57 @@ const CodeBlock: FC<Props> = (
             }
         >
             <div
+                className={
+                    styles['code-block__header']
+                }
+            >
+                <div
+                    className={
+                        styles['code-block__file-name']
+                    }
+                >
+                    {fileName?.trim() || 'file'}
+                </div>
+
+                <div
+                    className={
+                        styles['code-block__actions']
+                    }
+                >
+                    <button
+                        className={
+                            styles['code-block__action']
+                        }
+                        onClick={
+                            copyCode
+                        }
+                    >
+                        <CopyIcon
+                            className={
+                                styles['code-block__action-icon']
+                            }
+                        />
+                    </button>
+                    <button
+                        className={
+                            styles['code-block__action']
+                        }
+                        onClick={
+                            hideCode
+                        }
+                    >
+                        <HideIcon
+                            className={
+                                styles['code-block__action-icon']
+                            }
+                        />
+                    </button>
+                </div>
+            </div>
+            <div
                 className={`
                 ${styles['code-block-wrapper']} 
-                ${isCodeExpanded
+                ${isCodeHidden
                     ? styles['code-block-expanded']
                     : ''}
                     `}
@@ -110,21 +164,6 @@ const CodeBlock: FC<Props> = (
                         code
                     }
                 </SyntaxHighlighter>
-            </div>
-            <div
-                className={
-                    styles['code-block__expand']
-                }
-            >
-                <ExpandCodeSvg
-                    className={
-                        styles['code-block__expand-icon']
-                    }
-
-                    onClick={
-                        handleExpandCode
-                    }
-                />
             </div>
         </div>
     );

@@ -19,7 +19,6 @@ export default function parseNumberListBlock(
         lines,
         startIndex + 1,
         onImageClick,
-        isFileTreeOpened,
         pendingImages,
         numberingRef
     );

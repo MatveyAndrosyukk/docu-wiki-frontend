@@ -1,6 +1,6 @@
 import React, {FC, useCallback, useMemo, useState} from 'react';
 import styles from './TerminalBlock.module.scss'
-import {ReactComponent as ExpandCodeSvg} from '../code-block/images/code-block-expand-code.svg';
+import {ReactComponent as HideCodeSvg} from '../code-block/images/hide-code.svg';
 
 interface Props {
     commands: string;
@@ -12,7 +12,7 @@ const TerminalBlock: FC<Props> = (
     }
 ) => {
 
-    const [isExpanded, setIsExpanded] = useState(
+    const [isHidden, setIsHidden] = useState(
         false
     );
 
@@ -23,12 +23,12 @@ const TerminalBlock: FC<Props> = (
     const maxHeight = useMemo(
         () => {
 
-            if (isExpanded) return '500px';
+            if (isHidden) return '500px';
 
             return 'none';
         },
         [
-            isExpanded
+            isHidden
         ]
     );
 
@@ -67,7 +67,7 @@ const TerminalBlock: FC<Props> = (
     const handleExpand = useCallback(
         () => {
 
-            setIsExpanded(
+            setIsHidden(
                 prev => !prev
             );
         },
@@ -85,7 +85,7 @@ const TerminalBlock: FC<Props> = (
 
             className={`
             ${styles['terminal-block']} 
-            ${isExpanded
+            ${isHidden
                 ? styles['terminal-block-expanded']
                 : ''
             }`}
@@ -159,7 +159,7 @@ const TerminalBlock: FC<Props> = (
                     handleExpand
                 }
             >
-                <ExpandCodeSvg
+                <HideCodeSvg
                     className={
                         styles['terminal-block__expand-icon']
                     }

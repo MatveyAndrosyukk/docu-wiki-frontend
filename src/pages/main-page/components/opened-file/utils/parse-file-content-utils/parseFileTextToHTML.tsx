@@ -26,11 +26,10 @@ export default function parseFileTextToHTML(
 
         const line = lines[i].trim();
 
-        if (line.startsWith('[C]')) {
+        if (/^\[C\b/.test(line)) {
             const result = parseCodeBlock(
                 lines,
                 i,
-                isFileTreeOpened
             );
 
             elements.push(result.element);
