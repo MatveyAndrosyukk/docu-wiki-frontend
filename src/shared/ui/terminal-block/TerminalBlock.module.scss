@@ -1,61 +1,92 @@
 .terminal-block {
   background-color: #191a1a;
-  padding: 0 1em 1em 1em;
   border-radius: 8px;
+
+  overflow: hidden;
+
   font-family: "DM Mono", monospace;
   font-weight: 300;
   font-size: 13px;
   line-height: 18px;
+
   color: #e8e8e6;
+
   white-space: pre-wrap;
   word-break: break-word;
-  overflow: auto;
+
   scrollbar-width: thin;
   scrollbar-color: #8d9191 #191a1a;
-  position: relative;
 
-  max-height: inherit;
 
-  &-wrapper {
-  }
+  &__header {
+    height: 40px;
 
-  &-expanded {
-    max-height: none;
-    overflow: visible;
-  }
-
-  &-title {
-    user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 30px;
-    margin-bottom: 1em;
+
+    position: relative;
+
     border-bottom: 1px solid #2b2c2d;
+
+    background: #191a1a;
+
+    user-select: none;
   }
 
-  &__expand {
+
+  &__title {
+    font-size: 13px;
+    color: #8d9191;
+  }
+
+
+  &__action {
     cursor: pointer;
+
+    position: absolute;
+    right: 7px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     background-color: #191a1a;
+
     border: 1px solid #2b2c2d;
     border-radius: 8px;
-    width: 23px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 3px;
-    right: 7px;
-    z-index: 5;
+
 
     &:hover {
       background-color: #202222;
     }
+  }
 
-    &-icon {
-      width: 15px;
-      height: 15px;
-    }
+
+  &__action-icon {
+    width: 17px;
+    height: 17px;
+  }
+
+
+  &__content {
+    padding: 1em;
+
+    height: auto;
+
+    overflow: hidden;
+
+    transition: height .25s ease, padding .25s ease;
+  }
+
+
+  &__content-hidden {
+    height: 0;
+
+    padding-top: 0;
+    padding-bottom: 0;
   }
 }

@@ -42,8 +42,6 @@ const CodeBlock: FC<Props> = (
         ]
     );
 
-    const codeDisplay = isCodeHidden ? 'none' : 'block';
-
     const HideIcon = isCodeHidden
         ? ShowCodeSvg
         : HideCodeSvg;
@@ -127,17 +125,12 @@ const CodeBlock: FC<Props> = (
                 </div>
             </div>
             <div
-                style={
-                    {
-                        display: codeDisplay
-                    }
-                }
                 className={`
-                ${styles['code-block-wrapper']} 
-                ${isCodeHidden
-                    ? styles['code-block-expanded']
-                    : ''}
-                    `}
+                            ${styles['code-block-wrapper']}
+                            ${isCodeHidden
+                                ? styles['code-block-wrapper-hidden']
+                                : ''}
+                          `}
             >
                 <SyntaxHighlighter
                     language={

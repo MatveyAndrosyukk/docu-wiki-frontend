@@ -10,10 +10,22 @@
 
   &-wrapper {
     position: relative;
-    max-height: inherit;
 
-    &.code-block-hidden {
-      max-height: none;
+    max-height: 2000px;
+    overflow: hidden;
+
+    transition: max-height 0.3s ease,
+    opacity 0.25s ease,
+    transform 0.3s ease;
+
+    opacity: 1;
+    transform: translateY(0);
+
+
+    &-hidden {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-20px);
     }
   }
 

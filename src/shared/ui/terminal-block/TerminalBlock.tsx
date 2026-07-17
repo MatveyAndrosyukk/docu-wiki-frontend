@@ -1,6 +1,7 @@
-import React, {FC, useCallback, useMemo, useState} from 'react';
+import React, {FC, useCallback, useState} from 'react';
 import styles from './TerminalBlock.module.scss'
 import {ReactComponent as HideCodeSvg} from '../code-block/images/hide-code.svg';
+import {ReactComponent as ShowCodeSvg} from '../code-block/images/show-code.svg';
 
 interface Props {
     commands: string;
@@ -18,18 +19,6 @@ const TerminalBlock: FC<Props> = (
 
     const lines = commands.split(
         '\n'
-    );
-
-    const maxHeight = useMemo(
-        () => {
-
-            if (isHidden) return '500px';
-
-            return 'none';
-        },
-        [
-            isHidden
-        ]
     );
 
     const promptRegex = new RegExp(
@@ -64,7 +53,11 @@ const TerminalBlock: FC<Props> = (
         '\\s*(.*)$'
     );
 
-    const handleExpand = useCallback(
+    const HideIcon = isHidden
+        ? ShowCodeSvg
+        : HideCodeSvg;
+
+    const hide = useCallback(
         () => {
 
             setIsHidden(
@@ -74,98 +67,104 @@ const TerminalBlock: FC<Props> = (
         []
     );
 
-    return (
-        <pre
-            style={
-                {
-                    maxHeight,
-                    overflowY: 'auto'
-                }
-            }
 
-            className={`
-            ${styles['terminal-block']} 
-            ${isHidden
-                ? styles['terminal-block-expanded']
-                : ''
-            }`}
+    return (
+        <div
+            className={
+                styles['terminal-block']
+            }
         >
             <div
                 className={
-                    styles['terminal-block-title']
+                    styles['terminal-block__header']
                 }
             >
-                Terminal
+                <div
+                    className={
+                        styles['terminal-block__title']
+                    }
+                >
+                    Terminal
+                </div>
+
+                <button
+                    className={
+                        styles['terminal-block__action']
+                    }
+
+                    onClick={
+                        hide
+                    }
+                >
+                    <HideIcon
+                        className={
+                            styles['terminal-block__action-icon']
+                        }
+                    />
+                </button>
             </div>
-            {
-                lines.map(
-                    (
-                        line,
-                        i
-                    ) => {
 
-                        const match = line.match(
-                            promptRegex
-                        );
 
-                        if (match) {
+            <div
+                className={`
+                ${styles['terminal-block__content']}
+                ${isHidden
+                    ? styles['terminal-block__content-hidden']
+                    : ''
+                }
+            `}
+            >
+                {
+                    lines.map(
+                        (
+                            line,
+                            i
+                        ) => {
 
-                            return (
-                                <div
-                                    key={
-                                        i
-                                    }
-                                >
-                            <span
-                                style={
-                                    {
-                                        color: '#577B0F',
-                                        userSelect: 'none'
-                                    }
-                                }
-                            >
-                                {
-                                    match[1]
-                                }
-                            </span>
-                                    <span>
+                            const match = line.match(
+                                promptRegex
+                            );
+
+                            if (match) {
+
+                                return (
+                                    <div
+                                        key={i}
+                                    >
+                                    <span
+                                        style={{
+                                            color: '#577B0F',
+                                            userSelect: 'none'
+                                        }}
+                                    >
+                                        {
+                                            match[1]
+                                        }
+                                    </span>
+
+                                        <span>
                                         {
                                             match[2]
                                         }
                                     </span>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <div
+                                    key={i}
+                                >
+                                    {
+                                        line
+                                    }
                                 </div>
                             );
-                        } else {
-
-                            return <div
-                                key={
-                                    i
-                                }
-                            >
-                                {
-                                    line
-                                }
-                            </div>;
                         }
-                    }
-                )
-            }
-            <div
-                className={
-                    styles['terminal-block__expand']
+                    )
                 }
-
-                onClick={
-                    handleExpand
-                }
-            >
-                <HideCodeSvg
-                    className={
-                        styles['terminal-block__expand-icon']
-                    }
-                />
             </div>
-        </pre>
+        </div>
     );
 };
 
