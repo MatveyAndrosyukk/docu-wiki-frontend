@@ -9,7 +9,10 @@ import {
 } from "../../../lib/hooks/use-files-handler/hooks/use-file-actions-hanler/file-actions-handler.types";
 
 const ActionsModal: FC = () => {
-    const {filesHandler} = useAppContext();
+
+    const {
+        filesHandler
+    } = useAppContext();
 
     const {
         fileActionsHandler
@@ -19,12 +22,16 @@ const ActionsModal: FC = () => {
         modalState
     } = fileActionsHandler.state;
 
-    const errorClassName = `${modalStyles['modal__error']}
-     ${styles['edit-modal__error']}
-      ${!fileActionsHandler.state.error ? modalStyles['modal__hidden'] : ''}
-`;
+    const errorClassName = `
+    ${modalStyles['modal__error']}
+    ${styles['edit-modal__error']}
+    ${!fileActionsHandler.state.error
+        ? modalStyles['modal__hidden']
+        : ''}
+        `;
 
     const handleConfirm = () => {
+
         filesHandler.fileActionsHandler.actions.confirm(
             {
                 title: fileActionsHandler.state.value,
@@ -36,40 +43,102 @@ const ActionsModal: FC = () => {
 
     return (
         <Modal
-            isOpen={fileActionsHandler.state.isOpen}
-            onClose={fileActionsHandler.actions.close}
+            isOpen={
+                fileActionsHandler.state.isOpen
+            }
+
+            onClose={
+                fileActionsHandler.actions.close
+            }
         >
-            <div className={modalStyles['modal__overlay']}>
-                <div className={modalStyles['modal__form']}>
-
-                    <div className={`${styles['edit-modal__title']} ${modalStyles['modal__title']}`}>
-                        {modalState.title}
+            <div
+                className={
+                    modalStyles['modal__overlay']
+                }
+            >
+                <div
+                    className={
+                        modalStyles['modal__form']
+                    }
+                >
+                    <div
+                        className={`
+                        ${styles['edit-modal__title']} 
+                        ${modalStyles['modal__title']}
+                        `}
+                    >
+                        {
+                            modalState.title
+                        }
                     </div>
-
-                    <p className={errorClassName}>
-                        {fileActionsHandler.state.error || "placeholder"}
+                    <p
+                        className={
+                            errorClassName
+                        }
+                    >
+                        {
+                            fileActionsHandler.state.error ||
+                            "placeholder"
+                        }
                     </p>
-
-                    <div className={styles['edit-modal__input-wrapper']}>
-
+                    <div
+                        className={
+                            styles['edit-modal__input-wrapper']
+                        }
+                    >
                         <input
-                            ref={fileActionsHandler.state.inputRef}
-                            type="text"
-                            className={styles['edit-modal__input']}
-                            placeholder="Enter the title"
-                            value={fileActionsHandler.state.value}
-                            onChange={(e) => filesHandler.fileActionsHandler.actions.setValue(e.currentTarget.value)}
-                            onKeyDown={(e) => {
-                                if (e.key !== 'Enter') return;
-                                e.preventDefault();
-                                if (!fileActionsHandler.state.error) handleConfirm();
-                            }}
-                        />
+                            ref={
+                                fileActionsHandler.state.inputRef
+                            }
 
+                            type="text"
+
+                            className={
+                                styles['edit-modal__input']
+                            }
+
+                            placeholder="Enter the title"
+
+                            value={
+                                fileActionsHandler.state.value
+                            }
+
+                            onChange={
+                                (
+                                    e
+                                ) => filesHandler.fileActionsHandler.actions.setValue(
+                                    e.currentTarget.value
+                                )
+                            }
+
+                            onKeyDown={
+                                (
+                                    e
+                                ) => {
+
+                                    if (e.key !== 'Enter') return;
+
+                                    e.preventDefault();
+
+                                    if (!fileActionsHandler.state.error)
+
+                                        handleConfirm();
+                                }
+                            }
+                        />
                         <button
-                            className={styles['edit-modal__submit']}
-                            disabled={!fileActionsHandler.state.value.trim() || !!fileActionsHandler.state.error}
-                            onClick={handleConfirm}
+                            className={
+                                styles['edit-modal__submit']
+                            }
+
+                            disabled={
+                                !fileActionsHandler.state.value.trim() ||
+                                !!fileActionsHandler.state.error
+                            }
+
+                            onClick={
+                                handleConfirm
+                            }
                         >
                             <ArrowIcon/>
                         </button>

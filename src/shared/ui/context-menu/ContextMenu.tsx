@@ -25,43 +25,126 @@ const ContextMenu: FC = () => {
     );
 
     if (!contextMenuFile) {
+
         return null;
     }
 
     return (
         <div>
-            <ul className={styles['context-menu']}
-                style={{top: contextMenuHandler.state.clickY, left: contextMenuHandler.state.clickX}}
-                ref={contextMenuHandler.state.menuRef}
-                onClick={contextMenuHandler.actions.close}>
-                {contextMenuFile.type === FileType.Folder && (
-                    <>
-                        {contextMenuHandler.state.copiedFile && (
-                            <li className={styles['context-menu__item']}
-                                onClick={() => contextMenuHandler.actions.paste(contextMenuFile.id)}>
-                                Paste
+            <ul
+                className={
+                    styles['context-menu']
+                }
+
+                style={
+                    {
+                        top: contextMenuHandler.state.clickY,
+                        left: contextMenuHandler.state.clickX
+                    }
+                }
+
+                ref={
+                    contextMenuHandler.state.menuRef
+                }
+
+                onClick={
+                    contextMenuHandler.actions.close
+                }
+            >
+                {
+                    contextMenuFile.type ===
+                    FileType.Folder && (
+
+                        <>
+                            {
+                                contextMenuHandler.state.copiedFile && (
+
+                                    <li
+                                        className={
+                                            styles['context-menu__item']
+                                        }
+
+                                        onClick={
+                                            () => contextMenuHandler.actions.paste(
+                                                contextMenuFile.id
+                                            )
+                                        }
+                                    >
+                                        Paste
+                                    </li>
+                                )
+                            }
+
+                            <li
+                                className={
+                                    styles['context-menu__item']
+                                }
+
+                                onClick={
+                                    () => contextMenuHandler.actions.addFile(
+                                        contextMenuFile.id
+                                    )
+                                }
+                            >
+                                Add File
                             </li>
-                        )}
-                        <li className={styles['context-menu__item']}
-                            onClick={() => contextMenuHandler.actions.addFile(contextMenuFile.id)}>
-                            Add File
-                        </li>
-                        <li className={styles['context-menu__item']}
-                            onClick={() => contextMenuHandler.actions.addFolder(contextMenuFile.id)}>
-                            Add Folder
-                        </li>
-                    </>
-                )}
-                <li className={styles['context-menu__item']}
-                    onClick={() => contextMenuHandler.actions.rename(contextMenuFile)}>
+
+                            <li
+                                className={
+                                    styles['context-menu__item']
+                                }
+
+                                onClick={
+                                    () => contextMenuHandler.actions.addFolder(
+                                        contextMenuFile.id
+                                    )
+                                }
+                            >
+                                Add Folder
+                            </li>
+                        </>
+                    )
+                }
+
+                <li
+                    className={
+                        styles['context-menu__item']
+                    }
+
+                    onClick={
+                        () => contextMenuHandler.actions.rename(
+                            contextMenuFile
+                        )
+                    }
+                >
                     Rename
                 </li>
-                <li className={styles['context-menu__item']}
-                    onClick={() => contextMenuHandler.actions.copy(contextMenuFile)}>
+
+                <li
+                    className={
+                        styles['context-menu__item']
+                    }
+
+                    onClick={
+                        () => contextMenuHandler.actions.copy(
+                            contextMenuFile
+                        )
+                    }
+                >
                     Copy
                 </li>
-                <li className={`${styles['context-menu__item']} ${styles['context-menu__item-delete']}`}
-                    onClick={() => contextMenuHandler.actions.remove(contextMenuFile)}
+
+                <li
+                    className={`
+                    ${styles['context-menu__item']} 
+                    ${styles['context-menu__item-delete']}
+                    `}
+
+                    onClick={
+                        () => contextMenuHandler.actions.remove(
+                            contextMenuFile
+                        )
+                    }
                 >
                     Delete
                 </li>

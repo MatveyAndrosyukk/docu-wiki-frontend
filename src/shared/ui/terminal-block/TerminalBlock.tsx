@@ -2,20 +2,35 @@ import React, {FC, useCallback, useMemo, useState} from 'react';
 import styles from './TerminalBlock.module.scss'
 import {ReactComponent as ExpandCodeSvg} from '../code-block/images/code-block-expand-code.svg';
 
-interface TerminalBlockProps {
+interface Props {
     commands: string;
 }
 
-const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const lines = commands.split('\n');
+const TerminalBlock: FC<Props> = (
+    {
+        commands
+    }
+) => {
 
-    const maxHeight = useMemo(() => {
+    const [isExpanded, setIsExpanded] = useState(
+        false
+    );
 
-        if (isExpanded) return '500px';
+    const lines = commands.split(
+        '\n'
+    );
 
-        return 'none';
-    }, [isExpanded]);
+    const maxHeight = useMemo(
+        () => {
+
+            if (isExpanded) return '500px';
+
+            return 'none';
+        },
+        [
+            isExpanded
+        ]
+    );
 
     const promptRegex = new RegExp(
         '^(' +
@@ -49,31 +64,106 @@ const TerminalBlock: FC<TerminalBlockProps> = ({commands}) => {
         '\\s*(.*)$'
     );
 
-    const handleExpand = useCallback(() => {
-        setIsExpanded(prev => !prev);
-    }, []);
+    const handleExpand = useCallback(
+        () => {
+
+            setIsExpanded(
+                prev => !prev
+            );
+        },
+        []
+    );
 
     return (
         <pre
-            style={{maxHeight, overflowY: 'auto'}}
-            className={`${styles['terminal-block']} ${isExpanded ? styles['terminal-block-expanded'] : ''}`}
-        >
-            <div className={styles['terminal-block-title']}>Terminal</div>
-            {lines.map((line, i) => {
-                const match = line.match(promptRegex);
-                if (match) {
-                    return (
-                        <div key={i}>
-                            <span style={{color: '#577B0F', userSelect: 'none'}}>{match[1]} </span>
-                            <span>{match[2]}</span>
-                        </div>
-                    );
-                } else {
-                    return <div key={i}>{line}</div>;
+            style={
+                {
+                    maxHeight,
+                    overflowY: 'auto'
                 }
-            })}
-            <div className={styles['terminal-block__expand']} onClick={handleExpand}>
-                <ExpandCodeSvg className={styles['terminal-block__expand-icon']}/>
+            }
+
+            className={`
+            ${styles['terminal-block']} 
+            ${isExpanded
+                ? styles['terminal-block-expanded']
+                : ''
+            }`}
+        >
+            <div
+                className={
+                    styles['terminal-block-title']
+                }
+            >
+                Terminal
+            </div>
+            {
+                lines.map(
+                    (
+                        line,
+                        i
+                    ) => {
+
+                        const match = line.match(
+                            promptRegex
+                        );
+
+                        if (match) {
+
+                            return (
+                                <div
+                                    key={
+                                        i
+                                    }
+                                >
+                            <span
+                                style={
+                                    {
+                                        color: '#577B0F',
+                                        userSelect: 'none'
+                                    }
+                                }
+                            >
+                                {
+                                    match[1]
+                                }
+                            </span>
+                                    <span>
+                                        {
+                                            match[2]
+                                        }
+                                    </span>
+                                </div>
+                            );
+                        } else {
+
+                            return <div
+                                key={
+                                    i
+                                }
+                            >
+                                {
+                                    line
+                                }
+                            </div>;
+                        }
+                    }
+                )
+            }
+            <div
+                className={
+                    styles['terminal-block__expand']
+                }
+
+                onClick={
+                    handleExpand
+                }
+            >
+                <ExpandCodeSvg
+                    className={
+                        styles['terminal-block__expand-icon']
+                    }
+                />
             </div>
         </pre>
     );

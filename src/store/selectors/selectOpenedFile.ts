@@ -1,7 +1,7 @@
 import {createSelector} from "@reduxjs/toolkit";
 import {RootState} from "../index";
 import {selectFileTree} from "./selectFileTree";
-import {findFileById} from "../utils/fileTreeActionUtils";
+import {findFileById} from "../utils/file.utils";
 
 export const selectOpenedFile = createSelector(
     [
@@ -11,7 +11,14 @@ export const selectOpenedFile = createSelector(
         (state: RootState) => state.fileUi.pendingFiles,
         (state: RootState) => state.fileUi.pendingRootFolders,
     ],
-    (openedFileId, serverFiles, openedFolders, pendingFiles, pendingRootFolders) => {
+    (
+        openedFileId,
+        serverFiles,
+        openedFolders,
+        pendingFiles,
+        pendingRootFolders
+    ) => {
+
         if (openedFileId === null) return null;
 
         const tree = selectFileTree.resultFunc(
@@ -21,6 +28,9 @@ export const selectOpenedFile = createSelector(
             pendingRootFolders
         );
 
-        return findFileById(tree, openedFileId);
+        return findFileById(
+            tree,
+            openedFileId
+        );
     }
 );

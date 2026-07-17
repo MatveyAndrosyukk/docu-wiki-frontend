@@ -10,12 +10,20 @@ const GlobalNotification = () => {
     );
 
     if (!notification.visible) {
+
         return null;
     }
 
     return (
-        <div className={commonStyles['common__notification']}>
-            {notification.message}
+
+        <div
+            className={
+                commonStyles['common__notification']
+            }
+        >
+            {
+                notification.message
+            }
         </div>
     );
 };

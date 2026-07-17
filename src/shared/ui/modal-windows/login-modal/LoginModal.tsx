@@ -8,7 +8,9 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
 
 const LoginModal: FC = () => {
-    const {authHandler} = useAppContext();
+    const {
+        authHandler
+    } = useAppContext();
 
     const {
         registrationHandler,
@@ -21,21 +23,33 @@ const LoginModal: FC = () => {
         authStatus
     } = useAuthContext();
 
-    const handleOpenEnterEmailModal = useCallback(() => {
-        loginHandler.actions.closeModal();
-        resetPasswordHandler.actions.openModal();
-    }, [loginHandler.actions, resetPasswordHandler.actions]);
+    const openEnterEmailModal = useCallback(
+        () => {
 
-    if (!loginHandler.state.isModalOpen) return null;
+            loginHandler.actions.closeModal();
+
+            resetPasswordHandler.actions.openModal();
+        },
+        [
+            loginHandler.actions,
+            resetPasswordHandler.actions
+        ]
+    );
+
+    if (!loginHandler.state.isModalOpen)
+
+        return null;
 
     const messageText = loginHandler.state.message
         || registrationHandler.state.message
         || loginHandler.state.error
         || registrationHandler.state.error;
 
-    const messageClassName = loginHandler.state.message || registrationHandler.state.message
+    const messageClassName = (loginHandler.state.message ||
+        registrationHandler.state.message)
         ? modalStyles.modal__message
-        : loginHandler.state.error || registrationHandler.state.error
+        : (loginHandler.state.error ||
+            registrationHandler.state.error)
             ? modalStyles.modal__error
             : `${modalStyles.modal__message} ${modalStyles.hidden}`;
 
@@ -49,82 +63,202 @@ const LoginModal: FC = () => {
 
     return (
         <Modal
-            isOpen={loginHandler.state.isModalOpen}
-            onClose={loginHandler.actions.closeModal}
-        >
-            <div className={`${modalStyles['modal__overlay']} ${styles['login-modal__overlay']}`}>
-                <div className={`${modalStyles['modal__form']} ${styles['login-modal__form']}`}>
+            isOpen={
+                loginHandler.state.isModalOpen
+            }
 
-                    <div className={styles['login-modal__header']}>
-                        <p className={styles['login-modal__form-text']}>
-                            {registrationHandler.state.isModal ? 'Register' : 'Login'}
+            onClose={
+                loginHandler.actions.closeModal
+            }
+        >
+            <div
+                className={`
+                ${modalStyles['modal__overlay']} 
+                ${styles['login-modal__overlay']}
+                `}
+            >
+                <div
+                    className={`
+                    ${modalStyles['modal__form']} 
+                    ${styles['login-modal__form']}
+                    `}
+                >
+                    <div
+                        className={
+                            styles['login-modal__header']
+                        }
+                    >
+                        <p
+                            className={
+                                styles['login-modal__form-text']
+                            }
+                        >
+                            {registrationHandler.state.isModal
+                                ? 'Register'
+                                : 'Login'
+                            }
                         </p>
                         <SwitchAuthSvg
-                            className={styles['login-modal__switch']}
-                            onClick={authorizationHandler.actions.switchAuthorization}
+                            className={
+                                styles['login-modal__switch']
+                            }
+
+                            onClick={
+                                authorizationHandler.actions.switchAuthorization
+                            }
                         />
                     </div>
-
-                    <p className={messageClassName}>{messageText}</p>
-
+                    <p
+                        className={
+                            messageClassName
+                        }
+                    >
+                        {
+                            messageText
+                        }
+                    </p>
                     <input
-                        ref={loginHandler.state.inputRef}
+                        ref={
+                            loginHandler.state.inputRef
+                        }
+
                         type='text'
-                        className={modalStyles['modal__input']}
+
+                        className={
+                            modalStyles['modal__input']
+                        }
+
                         placeholder="Enter your email"
-                        value={emailValue}
-                        onChange={authorizationHandler.actions.handleChangeEmail}
+
+                        value={
+                            emailValue
+                        }
+
+                        onChange={
+                            authorizationHandler.actions.handleChangeEmail
+                        }
                     />
-                    {registrationHandler.state.isModal && (
-                        <input
-                            type='text'
-                            className={modalStyles['modal__input']}
-                            placeholder="Enter username"
-                            value={registrationHandler.state.value.username}
-                            onChange={authorizationHandler.actions.handleChangeUsername}
-                        />
-                    )}
+                    {
+                        registrationHandler.state.isModal && (
+
+                            <input
+                                type='text'
+
+                                className={
+                                    modalStyles['modal__input']
+                                }
+
+                                placeholder="Enter username"
+
+                                value={
+                                    registrationHandler.state.value.username
+                                }
+
+                                onChange={
+                                    authorizationHandler.actions.handleChangeUsername
+                                }
+                            />
+                        )
+                    }
                     <input
                         type='password'
-                        className={modalStyles['modal__input']}
+
+                        className={
+                            modalStyles['modal__input']
+                        }
+
                         placeholder="Enter your password"
-                        value={passwordValue}
-                        onChange={authorizationHandler.actions.handleChangePassword}
+
+                        value={
+                            passwordValue
+                        }
+
+                        onChange={
+                            authorizationHandler.actions.handleChangePassword
+                        }
                     />
 
-                    {registrationHandler.state.isModal && (
-                        <input
-                            type='password'
-                            className={modalStyles['modal__input']}
-                            placeholder="Repeat your password"
-                            value={registrationHandler.state.value.rePassword}
-                            onChange={authorizationHandler.actions.handleChangeRePassword}
-                        />
-                    )}
+                    {
+                        registrationHandler.state.isModal && (
 
-                    <div className={styles['login-modal__footer']}>
-                        <div className={styles['footer__left']}>
+                            <input
+                                type='password'
+
+                                className={
+                                    modalStyles['modal__input']
+                                }
+
+                                placeholder="Repeat your password"
+
+                                value={
+                                    registrationHandler.state.value.rePassword
+                                }
+
+                                onChange={
+                                    authorizationHandler.actions.handleChangeRePassword
+                                }
+                            />
+                        )
+                    }
+                    <div
+                        className={
+                            styles['login-modal__footer']
+                        }
+                    >
+                        <div
+                            className={
+                                styles['footer__left']
+                            }
+                        >
                             <p
-                                className={styles['login-modal__forgot-password']}
-                                onClick={handleOpenEnterEmailModal}
+                                className={
+                                    styles['login-modal__forgot-password']
+                                }
+
+                                onClick={
+                                    openEnterEmailModal
+                                }
                             >
                                 Forgot password?
                             </p>
                         </div>
-
-                        <div className={styles['footer__center']}>
+                        <div className={
+                            styles['footer__center']
+                        }
+                        >
                             <button
-                                className={modalStyles.modal__button}
-                                disabled={loginHandler.state.loading || authStatus === 'loading'}
-                                onClick={authorizationHandler.actions.authorize}
+                                className={
+                                    modalStyles.modal__button
+                                }
+
+                                disabled={
+                                    loginHandler.state.loading ||
+                                    authStatus === 'loading'
+                                }
+
+                                onClick={
+                                    authorizationHandler.actions.authorize
+                                }
                             >
-                                {(loginHandler.state.loading || registrationHandler.state.loading) ?
-                                    <span className={styles['login-modal__loader']}/> :
-                                    authorizationHandler.actions.getAuthorizationText()}
+                                {
+                                    (loginHandler.state.loading ||
+                                        registrationHandler.state.loading)
+                                        ?
+                                        <span
+                                            className={
+                                                styles['login-modal__loader']
+                                            }
+                                        />
+                                        :
+                                        authorizationHandler.actions.getAuthorizationText()
+                                }
                             </button>
                         </div>
-
-                        <div className={styles['footer__right']}>
+                        <div
+                            className={
+                                styles['footer__right']
+                            }
+                        >
                             <GoogleButton/>
                         </div>
                     </div>

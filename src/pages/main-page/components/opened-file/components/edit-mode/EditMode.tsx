@@ -52,41 +52,35 @@ const EditMode: FC<Params> = (
     } = useAppContext();
 
 
-    const loggedInUser =
-        useSelector(
-            (state: RootState) =>
-                state.user.loggedInUser
-        );
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
 
 
-    const isSaving =
-        useSelector(
-            (state: RootState) =>
-                state.fileUi.isSaving
-        );
+    const isSaving = useSelector(
+        (state: RootState) => state.fileUi.isSaving
+    );
 
-    const debouncedContent =
-        useDebouncedValue(
-            editorHandler.textareaHandler.state.content,
-            300
-        );
+    const debouncedContent = useDebouncedValue(
+        editorHandler.textareaHandler.state.content,
+        300
+    );
 
 
-    const previewContent =
-        useMemo(
-            () =>
-                parseFileTextToHTML(
-                    debouncedContent,
-                    onImageClick,
-                    isFileTreeOpened
-                ),
-            [
+    const previewContent = useMemo(
+        () =>
+            parseFileTextToHTML(
                 debouncedContent,
-                parseFileTextToHTML,
                 onImageClick,
-                isFileTreeOpened,
-            ]
-        );
+                isFileTreeOpened
+            ),
+        [
+            debouncedContent,
+            parseFileTextToHTML,
+            onImageClick,
+            isFileTreeOpened,
+        ]
+    );
 
 
     const handleSaveEdition =
@@ -100,7 +94,9 @@ const EditMode: FC<Params> = (
                     loggedInUser?.name
                 );
 
-                editorHandler.imagesHandler.actions.reset([]);
+                editorHandler.imagesHandler.actions.reset(
+                    []
+                );
 
             },
             [
@@ -121,8 +117,9 @@ const EditMode: FC<Params> = (
                 );
 
 
-                editorHandler.imagesHandler.actions.reset([]);
-
+                editorHandler.imagesHandler.actions.reset(
+                    []
+                );
             },
             [
                 editorHandler,
@@ -133,31 +130,36 @@ const EditMode: FC<Params> = (
 
     return (
 
-        <div className={styles["edit-mode"]}>
-
-
-            <div className={styles["edit-mode__header"]}>
-
-
-                <div className={styles["header__edit-buttons"]}>
-
-
+        <div
+            className={
+                styles["edit-mode"]
+            }
+        >
+            <div
+                className={
+                    styles["edit-mode__header"]
+                }
+            >
+                <div
+                    className={
+                        styles["header__edit-buttons"]
+                    }
+                >
                     <EditorToolbar
                         toolbar={
                             editorHandler.toolbar
                         }
                     />
-
-
                     <input
-
                         type="file"
 
                         accept="image/*"
 
-                        style={{
-                            display: "none"
-                        }}
+                        style={
+                            {
+                                display: "none"
+                            }
+                        }
 
                         ref={
                             editorHandler.imagesHandler.state.inputRef
@@ -166,18 +168,14 @@ const EditMode: FC<Params> = (
                         onChange={
                             editorHandler.imagesHandler.actions.changeFile
                         }
-
                     />
-
-
                 </div>
-
-
-                <div className={styles["header__action-buttons"]}>
-
-
+                <div
+                    className={
+                        styles["header__action-buttons"]
+                    }
+                >
                     <button
-
                         className={
                             styles["header__action-buttons-save"]
                         }
@@ -189,20 +187,14 @@ const EditMode: FC<Params> = (
                         disabled={
                             isSaving
                         }
-
                     >
-
                         {
                             isSaving
                                 ? "Saving…"
                                 : "Save"
                         }
-
                     </button>
-
-
                     <button
-
                         className={
                             styles["header__action-buttons-cancel"]
                         }
@@ -210,25 +202,16 @@ const EditMode: FC<Params> = (
                         onClick={
                             handleCancelEdition
                         }
-
                     >
-
                         Cancel
-
                     </button>
-
-
                 </div>
-
-
             </div>
-
-
-            <div className={styles["edit-mode__body"]}>
-
-
+            <div className={
+                styles["edit-mode__body"]
+            }
+            >
                 <textarea
-
                     ref={
                         editorHandler.textareaHandler.state.textareaRef
                     }
@@ -244,46 +227,39 @@ const EditMode: FC<Params> = (
                     onChange={
                         editorHandler.textareaHandler.actions.handleChangeTextarea
                     }
-
                 />
-
-
-                <div className={styles["edit-mode__error"]}>
-
+                <div
+                    className={
+                        styles["edit-mode__error"]
+                    }
+                >
                     {
                         editorHandler.editModeHandler.state.contentError
                     }
-
                 </div>
-
-
-                <div className={styles["body__preview"]}>
-
-
-                    <div className={styles["body__preview-title"]}>
-
+                <div className={
+                    styles["body__preview"]
+                }
+                >
+                    <div
+                        className={
+                            styles["body__preview-title"]
+                        }
+                    >
                         Preview
-
                     </div>
-
-
-                    <div className={styles["body__preview-content"]}>
-
+                    <div
+                        className={
+                            styles["body__preview-content"]
+                        }
+                    >
                         {
                             previewContent
                         }
-
                     </div>
-
-
                 </div>
-
-
             </div>
-
-
             <SwitchWhileEditModal
-
                 contentBeforeEdition={
                     file.content ?? ""
                 }
@@ -295,14 +271,9 @@ const EditMode: FC<Params> = (
                 addedImagesWhileEditing={
                     editorHandler.imagesHandler.state.addedImages
                 }
-
             />
-
-
         </div>
-
     );
-
 };
 
 

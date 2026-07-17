@@ -1,4 +1,4 @@
-import {findFileById} from "../../../../../../../store/utils/fileTreeActionUtils";
+import {findFileById} from "../../../../../../../store/utils/file.utils";
 import {UiFile} from "../../../../../../../store/types/UiFile";
 import {ActionModalState, ActionType} from "../file-actions-handler.types";
 

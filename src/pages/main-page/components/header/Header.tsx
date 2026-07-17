@@ -22,11 +22,14 @@ interface Props {
     setIsFeedbackOpen: Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Header: FC<Props> = ({
-                               setIsFeedbackOpen,
-                           }) => {
-    const [burgerOpen, setBurgerOpen] =
-        useState(false);
+const Header: FC<Props> = (
+    {
+        setIsFeedbackOpen,
+    }) => {
+
+    const [burgerOpen, setBurgerOpen] = useState(
+        false
+    );
 
     const navigate = useNavigate();
 
@@ -47,7 +50,7 @@ const Header: FC<Props> = ({
         (state: RootState) => state.user.loggedInUser
     );
 
-    const userModalState =
+    const userHandler =
         useUserHandler(
             {
                 user: loggedInUser,
@@ -59,17 +62,16 @@ const Header: FC<Props> = ({
 
     const width = useWindowWidth();
 
-    const {handleOpenUserModal} = userModalState
-
-    const {setIsPremiumModalOpen} = premiumHandler;
-
     const isMobile = width < 1066;
 
-    const menuRef =
-        useRef<HTMLDivElement | null>(null);
+    const menuRef = useRef<
+        HTMLDivElement | null
+    >(null);
 
     const burgerButtonRef =
-        useRef<HTMLButtonElement | null>(null);
+        useRef<
+            HTMLButtonElement | null
+        >(null);
 
     useElementOutsideEvent(
         {
@@ -82,77 +84,167 @@ const Header: FC<Props> = ({
     );
 
     const handleToggleBurgerMenu = () => {
+
         setBurgerOpen(!burgerOpen);
     };
 
     const handleRedirectToMainPage = () => {
+
         navigate('/');
     }
 
     return (
-        <div className={styles['header']}>
-            <div className={styles['header__container']}>
-                <div className={styles['header__content']}>
-                    <div className={styles['header__left']}>
+        <div
+            className={
+                styles['header']
+            }
+        >
+            <div
+                className={
+                    styles['header__container']
+                }
+            >
+                <div
+                    className={
+                        styles['header__content']
+                    }
+                >
+                    <div
+                        className={
+                            styles['header__left']
+                        }
+                    >
                         <div
-                            className={styles['header__logo']}
-                            onClick={handleRedirectToMainPage}
+                            className={
+                                styles['header__logo']
+                            }
+
+                            onClick={
+                                handleRedirectToMainPage
+                            }
                         >
                             <LogoSvg/>
                         </div>
                     </div>
 
-                    <div className={styles['header__right']}>
+                    <div
+                        className={
+                            styles['header__right']
+                        }
+                    >
                         <div
-                            className={styles['header__premium-button']}
+                            className={
+                                styles['header__premium-button']
+                            }
+
                             onClick={
-                                () => setIsPremiumModalOpen(true)
+                                () => premiumHandler.setIsPremiumModalOpen(true)
                             }
                         >
                             <PremiumSvg/>
                         </div>
 
-                        <div className={styles['header__search']}>
-                            <div className={styles['header__search-input']}>
+                        <div className={
+                            styles['header__search']
+                        }
+                        >
+                            <div
+                                className={
+                                    styles['header__search-input']
+                                }
+                            >
                                 <SearchInput
-                                    onClick={searchFileHandler.actions.openPathToSelectedFile}
-                                    searchType={searchFileHandler.state.searchType}
+
+                                    onClick={
+                                        searchFileHandler.actions.openPathToSelectedFile
+                                    }
+
+                                    searchType={
+                                        searchFileHandler.state.searchType
+                                    }
                                 />
 
-                                <SearchSvg className={styles['header__search-icon']}/>
+                                <SearchSvg
+                                    className={
+                                        styles['header__search-icon']
+                                    }
+                                />
                             </div>
 
-                            <SwapSvg className={styles['header__search-swap']}
-                                     onClick={searchFileHandler.actions.switchSearchType}
+                            <SwapSvg
+                                className={
+                                    styles['header__search-swap']
+                                }
+
+                                onClick={
+                                    searchFileHandler.actions.switchSearchType
+                                }
                             />
                         </div>
 
                         {
+
                             isMobile ? (
-                                <div className={styles['header__burger-container']}>
+
+                                <div
+                                    className={
+                                        styles['header__burger-container']
+                                    }
+                                >
                                     <button
-                                        ref={burgerButtonRef}
-                                        className={styles['header__burger-button']}
-                                        onClick={handleToggleBurgerMenu}
+                                        ref={
+                                            burgerButtonRef
+                                        }
+
+                                        className={
+                                            styles['header__burger-button']
+                                        }
+
+                                        onClick={
+                                            handleToggleBurgerMenu
+                                        }
+
                                         aria-label="Toggle menu"
                                     >
                                         &#9776;
                                     </button>
 
                                     {
+
                                         burgerOpen && (
+
                                             <div
-                                                className={styles['header__burger-menu']}
-                                                ref={menuRef}
+                                                className={
+                                                    styles['header__burger-menu']
+                                                }
+
+                                                ref={
+                                                    menuRef
+                                                }
                                             >
-                                                <div className={styles['header__burger-item']}>
+                                                <div
+                                                    className={
+                                                        styles['header__burger-item']
+                                                    }
+                                                >
                                                     <UserSvg
-                                                        onClick={handleOpenUserModal}
+                                                        onClick={
+                                                            userHandler.actions.openModal
+                                                        }
                                                     />
                                                 </div>
-                                                <div className={styles['header__burger-item']}>
+                                                <div
+                                                    className={
+                                                        styles['header__burger-item']
+                                                    }
+                                                >
                                             <span
-                                                style={{color: '#8D9191'}}
+                                                style={
+                                                    {
+                                                        color: '#8D9191'
+                                                    }
+                                                }
+
                                                 onClick={
                                                     () => setIsFeedbackOpen(true)
                                                 }
@@ -161,8 +253,14 @@ const Header: FC<Props> = ({
                                             </span>
                                                 </div>
                                                 {
+
                                                     authStatus === 'authenticated' ? (
-                                                        <div className={styles['header__burger-item']}>
+
+                                                        <div
+                                                            className={
+                                                                styles['header__burger-item']
+                                                            }
+                                                        >
                                                             <LogoutSvg
                                                                 onClick={
                                                                     () => loginHandler.actions.logout()
@@ -171,30 +269,50 @@ const Header: FC<Props> = ({
                                                         </div>
                                                     ) : (
                                                         <button
-                                                            onClick={() => loginHandler.actions.openModal()}
+                                                            onClick={
+                                                                () => loginHandler.actions.openModal()
+                                                            }
                                                         >
                                                             Login
                                                         </button>
-                                                    )}
+                                                    )
+                                                }
                                             </div>
-                                        )}
+                                        )
+                                    }
                                 </div>
                             ) : (
-                                <div className={styles['header__buttons']}>
+
+                                <div className={
+                                    styles['header__buttons']
+                                }
+                                >
                                     <UserSvg
-                                        className={styles['header__user']}
-                                        onClick={handleOpenUserModal}
+                                        className={
+                                            styles['header__user']
+                                        }
+
+                                        onClick={
+                                            userHandler.actions.openModal
+                                        }
                                     />
 
                                     {
+
                                         authStatus === 'loading' ? (
-                                            <div className={styles['header__auth-skeleton']}/>
+
+                                            <div className={
+                                                styles['header__auth-skeleton']
+                                            }
+                                            />
                                         ) : (
+
                                             <div
                                                 className={authStatus === 'authenticated'
                                                     ? styles['header__logout']
                                                     : styles['header__login']
                                                 }
+
                                                 onClick={authStatus === 'authenticated'
                                                     ? () => loginHandler.actions.logout()
                                                     : () => loginHandler.actions.openModal()
@@ -205,15 +323,19 @@ const Header: FC<Props> = ({
                                                     : 'Login'
                                                 }
                                             </div>
-                                        )}
+                                        )
+                                    }
                                 </div>
-                            )}
+                            )
+                        }
                     </div>
                 </div>
             </div>
 
             <UserModal
-                userModalState={userModalState}
+                userHandler={
+                    userHandler
+                }
             />
         </div>
     );

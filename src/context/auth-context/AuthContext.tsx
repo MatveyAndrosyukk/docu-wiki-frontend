@@ -3,7 +3,12 @@ import {AuthStatus} from "./AuthProvider";
 
 type AuthProviderState = {
     authStatus: AuthStatus;
-    setAuthStatus: (authStatus: AuthStatus) => void;
+
+    setAuthStatus: (
+        authStatus: AuthStatus
+    ) => void;
 }
 
-export const AuthContext = createContext<AuthProviderState | null>(null);
+export const AuthContext = createContext<
+    AuthProviderState | null
+>(null);

@@ -6,16 +6,43 @@ import VerifyPage from "./pages/verify-page/VerifyPage";
 import useRefreshToken from "./shared/lib/hooks/useRefreshToken";
 
 function App() {
+
     useRefreshToken();
 
     return (
+
         <Router>
             <Routes>
-                <Route path="/" element={<MainPageWrapper/>}/>
-                <Route path="/verify" element={<VerifyPage/>}/>
-                <Route path="/resetPassword" element={<MainPageWrapper/>}/>
-                <Route path="/:username" element={<MainPageWrapper/>}/>
-                <Route path="/:username/file/:fileId" element={<MainPageWrapper/>}/>
+                <Route
+                    path="/"
+                    element={
+                        <MainPageWrapper/>
+                    }
+                />
+                <Route
+                    path="/verify"
+                    element={
+                        <VerifyPage/>
+                    }
+                />
+                <Route
+                    path="/resetPassword"
+                    element={
+                        <MainPageWrapper/>
+                    }
+                />
+                <Route
+                    path="/:username"
+                    element={
+                        <MainPageWrapper/>
+                    }
+                />
+                <Route
+                    path="/:username/file/:fileId"
+                    element={
+                        <MainPageWrapper/>
+                    }
+                />
             </Routes>
 
         </Router>

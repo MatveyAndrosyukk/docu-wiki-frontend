@@ -20,7 +20,9 @@ import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOut
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
+
     isFileTreeOpened: boolean;
+
     setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -32,8 +34,8 @@ const FileTree: FC<FileTreeProps> = React.memo(
             setIsFileTreeOpened,
         }
     ) => {
-        const dispatch =
-            useDispatch<AppDispatch>();
+
+        const reduxDispatch = useDispatch<AppDispatch>();
 
         const {
             filesHandler,
@@ -66,8 +68,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const {setIsPremiumModalOpen} = premiumHandler;
 
-        const fileTreeRef =
-            useRef<HTMLDivElement>(null);
+        const fileTreeRef = useRef<HTMLDivElement>(null);
 
         const windowWidth = useWindowWidth();
 
@@ -92,6 +93,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const fileTreeStyles = useMemo(
             () => {
+
                 if (!isFileTreeOpened) return styles['file-tree-closed'];
 
                 if (windowWidth < 1270) {
@@ -108,9 +110,11 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         const blockViewHandler = useCallback(
             async () => {
+
                 if (!viewedUser?.email) return;
 
                 if (!loggedInUser?.isPremium) {
+
                     setIsPremiumModalOpen(true);
 
                     return;
@@ -119,14 +123,21 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 notificationHandler.actions.show();
 
                 try {
-                    await dispatch(toggleUserIsViewBlocked(viewedUser.email)).unwrap();
+
+                    await reduxDispatch(
+                        toggleUserIsViewBlocked(
+                            viewedUser.email
+                        )
+                    ).unwrap();
+
                 } catch (error) {
+
                     console.error(error);
                 }
 
             },
             [
-                dispatch,
+                reduxDispatch,
                 viewedUser,
                 notificationHandler,
                 loggedInUser,
@@ -137,8 +148,10 @@ const FileTree: FC<FileTreeProps> = React.memo(
         const handleCreateRootFolder = useCallback(
             () => {
                 if (authStatus === 'authenticated') {
+
                     filesHandler.contextMenuHandler.actions.addRootFolder();
                 } else {
+
                     loginHandler.actions.openModal();
                 }
 
@@ -174,30 +187,55 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
         return (
             <div
-                className={fileTreeStyles}
-                ref={fileTreeRef}
+                className={
+                    fileTreeStyles
+                }
+
+                ref={
+                    fileTreeRef
+                }
             >
                 {
+
                     notificationHandler.state.visible && (
+
                         <div
-                            className={`${commonStyles.common__notification} ${notificationHandler.state.closing
-                                ? commonStyles['common__notification--closing']
-                                : ''
-                            }`}
-                            key={notificationHandler.state.id}
-                            onClick={notificationHandler.actions.close}
+                            className={
+                                `${commonStyles.common__notification} ${notificationHandler.state.closing
+                                    ? commonStyles['common__notification--closing']
+                                    : ''
+                                }`
+                            }
+
+                            key={
+                                notificationHandler.state.id
+                            }
+
+                            onClick={
+                                notificationHandler.actions.close
+                            }
                         >
                             You
-                            {viewedUser?.isViewBlocked
-                                ? 'blocked'
-                                : 'unblocked'
+
+                            {
+                                viewedUser?.isViewBlocked
+                                    ? 'blocked'
+                                    : 'unblocked'
                             }
+
                             files for view
                         </div>
-                    )}
+                    )
+                }
 
-                <div className={styles['file-tree__content']}>
+                <div
+                    className={
+                        styles['file-tree__content']
+                    }
+                >
+
                     {
+
                         (
                             isViewedUserLoading
                             || areFilesLoading
@@ -207,94 +245,158 @@ const FileTree: FC<FileTreeProps> = React.memo(
                             : (
                                 <>
                                     {
+
                                         showHeader && (
-                                            <div className={styles['file-tree__header']}>
-                                                <div className={styles['file-tree__top']}>
-                                                    <div className={styles['file-tree__user']}>
+                                            <div
+                                                className={
+                                                    styles['file-tree__header']
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles['file-tree__top']
+                                                    }
+                                                >
+                                                    <div
+                                                        className={
+                                                            styles['file-tree__user']
+                                                        }
+                                                    >
                                                         {viewedUser?.name}
                                                     </div>
 
-                                                    {isUserOwner(loggedInUser) && (
-                                                        <div
-                                                            className={styles['file-tree__ban']}
-                                                            onClick={() => banHandler.actions.open()}
-                                                        >
-                                                            <BanSvg/>
-                                                        </div>
-                                                    )}
+                                                    {
+                                                        isUserOwner(loggedInUser) && (
+                                                            <div
+                                                                className={
+                                                                    styles['file-tree__ban']
+                                                                }
+
+                                                                onClick={
+                                                                    () => banHandler.actions.open()
+                                                                }
+                                                            >
+                                                                <BanSvg/>
+                                                            </div>
+                                                        )
+                                                    }
                                                 </div>
 
-                                                <div className={styles['file-tree__line']}/>
+                                                <div
+                                                    className={
+                                                        styles['file-tree__line']
+                                                    }
+                                                />
                                             </div>
                                         )}
 
                                     {
+
                                         isBanned &&
-                                        <div className={styles['file-tree__view']}>
+                                        <div className={
+                                            styles['file-tree__view']
+                                        }
+                                        >
                                             This user has been banned
                                         </div>
                                     }
 
                                     {
+
                                         (!isBanned && !canView) &&
-                                        <div className={styles['file-tree__view']}>
+                                        <div
+                                            className={
+                                                styles['file-tree__view']
+                                            }
+                                        >
                                             User blocked his files for view
                                         </div>
                                     }
 
                                     {
+
                                         canEdit && (
-                                            <div className={styles['file-tree__buttons']}>
+                                            <div
+                                                className={
+                                                    styles['file-tree__buttons']
+                                                }
+                                            >
                                                 <div
-                                                    className={styles['file-tree__button-create']}
-                                                    onClick={handleCreateRootFolder}
+                                                    className={
+                                                        styles['file-tree__button-create']
+                                                    }
+
+                                                    onClick={
+                                                        handleCreateRootFolder
+                                                    }
                                                 >
                                                     Create a root folder
                                                 </div>
 
                                                 {
+
                                                     authStatus === 'authenticated' && (
                                                         <div
-                                                            className={`
-                                                                ${styles['file-tree__button-block']}
+                                                            className={
+                                                                `${styles['file-tree__button-block']}
                                                                 ${!loggedInUser?.isPremium
-                                                                ? styles['file-tree__button-block--premium']
-                                                                : ''
+                                                                    ? styles['file-tree__button-block--premium']
+                                                                    : ''
+                                                                }`
                                                             }
-`}
+
                                                             title={
                                                                 viewedUser?.isViewBlocked
                                                                     ? 'Unblock view for other users'
                                                                     : 'Block view for other users'
                                                             }
-                                                            onClick={blockViewHandler}
+
+                                                            onClick={
+                                                                blockViewHandler
+                                                            }
                                                         >
                                                             <LockSvg/>
                                                         </div>
                                                     )
                                                 }
                                             </div>
-                                        )}
+                                        )
+                                    }
 
                                     {
+
                                         canEdit && (
-                                            <div className={styles['file-tree__usage']}>
-                                                <div className={styles['file-tree__usage-text']}>
+                                            <div
+                                                className={
+                                                    styles['file-tree__usage']
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles['file-tree__usage-text']
+                                                    }
+                                                >
                                                     {
+
                                                         viewedUser?.isPremium
                                                             ? `${viewedUser?.amountOfFiles ?? 0} files`
                                                             : `${viewedUser?.amountOfFiles ?? 0} / 20 files`
                                                     }
                                                 </div>
 
-                                                <div className={styles['file-tree__usage-bar']}>
+                                                <div
+                                                    className={
+                                                        styles['file-tree__usage-bar']
+                                                    }
+                                                >
                                                     <div
                                                         className={`
-                                                            ${styles['file-tree__usage-fill']}
-                                                            ${isWarning
+                                                        ${styles['file-tree__usage-fill']}
+                                                        ${isWarning
                                                             ? styles['file-tree__usage-fill--warning']
-                                                            : ''
-                                                        }`}
+                                                            : ''}
+                                                                `}
+
                                                         style={
                                                             {
                                                                 width: viewedUser?.isPremium
@@ -308,13 +410,24 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                     />
                                                 </div>
                                             </div>
-                                        )}
+                                        )
+                                    }
 
                                     {
-                                        (viewedUser && !isBanned && canView) && (
-                                            <div className={styles['file-tree__files']}>
+
+                                        (
+                                            viewedUser
+                                            && !isBanned
+                                            && canView) &&
+                                        (
+                                            <div className={
+                                                styles['file-tree__files']
+                                            }
+                                            >
                                                 <FileList
-                                                    viewedUserEmail={viewedUserEmail}
+                                                    viewedUserEmail={
+                                                        viewedUserEmail
+                                                    }
                                                 />
                                             </div>
                                         )
@@ -324,28 +437,47 @@ const FileTree: FC<FileTreeProps> = React.memo(
                     }
                 </div>
 
-                {viewedUser?.isPremium ? (
-                    <div className={styles['file-tree__premium-active']}>
-                        <span>PREMIUM</span>
+                {
+                    viewedUser?.isPremium ? (
 
-                        <span className={styles['file-tree__premium-badge']}>
+                        <div
+                            className={
+                                styles['file-tree__premium-active']
+                            }
+                        >
+                        <span>
+                            PREMIUM
+                        </span>
+
+                            <span
+                                className={
+                                    styles['file-tree__premium-badge']
+                                }
+                            >
                             ACTIVE
                         </span>
-                    </div>
-                ) : (
-                    <div
-                        className={`${commonStyles.premium} ${styles.premium}`}
-                        onClick={
-                            () => setIsPremiumModalOpen(true)
-                        }
-                    >
-                        Upgrade
-                    </div>
-                )}
+                        </div>
+                    ) : (
+                        <div
+                            className={
+                                `${commonStyles.premium} ${styles.premium}`
+                            }
+
+                            onClick={
+                                () => setIsPremiumModalOpen(true)
+                            }
+                        >
+                            Upgrade
+                        </div>
+                    )
+                }
             </div>
         );
 
-    }, (prev, next) =>
+    }, (
+        prev,
+        next
+    ) =>
         prev.isFileTreeOpened === next.isFileTreeOpened &&
         prev.viewedUserEmail === next.viewedUserEmail
 );

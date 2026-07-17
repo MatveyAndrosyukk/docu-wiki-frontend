@@ -1,6 +1,6 @@
 const imageRegex = /\[image\/(.+?)]/g;
 const linkRegex = /\[L to="([^"]+)"](.+?)\[\/L]/g;
-const simpleTagsRegex = /\[([UBI])]([\s\S]+?)\[\/\1]/g;
+const simpleTagsRegex = /\[([UBI])\]([\s\S]+?)\[\/\1\]/g;
 const lineCodeRegex = /\[LC](.*?)\[\/LC]/g;
 const numberRegex = /\[N]([\s\S]+?)\[\/N]/g;
 

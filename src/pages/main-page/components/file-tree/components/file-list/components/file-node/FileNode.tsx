@@ -33,19 +33,16 @@ const FileNode: React.FC<Props> = React.memo(
             emailParam,
         }
     ) => {
+
         const {
             file,
-
             depth,
-
             isLastChild,
-
             hasNextOnLevel
         } = node;
 
         const {
             filesHandler,
-
             editorHandler,
         } = useAppContext();
 
@@ -85,8 +82,14 @@ const FileNode: React.FC<Props> = React.memo(
             useRef<NodeJS.Timeout | null>(null);
 
         const linesBlock = (
-            <span className={styles['file-list__node-line-block']}>
+
+            <span
+                className={
+                    styles['file-list__node-line-block']
+                }
+            >
                 {
+
                     Array.from(
                         {
                             length: depth
@@ -99,22 +102,37 @@ const FileNode: React.FC<Props> = React.memo(
                             const isLastLevel = levelIndex === depth - 1;
 
                             if (!isLastLevel) {
+
                                 if (!hasNextOnLevel[levelIndex]) {
+
                                     return (
                                         <span
-                                            className={styles['file-list__node-line']}
-                                            key={levelIndex}
+                                            className={
+                                                styles['file-list__node-line']
+                                            }
+
+                                            key={
+                                                levelIndex
+                                            }
                                         />
                                     );
                                 }
 
                                 return (
+
                                     <span
-                                        className={styles['file-list__node-line']}
-                                        key={levelIndex}
+                                        className={
+                                            styles['file-list__node-line']
+                                        }
+
+                                        key={
+                                            levelIndex
+                                        }
                                     >
                                     <LineSvg
-                                        className={nodeStyles.line}
+                                        className={
+                                            nodeStyles.line
+                                        }
                                     />
                                 </span>
                                 );
@@ -126,11 +144,18 @@ const FileNode: React.FC<Props> = React.memo(
 
                             return (
                                 <span
-                                    className={styles['file-list__node-line']}
-                                    key={levelIndex}
+                                    className={
+                                        styles['file-list__node-line']
+                                    }
+
+                                    key={
+                                        levelIndex
+                                    }
                                 >
                                 <LineComponent
-                                    className={nodeStyles.lineComponent}
+                                    className={
+                                        nodeStyles.lineComponent
+                                    }
                                 />
                             </span>
                             );
@@ -144,7 +169,9 @@ const FileNode: React.FC<Props> = React.memo(
             (
                 id: number
             ) => {
-                reduxDispatch(toggleFolder(
+
+                reduxDispatch(
+                    toggleFolder(
                         {
                             id,
                             tree: files
@@ -161,6 +188,7 @@ const FileNode: React.FC<Props> = React.memo(
         const handleTouchStart = (
             e: React.TouchEvent<HTMLDivElement>
         ) => {
+
             if (!isUserCanEdit(
                 authStatus === 'authenticated',
                 emailParam,
@@ -170,21 +198,27 @@ const FileNode: React.FC<Props> = React.memo(
 
             const touch = e.touches[0];
 
-            longPressTimer.current = setTimeout(() => {
-                contextMenuHandler.actions.open(
-                    {
-                        preventDefault: () => {
-                        },
-                        clientX: touch.clientX,
-                        clientY: touch.clientY
-                    } as any,
-                    file
-                );
-            }, 600);
+            longPressTimer.current = setTimeout(
+                () => {
+
+                    contextMenuHandler.actions.open(
+                        {
+                            preventDefault: () => {
+                            },
+                            clientX: touch.clientX,
+                            clientY: touch.clientY
+                        } as any,
+                        file
+                    );
+                },
+                600
+            );
         };
 
         const cancelLongPress = () => {
+
             if (longPressTimer.current) {
+
                 clearTimeout(longPressTimer.current);
 
                 longPressTimer.current = null;
@@ -194,12 +228,14 @@ const FileNode: React.FC<Props> = React.memo(
         const handleOpenContextMenu = (
             e: React.MouseEvent<HTMLDivElement>
         ) => {
+
             if (isUserCanEdit(
                 authStatus === 'authenticated',
                 emailParam,
                 viewedUser,
                 loggedInUser
             )) {
+
                 contextMenuHandler.actions.open(e, file);
             }
         };
@@ -207,39 +243,68 @@ const FileNode: React.FC<Props> = React.memo(
         const isFolder = file.type === FileType.Folder;
 
         const clickHandler = isFolder
-            ? () => handleFolderClick(file.id)
+            ? () => handleFolderClick(
+                file.id
+            )
             : () => {
-                editModeHandler.actions.tryToOpenFile(file.id);
 
-                navigate(`/${viewedUser?.name}/file/${file.id}`);
+                editModeHandler.actions.tryToOpenFile(
+                    file.id
+                );
+
+                navigate(
+                    `/${viewedUser?.name}/file/${file.id}`
+                );
             };
 
         return (
+
             <div
-                className={styles['file-list__node']}
-                key={file.id}
+                className={
+                    styles['file-list__node']
+                }
+
+                key={
+                    file.id
+                }
             >
-                <div className={styles['file-list__node-container']}>
-                    {linesBlock}
+                <div
+                    className={
+                        styles['file-list__node-container']
+                    }
+                >
+                    {
+                        linesBlock
+                    }
 
                     <div
                         className={isFolder
                             ? styles['file-list__node-folder']
-                            : styles['file-list__node-file']}
+                            : styles['file-list__node-file']
+                        }
                     >
                         {
+
                             file.isPending ? (
+
                                 <FileLoader/>
                             ) : (
+
                                 <div
-                                    className={styles['file-list__node-content']}
-                                    onClick={!file.isPending
-                                        ? clickHandler
-                                        : undefined
+                                    className={
+                                        styles['file-list__node-content']
+                                    }
+
+                                    onClick={
+                                        !file.isPending
+                                            ? clickHandler
+                                            : undefined
                                     }
                                 >
                                     {
+
                                         isFolder ? (
+
                                             file.status === FileStatus.Opened
                                                 ? <OpenedSvg
                                                     style={
@@ -256,31 +321,45 @@ const FileNode: React.FC<Props> = React.memo(
                                                     }
                                                 />
                                         ) : <FileImg
-                                            className={styles['file-list__node-image']}
+                                            className={
+                                                styles['file-list__node-image']
+                                            }
                                         />
                                     }
 
                                     <span
                                         className={`
-                                        ${styles['file-list__node-text']} 
-                                        ${(!isFolder && file.id === openedFile?.id)
+                                            ${styles['file-list__node-text']}                                          
+                                            ${(!isFolder && file.id === openedFile?.id)
                                             ? styles['file-list__node-text--opened']
-                                            : ''
-                                        }`}
+                                            : ''}`
+                                        }
+
                                         onContextMenu={
                                             !file.isPending
                                                 ? handleOpenContextMenu
                                                 : undefined
                                         }
+
                                         onTouchStart={
                                             !file.isPending
                                                 ? handleTouchStart
                                                 : undefined
                                         }
-                                        onTouchEnd={cancelLongPress}
-                                        onTouchMove={cancelLongPress}
+
+                                        onTouchEnd={
+                                            cancelLongPress
+                                        }
+
+                                        onTouchMove={
+                                            cancelLongPress
+                                        }
+
                                     >
-                                    {file.name}
+
+                                    {
+                                        file.name
+                                    }
                                     </span>
                                 </div>
                             )
@@ -290,7 +369,10 @@ const FileNode: React.FC<Props> = React.memo(
             </div>
         );
     },
-    (prevProps, nextProps) => {
+    (
+        prevProps,
+        nextProps
+    ) => {
         return prevProps.node.file.id === nextProps.node.file.id &&
             prevProps.node.file.status === nextProps.node.file.status &&
             prevProps.node.file.name === nextProps.node.file.name &&

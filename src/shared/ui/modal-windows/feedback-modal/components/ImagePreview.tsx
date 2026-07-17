@@ -6,43 +6,86 @@ import {formatFileSize} from "../../../../lib/utils/formatFileSize";
 
 interface Props {
     image: File;
+
     preview: string | null;
+
     loading: boolean;
+
     onRemove: () => void;
 }
 
-const ImagePreview: React.FC<Props> = ({
-                                           image,
-                                           preview,
-                                           loading,
-                                           onRemove
-                                       }) => {
+const ImagePreview: React.FC<Props> = (
+    {
+        image,
+        preview,
+        loading,
+        onRemove
+    }) => {
     return (
-        <div className={styles.loaded}>
-            <div className={styles.loadedImg}>
-                {loading ? (
-                    <div className={styles.loader} />
-                ) : (
-                    <img
-                        src={preview || ''}
-                        alt={image.name}
-                    />
-                )}
+
+        <div
+            className={
+                styles.loaded
+            }
+        >
+            <div
+                className={
+                    styles.loadedImg
+                }
+            >
+                {
+                    loading ? (
+
+                        <div
+                            className={
+                                styles.loader
+                            }
+                        />
+                    ) : (
+
+                        <img
+                            src={
+                                preview || ''
+                            }
+                            alt={
+                                image.name
+                            }
+                        />
+                    )
+                }
             </div>
-
-            <div className={styles.loadedInfo}>
-                <span title={image.name}>
-                    {formatFileName(image.name)}
+            <div
+                className={
+                    styles.loadedInfo
+                }
+            >
+                <span
+                    title={
+                        image.name
+                    }
+                >
+                    {
+                        formatFileName(
+                            image.name
+                        )
+                    }
                 </span>
-
                 <span>
-                    {formatFileSize(image.size)}
+                    {
+                        formatFileSize(
+                            image.size
+                        )
+                    }
                 </span>
             </div>
-
             <span
-                className={styles.loadedClose}
-                onClick={onRemove}
+                className={
+                    styles.loadedClose
+                }
+
+                onClick={
+                    onRemove
+                }
             >
                 ✕
             </span>

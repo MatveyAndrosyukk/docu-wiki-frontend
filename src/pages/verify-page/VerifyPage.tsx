@@ -5,8 +5,11 @@ import {useAppContext} from "../../context/app-context/hooks/useAppContext";
 
 const VerifyPage: FC = () => {
     const [searchParams] = useSearchParams();
+
     const token = searchParams.get("token");
+
     const navigate = useNavigate();
+
     const {authHandler} = useAppContext();
 
     const {
@@ -14,9 +17,13 @@ const VerifyPage: FC = () => {
         registrationHandler,
     } = authHandler;
 
-    useEffect(() => {
+    useEffect(
+        () => {
+
             async function verifyEmail() {
+
                 if (!token) {
+
                     navigate('/')
 
                     loginHandler.actions.openModal();
@@ -27,28 +34,38 @@ const VerifyPage: FC = () => {
 
                     return;
                 }
-                performVerificationAsync(token)
-                    .then(() => {
+                performVerificationAsync(
+                    token
+                ).then(
+                    () => {
                         navigate('/');
-                    })
-                    .catch(() => {
+                    }
+                ).catch(
+                    () => {
                         navigate('/')
-                    })
+                    }
+                )
             }
 
             verifyEmail()
-                .then(() => {
-                    loginHandler.actions.openModal();
+                .then(
+                    () => {
 
-                    registrationHandler.actions.setIsModal(false);
+                        loginHandler.actions.openModal();
 
-                    loginHandler.actions.setError('');
+                        registrationHandler.actions.setIsModal(false);
 
-                    loginHandler.actions.setMessage(
-                        'Your email confirmed!'
-                    );
-                })
-                .catch((error) => {
+                        loginHandler.actions.setError('');
+
+                        loginHandler.actions.setMessage(
+                            'Your email confirmed!'
+                        );
+                    }
+                ).catch(
+                (
+                    error
+                ) => {
+
                     loginHandler.actions.openModal();
 
                     registrationHandler.actions.setIsModal(true);
@@ -56,8 +73,10 @@ const VerifyPage: FC = () => {
                     registrationHandler.actions.setError(
                         error.message
                     );
-                });
-        }, [
+                }
+            );
+        },
+        [
             authHandler,
             loginHandler.actions,
             navigate,

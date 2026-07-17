@@ -5,11 +5,22 @@ interface Props {
     onClick: () => void;
 }
 
-const FeedbackButton: React.FC<Props> = ({ onClick }) => {
+const FeedbackButton: React.FC<Props> = (
+    {
+        onClick
+    }
+) => {
+
     return (
+
         <button
-            className={styles.feedbackButton}
-            onClick={onClick}
+            className={
+                styles.feedbackButton
+            }
+
+            onClick={
+                onClick
+            }
         >
             🗪
         </button>

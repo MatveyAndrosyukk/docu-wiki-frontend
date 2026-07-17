@@ -4,8 +4,15 @@ import API_BASE_URL from "../../../shared/assets/config/api-config";
 
 export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
     'user/fetchViewedUserByEmail',
-    async (email, {rejectWithValue}) => {
+    async (
+        email,
+        {
+            rejectWithValue
+        }
+    ) => {
+
         try {
+
             const response = await fetch(
                 `${API_BASE_URL}/users/findOne?email=${email}`,
                 {
@@ -14,12 +21,19 @@ export const fetchViewedUserByEmail = createAsyncThunk<User, string>(
             );
 
             if (!response.ok) {
-                throw new Error('Failed to fetch user');
+                throw new Error(
+                    'Failed to fetch user'
+                );
             }
 
             return await response.json();
         } catch (error) {
-            return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
+
+            return rejectWithValue(
+                error instanceof Error
+                    ? error.message
+                    : 'Unknown error'
+            );
         }
     }
 );

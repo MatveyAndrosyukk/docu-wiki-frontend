@@ -7,54 +7,124 @@ import {getLanguage} from "../../lib/utils/getLanguage";
 import {useDebouncedValue} from "../../lib/hooks/useDebouncedValue";
 import useCheckIsMobile from "../../lib/hooks/useCheckIsMobile";
 
-interface CodeBlockProps {
+interface Props {
     code: string;
+
     isFileTreeOpened: boolean;
 }
 
-const CodeBlock: FC<CodeBlockProps> = (
+const CodeBlock: FC<Props> = (
     {
         code,
         isFileTreeOpened
     }) => {
-    const [isCodeExpanded, setIsCodeExpanded] = useState(false);
+    const [isCodeExpanded, setIsCodeExpanded] = useState(
+        false
+    );
 
-    const debouncedCode = useDebouncedValue(code, 300);
+    const debouncedCode = useDebouncedValue(
+        code,
+        300
+    );
 
-    const detectedLanguage = useMemo(() => getLanguage(debouncedCode), [debouncedCode]);
+    const detectedLanguage = useMemo(
+        () => getLanguage(
+            debouncedCode
+        ),
+        [
+            debouncedCode
+        ]
+    );
 
     const isMobile = useCheckIsMobile();
 
-    const maxHeight = useMemo(() => {
-        if (isMobile) return 'none';
+    const maxHeight = useMemo(
+        () => {
 
-        if (isCodeExpanded) return isFileTreeOpened ? '21em' : '22em';
+            if (isMobile) return 'none';
 
-        return 'none';
-    }, [isMobile, isCodeExpanded, isFileTreeOpened]);
+            if (isCodeExpanded) return isFileTreeOpened
+                ? '21em'
+                : '22em';
 
-    const handleExpandCode = useCallback(() => {
-        setIsCodeExpanded(prev => !prev);
-    }, []);
+            return 'none';
+        },
+        [
+            isMobile,
+            isCodeExpanded,
+            isFileTreeOpened
+        ]
+    );
+
+    const handleExpandCode = useCallback(
+        () => {
+
+            setIsCodeExpanded(
+                prev => !prev
+            );
+        },
+        []
+    );
 
     return (
         <div
-            style={{maxHeight}}
-            className={`${styles['code-block']}`}>
-            <div className={`${styles['code-block-wrapper']} ${isCodeExpanded ? styles['code-block-expanded'] : ''}`}>
+            style={
+                {
+                    maxHeight
+                }
+            }
+            className={
+                `${styles['code-block']}`
+            }
+        >
+            <div
+                className={`
+                ${styles['code-block-wrapper']} 
+                ${isCodeExpanded
+                    ? styles['code-block-expanded']
+                    : ''}
+                    `}
+            >
                 <SyntaxHighlighter
-                    language={detectedLanguage}
-                    style={darcula}
-                    showLineNumbers={false}
-                    wrapLines={true}
+                    language={
+                        detectedLanguage
+                    }
+
+                    style={
+                        darcula
+                    }
+
+                    showLineNumbers={
+                        false
+                    }
+
+                    wrapLines={
+                        true
+                    }
+
                     PreTag="pre"
+
                     CodeTag="code"
                 >
-                    {code}
+                    {
+                        code
+                    }
                 </SyntaxHighlighter>
             </div>
-            <div className={styles['code-block__expand']}>
-                <ExpandCodeSvg className={styles['code-block__expand-icon']} onClick={handleExpandCode}/>
+            <div
+                className={
+                    styles['code-block__expand']
+                }
+            >
+                <ExpandCodeSvg
+                    className={
+                        styles['code-block__expand-icon']
+                    }
+
+                    onClick={
+                        handleExpandCode
+                    }
+                />
             </div>
         </div>
     );

@@ -4,20 +4,34 @@ import {ReactComponent as CustomGoogleButtonSvg} from './images/custom-google-bu
 import {useAppContext} from "../../../context/app-context/hooks/useAppContext";
 
 const GoogleButton = () => {
-    const {authHandler} = useAppContext();
 
-    const {googleHandler} = authHandler;
+    const {
+        authHandler
+    } = useAppContext();
 
-    const handleGoogleAuthResult = useGoogleLogin({
-        flow: 'auth-code',
-        onSuccess: googleHandler.actions.success,
-        onError: googleHandler.actions.error,
-    });
+    const {
+        googleHandler
+    } = authHandler;
+
+    const handleGoogleAuthResult = useGoogleLogin(
+        {
+            flow: 'auth-code',
+            onSuccess: googleHandler.actions.success,
+            onError: googleHandler.actions.error,
+        }
+    );
 
     return (
+
         <CustomGoogleButtonSvg
-            className={`${styles['customGoogleButton']}`}
-            onClick={() => handleGoogleAuthResult()}/>
+            className={
+                `${styles['customGoogleButton']}`
+            }
+
+            onClick={
+                () => handleGoogleAuthResult()
+            }
+        />
     );
 };
 

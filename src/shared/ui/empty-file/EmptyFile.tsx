@@ -6,59 +6,126 @@ import commonStyles from '../../assets/styles/Common.module.scss';
 
 interface EmptyFileProps {
     isFileTreeOpened: boolean;
+
     isFileLoading: boolean;
-    setIsFileTreeOpened: Dispatch<SetStateAction<boolean>>;
+
+    setIsFileTreeOpened: Dispatch<
+        SetStateAction<boolean>
+    >;
 }
 
-const EmptyFile: React.FC<EmptyFileProps> = ({
-                                                 isFileTreeOpened,
-                                                 setIsFileTreeOpened,
-                                                 isFileLoading,
-                                             }) => {
+const EmptyFile: React.FC<EmptyFileProps> = (
+    {
+        isFileTreeOpened,
+        setIsFileTreeOpened,
+        isFileLoading,
+    }
+) => {
 
     return (
-        <div className={styles['opened-file']}>
 
-            <div className={emptyStyles['empty']}>
-                <div className={emptyStyles['empty__card']}>
-
-                    {isFileLoading ?
-                        <div className={`${commonStyles['common__loader']} ${emptyStyles['empty__loader']}`}>
-
-                        </div> :
-                        <div className={emptyStyles['empty__icon']}>
-                            {/*⭐*/}
-                            ⚡
-                        </div>}
-
-                    <div className={emptyStyles['empty__title']}>
+        <div
+            className={
+                styles['opened-file']
+            }
+        >
+            <div
+                className={
+                    emptyStyles['empty']
+                }
+            >
+                <div
+                    className={
+                        emptyStyles['empty__card']
+                    }
+                >
+                    {
+                        isFileLoading ?
+                            <div
+                                className={`
+                            ${commonStyles['common__loader']} 
+                            ${emptyStyles['empty__loader']}
+                            `}
+                            >
+                            </div>
+                            :
+                            <div
+                                className={
+                                    emptyStyles['empty__icon']
+                                }
+                            >
+                                ⚡
+                            </div>
+                    }
+                    <div
+                        className={
+                            emptyStyles['empty__title']
+                        }
+                    >
                         No file opened
                     </div>
-
-                    <div className={emptyStyles['empty__subtitle']}>
+                    <div
+                        className={
+                            emptyStyles['empty__subtitle']
+                        }
+                    >
                         Select a file from the tree
                     </div>
-
-                    <div className={emptyStyles['empty__hint']}>
+                    <div
+                        className={
+                            emptyStyles['empty__hint']
+                        }
+                    >
                         Press
-                        <span className={emptyStyles['empty__kbd']}>Ctrl</span>
+                        <span
+                            className={
+                                emptyStyles['empty__kbd']
+                            }
+                        >
+                            Ctrl
+                        </span>
                         +
-                        <span className={emptyStyles['empty__kbd']}>P</span>
+                        <span
+                            className={
+                                emptyStyles['empty__kbd']
+                            }
+                        >
+                            P
+                        </span>
                         to create folder
                     </div>
-
                 </div>
             </div>
 
             <div
-                style={{display: isFileTreeOpened ? 'none' : 'flex'}}
-                className={emptyStyles['file-tree']}
-                onClick={(event) => {
-                    event.stopPropagation()
-                    setIsFileTreeOpened(!isFileTreeOpened)
-                }}
+                style={
+                    {
+                        display: isFileTreeOpened
+                            ? 'none'
+                            : 'flex'
+                    }
+                }
+
+                className={
+                    emptyStyles['file-tree']
+                }
+
+                onClick={
+                    (
+                        event
+                    ) => {
+
+                        event.stopPropagation()
+
+                        setIsFileTreeOpened(!isFileTreeOpened)
+                    }
+                }
             >
-                <BurgerSvg className={emptyStyles['file-tree-image']}/>
+                <BurgerSvg
+                    className={
+                        emptyStyles['file-tree-image']
+                    }
+                />
             </div>
 
         </div>

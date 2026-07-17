@@ -12,9 +12,13 @@ import {AuthState} from "../../shared/lib/hooks/use-auth-handler/auth-handler.ty
 
 export interface ProviderState {
     filesHandler: FilesState;
+
     banHandler: BanUserActionsState;
+
     premiumHandler: PremiumState;
+
     authHandler: AuthState;
+
     editorHandler: EditorState;
 }
 
@@ -44,13 +48,16 @@ export const AppProvider: FC<Props> = (
 
     return (
         <Context.Provider
-            value={{
-                filesHandler,
-                banHandler,
-                premiumHandler,
-                authHandler,
-                editorHandler,
-            }}>
+            value={
+                {
+                    filesHandler,
+                    banHandler,
+                    premiumHandler,
+                    authHandler,
+                    editorHandler,
+                }
+            }
+        >
             {children}
         </Context.Provider>
     );

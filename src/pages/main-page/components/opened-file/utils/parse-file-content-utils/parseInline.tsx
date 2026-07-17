@@ -57,7 +57,14 @@ export default function parseInline(
                 );
                 break;
 
-            case 'simple':
+            case 'simple': {
+                const children = parseInline(
+                    match[2],
+                    onImageClick,
+                    pendingImages,
+                    numberingRef
+                );
+
                 parts.push(
                     handleSimpleTag(
                         match,
@@ -65,7 +72,9 @@ export default function parseInline(
                         children
                     )
                 );
+
                 break;
+            }
 
             case 'lineCode':
                 parts.push(

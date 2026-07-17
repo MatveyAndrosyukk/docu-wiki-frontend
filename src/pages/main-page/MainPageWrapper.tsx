@@ -4,14 +4,17 @@ import MainPage from "./MainPage";
 import {performGetEmailByUsername} from "../../shared/lib/services/performGetEmailByUsername";
 
 function useQuery() {
-    return new URLSearchParams(useLocation().search);
+    return new URLSearchParams(
+        useLocation().search
+    );
 }
 
 const MainPageWrapper = () => {
     let email: any, setEmail: any;
 
-    [email, setEmail] =
-        useState<string | undefined>(undefined);
+    [email, setEmail] = useState<string | undefined>(
+        undefined
+    );
 
     const query = useQuery()
 
@@ -31,20 +34,25 @@ const MainPageWrapper = () => {
         }
     >();
 
-    useEffect(() => {
+    useEffect(
+        () => {
+
             if (!username) {
+
                 navigate("/");
 
                 return;
             }
 
-            performGetEmailByUsername(username)
-                .then(
-                    data => setEmail(data.email)
+            performGetEmailByUsername(
+                username
+            ).then(
+                data => setEmail(
+                    data.email
                 )
-                .catch(
-                    () => setEmail(undefined)
-                );
+            ).catch(
+                () => setEmail(undefined)
+            );
         },
         [
             email,
@@ -56,8 +64,11 @@ const MainPageWrapper = () => {
 
     return <MainPage
         resetToken={token}
+
         viewedUserEmail={email}
-        fileId={fileId}/>
+
+        fileId={fileId}
+    />
 };
 
 export default MainPageWrapper;

@@ -19,6 +19,7 @@ const FileList: React.FC<FileListProps> = React.memo(
             viewedUserEmail,
         }
     ) => {
+
         const {
             filesHandler,
         } = useAppContext();
@@ -35,7 +36,9 @@ const FileList: React.FC<FileListProps> = React.memo(
             contextMenuHandler,
         } = filesHandler;
 
-        const flattenedNodes = useFlattenedTree(files);
+        const flattenedNodes = useFlattenedTree(
+            files
+        );
 
         const windowWidth = useWindowWidth();
 
@@ -45,12 +48,24 @@ const FileList: React.FC<FileListProps> = React.memo(
 
         return (
             <div
-                className={styles['file-list']}
-                style={{maxHeight}}
+                className={
+                    styles['file-list']
+                }
+
+                style={
+                    {
+                        maxHeight
+                    }
+                }
             >
                 {
+
                     fileActionsHandler.state.isLimitError && (
-                        <div className={commonStyles['common__notification']}>
+
+                        <div className={
+                            commonStyles['common__notification']
+                        }
+                        >
                             You've reached the free plan limit of 20 files.
                             Upgrade to Premium to create more.
                         </div>
@@ -59,17 +74,24 @@ const FileList: React.FC<FileListProps> = React.memo(
 
                 <div>
                     {
+
                         flattenedNodes.map(
                             (
                                 node: TreeNode
                             ) => (
+
                                 <FileNode
+                                    key={
+                                        node.file.id
+                                    }
 
-                                    key={node.file.id}
+                                    node={
+                                        node
+                                    }
 
-                                    node={node}
-
-                                    emailParam={viewedUserEmail}
+                                    emailParam={
+                                        viewedUserEmail
+                                    }
                                 />
                             )
                         )
@@ -77,15 +99,21 @@ const FileList: React.FC<FileListProps> = React.memo(
                 </div>
 
                 {
-                    (contextMenuHandler.state.visible
-                        && contextMenuHandler.state.file) && (
+
+                    (
+                        contextMenuHandler.state.visible &&
+                        contextMenuHandler.state.file) && (
+
                         <ContextMenu/>
                     )
                 }
             </div>
         );
     },
-    (prev, next) =>
+    (
+        prev,
+        next
+    ) =>
         prev.viewedUserEmail === next.viewedUserEmail
 );
 

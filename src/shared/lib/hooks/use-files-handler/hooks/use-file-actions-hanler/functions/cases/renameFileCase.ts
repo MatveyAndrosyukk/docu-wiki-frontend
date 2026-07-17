@@ -1,4 +1,4 @@
-import {findFileById} from "../../../../../../../../store/utils/fileTreeActionUtils";
+import {findFileById} from "../../../../../../../../store/utils/file.utils";
 import {updateFileName} from "../../../../../../../../store/thunks/files/updateFileName";
 import {checkNameConflictInFolder} from "../../../../../../utils/modalUtils";
 import {FileActionsHandlerContext} from "../../file-actions-handler.types";

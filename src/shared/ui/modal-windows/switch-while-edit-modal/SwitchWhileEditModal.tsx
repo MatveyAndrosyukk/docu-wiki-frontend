@@ -4,50 +4,105 @@ import styles from './SwitchWhileEditModal.module.scss'
 import Modal from "../modal/Modal";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 
-interface SwitchWhileEditModalProps {
+interface Props {
     contentBeforeEdition: string;
+
     onCancelEditedFileChange: (
         addedImages: string[],
         contentBeforeEdition: string) => void;
+
     addedImagesWhileEditing: string[];
 }
 
-const SwitchWhileEditModal: FC<SwitchWhileEditModalProps> = (
+const SwitchWhileEditModal: FC<Props> = (
     {
         onCancelEditedFileChange,
         addedImagesWhileEditing,
         contentBeforeEdition,
     }) => {
-    const {editorHandler} = useAppContext();
 
-    const confirmSwitchHandler = useCallback(() => {
-        editorHandler.editModeHandler.actions.confirmSwitch()
-        onCancelEditedFileChange(addedImagesWhileEditing, contentBeforeEdition)
-    }, [addedImagesWhileEditing, contentBeforeEdition, editorHandler.editModeHandler.actions, onCancelEditedFileChange])
+    const {
+        editorHandler
+    } = useAppContext();
+
+    const confirmSwitchHandler = useCallback(
+        () => {
+
+            editorHandler.editModeHandler.actions.confirmSwitch()
+
+            onCancelEditedFileChange(
+                addedImagesWhileEditing,
+                contentBeforeEdition
+            )
+        },
+        [
+            addedImagesWhileEditing,
+            contentBeforeEdition,
+            editorHandler.editModeHandler.actions,
+            onCancelEditedFileChange
+        ]
+    )
 
     return (
-        <Modal isOpen={editorHandler.editModeHandler.state.isTryToSwitchWhileEditing}
-               onClose={editorHandler.editModeHandler.actions.rejectSwitch}>
+        <Modal
+            isOpen={
+                editorHandler.editModeHandler.state.isTryToSwitchWhileEditing
+            }
+
+            onClose={
+                editorHandler.editModeHandler.actions.rejectSwitch
+            }
+        >
             <div
-                className={`${modalStyles['modal__overlay']} ${styles['switch-modal__overlay']}`}
+                className={`
+                ${modalStyles['modal__overlay']} 
+                ${styles['switch-modal__overlay']}
+                `}
             >
-                <div className={modalStyles['modal__form']}>
+                <div
+                    className={
+                        modalStyles['modal__form']
+                    }
+                >
                     <p
-                        className={`${modalStyles['modal__title']} ${styles['switch-modal__title']}`}
+                        className={`
+                        ${modalStyles['modal__title']} 
+                        ${styles['switch-modal__title']}
+                        `}
                     >
-                        <div>Are you sure that you want to open another file?</div>
-                        <div>You will lose all your unsaved changes.</div>
+                        <div>
+                            Are you sure that you want to open another file?
+                        </div>
+                        <div>
+                            You will lose all your unsaved changes.
+                        </div>
                     </p>
-                    <div className={modalStyles['modal__buttons']}>
+                    <div
+                        className={
+                            modalStyles['modal__buttons']
+                        }
+                    >
                         <button
-                            className={`${styles['switch-modal__buttons-confirm']} ${styles['switch-modal__button']}`}
-                            onClick={confirmSwitchHandler}
+                            className={`
+                            ${styles['switch-modal__buttons-confirm']} 
+                            ${styles['switch-modal__button']}
+                            `}
+
+                            onClick={
+                                confirmSwitchHandler
+                            }
                         >
                             Open
                         </button>
                         <button
-                            className={`${styles['switch-modal__buttons-reject']} ${styles['switch-modal__button']}`}
-                            onClick={editorHandler.editModeHandler.actions.rejectSwitch}
+                            className={`
+                            ${styles['switch-modal__buttons-reject']} 
+                            ${styles['switch-modal__button']}
+                            `}
+
+                            onClick={
+                                editorHandler.editModeHandler.actions.rejectSwitch
+                            }
                         >
                             Cancel
                         </button>

@@ -22,8 +22,9 @@ const FeedbackModal: React.FC<Props> = ({
                                             onClose,
                                             userEmail
                                         }) => {
-    const screenshotInputRef =
-        useRef<HTMLInputElement>(null);
+    const screenshotInputRef = useRef<
+        HTMLInputElement
+    >(null);
 
     const {
         type,
@@ -42,99 +43,167 @@ const FeedbackModal: React.FC<Props> = ({
         removeImage,
 
         submit
-    } = useFeedbackForm({
-        userEmail,
-        onSuccess: onClose
-    });
+    } = useFeedbackForm(
+        {
+            userEmail,
+            onSuccess: onClose
+        }
+    );
 
     const handleFileChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
+
         const file = e.target.files?.[0];
 
         if (!file) {
+
             return;
         }
 
-        selectImage(file);
+        selectImage(
+            file
+        );
     };
 
     return (
         <Modal
-            isOpen={isOpen}
-            onClose={onClose}
+            isOpen={
+                isOpen
+            }
+
+            onClose={
+                onClose
+            }
         >
-            <div className={styles.overlay}>
-                <div className={styles.modal}>
-                    <p className={styles.title}>
+            <div
+                className={
+                    styles.overlay
+                }
+            >
+                <div
+                    className={
+                        styles.modal
+                    }
+                >
+                    <p
+                        className={
+                            styles.title
+                        }
+                    >
                         Send Feedback
                     </p>
 
                     <FeedbackTypeSelector
-                        value={type}
-                        onChange={setType}
-                    />
+                        value={
+                            type
+                        }
 
-                    <div className={styles.container}>
+                        onChange={
+                            setType
+                        }
+                    />
+                    <div
+                        className={
+                            styles.container
+                        }
+                    >
                         <textarea
-                            className={`${styles.issue} ${
-                                image
-                                    ? styles.space
-                                    : ''
+                            className={`
+                            ${styles.issue} 
+                            
+                            ${image
+                                ? styles.space
+                                : ''
                             }`}
+
                             placeholder="Describe your issue..."
-                            value={message}
-                            onChange={(e) =>
-                                setMessage(e.target.value)
+
+                            value={
+                                message
+                            }
+
+                            onChange={
+                                (e) =>
+                                    setMessage(
+                                        e.target.value
+                                    )
                             }
                         />
 
-                        {image && (
-                            <ImagePreview
-                                image={image}
-                                preview={preview}
-                                loading={
-                                    isPreviewLoading
-                                }
-                                onRemove={
-                                    removeImage
-                                }
-                            />
-                        )}
+                        {
+                            image &&
+                            (
 
+                                <ImagePreview
+                                    image={
+                                        image
+                                    }
+
+                                    preview={
+                                        preview
+
+                                    }
+                                    loading={
+                                        isPreviewLoading
+                                    }
+
+                                    onRemove={
+                                        removeImage
+                                    }
+                                />
+                            )
+                        }
                         <div>
                             <ClipIcon
-                                className={styles.file}
-                                onClick={() =>
-                                    screenshotInputRef.current?.click()
+                                className={
+                                    styles.file
+                                }
+
+                                onClick={
+                                    () =>
+                                        screenshotInputRef.current?.click()
                                 }
                             />
                         </div>
-
                         <button
-                            className={`${styles.send} ${
-                                isSubmitting
-                                    ? styles.loading
-                                    : ''
-                            }`}
-                            onClick={submit}
+                            className={`
+                            ${styles.send} 
+                            ${isSubmitting
+                                ? styles.loading
+                                : ''}
+                            `}
+
+                            onClick={
+                                submit
+                            }
+
                             disabled={
                                 !message.trim() ||
                                 isSubmitting
                             }
                         >
-                            <ArrowIcon className={styles.arrow}/>
+                            <ArrowIcon
+                                className={
+                                    styles.arrow
+                                }
+                            />
                         </button>
-
                         <input
                             ref={
                                 screenshotInputRef
                             }
+
                             type="file"
+
                             accept="image/*"
-                            style={{
-                                display: 'none'
-                            }}
+
+                            style={
+                                {
+                                    display: 'none'
+                                }
+                            }
+
                             onChange={
                                 handleFileChange
                             }

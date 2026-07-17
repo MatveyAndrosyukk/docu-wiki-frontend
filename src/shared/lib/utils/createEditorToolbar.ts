@@ -8,6 +8,8 @@ import {ReactComponent as PointImage} from "../../../pages/main-page/components/
 import {ReactComponent as LineImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__line.svg";
 import {ReactComponent as LinkImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__link.svg";
 import {ReactComponent as ImgImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/edit-file-view__image.svg";
+import {ReactComponent as NumberList} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/number-list.svg";
+
 
 export const createEditorToolbar = (
     wrapSelection: (start: string, end: string) => void,
@@ -37,6 +39,12 @@ export const createEditorToolbar = (
         icon: PointImage,
         action: () => wrapSelection('[P]\n', '\n[/P]'),
         style: {width: '4px', height: '4px'}
+    },
+    {
+        title: 'Numbers',
+        icon: NumberList,
+        action: () => wrapSelection('[NL]\n\n[N]', '[/N]\n\n[/NL]'),
+        style: {width: '14px', height: '14px'}
     },
     {
         title: 'Link',
