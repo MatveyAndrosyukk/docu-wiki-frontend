@@ -80,12 +80,34 @@ const FeedbackModal: React.FC<Props> = ({
                 className={
                     styles.overlay
                 }
+
+                onClick={onClose}
             >
                 <div
                     className={
                         styles.modal
                     }
+
+                    onClick={
+                        e => e.stopPropagation()
+                    }
                 >
+                    <button
+                        type="button"
+
+                        className={
+                            styles.close
+                        }
+
+                        onClick={
+                            onClose
+                        }
+
+                        aria-label="Close modal"
+                    >
+                        ×
+                    </button>
+
                     <p
                         className={
                             styles.title

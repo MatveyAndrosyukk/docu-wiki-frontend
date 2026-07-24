@@ -2,22 +2,42 @@ import {isUserAdminOrOwner} from "../../../../../utils/permissions-utils/isUserA
 import {User} from "../../../../../../../store/slices/userSlice";
 
 interface Params {
-    loggedInUser: User | null;
+    viewedUser: User | null;
+
     totalFiles: number;
+
     filesToAdd: number;
+
     filesLimit: number;
 }
 
 export function isFilesLimitExceeded(
     {
-        loggedInUser,
+        viewedUser,
         totalFiles,
         filesToAdd,
         filesLimit,
     }: Params
 ) {
+
+    if (!viewedUser) {
+        return true;
+    }
+
+    if (viewedUser.isPremium) {
+        return false;
+    }
+
+    if (
+        isUserAdminOrOwner(
+            viewedUser
+        )
+    ) {
+        return false;
+    }
+
     return (
-        !isUserAdminOrOwner(loggedInUser) &&
         totalFiles + filesToAdd > filesLimit
     );
+
 }

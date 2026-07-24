@@ -35,7 +35,7 @@ export function addFileCase(
 
         filesLimit,
 
-        loggedInUser,
+        viewedUser,
 
         premiumHandler,
 
@@ -62,7 +62,7 @@ export function addFileCase(
     if (
         isFilesLimitExceeded(
             {
-                loggedInUser,
+                viewedUser,
                 totalFiles,
                 filesToAdd: 1,
                 filesLimit,

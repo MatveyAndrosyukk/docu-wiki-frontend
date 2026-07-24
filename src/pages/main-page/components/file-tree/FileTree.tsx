@@ -179,7 +179,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 loggedInUser
             );
 
-        const showHeader = isUserEqualsLoggedIn(
+        const isNotOwnProfile = isUserEqualsLoggedIn(
             viewedUserEmail,
             authStatus === 'authenticated',
             viewedUser
@@ -246,7 +246,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                 <>
                                     {
 
-                                        showHeader && (
+                                        isNotOwnProfile && (
                                             <div
                                                 className={
                                                     styles['file-tree__header']
@@ -457,7 +457,8 @@ const FileTree: FC<FileTreeProps> = React.memo(
                             ACTIVE
                         </span>
                         </div>
-                    ) : (
+                    ) : !isNotOwnProfile ? (
+
                         <div
                             className={
                                 `${commonStyles.premium} ${styles.premium}`
@@ -468,6 +469,27 @@ const FileTree: FC<FileTreeProps> = React.memo(
                             }
                         >
                             Upgrade
+                        </div>
+
+                    ) : (
+
+                        <div
+                            className={
+                                `${styles['file-tree__premium-active']}
+                                ${styles['file-tree__premium-active--inactive']}`
+                            }
+                        >
+                            <span>
+                            PREMIUM
+                            </span>
+
+                            <span
+                                className={
+                                    styles['file-tree__premium-badge']
+                                }
+                            >
+                            INACTIVE
+                            </span>
                         </div>
                     )
                 }

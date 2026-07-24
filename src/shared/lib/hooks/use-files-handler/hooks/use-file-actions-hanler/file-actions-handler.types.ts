@@ -107,6 +107,8 @@ export interface FileActionsHandlerContext {
 
     loggedInUser: User | null;
 
+    viewedUser: User | null;
+
     totalFiles: number;
 
     filesLimit: number;

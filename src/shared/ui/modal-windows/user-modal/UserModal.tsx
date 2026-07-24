@@ -35,7 +35,7 @@ const UserModal: FC<Props> = (
         ) => {
 
             navigate(
-                `/${encodeURIComponent(user.email)}`
+                `/${encodeURIComponent(user.name)}`
             );
 
             userHandler.actions.updateModalValue(

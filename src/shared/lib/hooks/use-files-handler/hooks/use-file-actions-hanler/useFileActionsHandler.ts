@@ -77,27 +77,31 @@ export default function useFileActionsHandler(
         ) => {
 
 
-            dispatch({
+            dispatch(
+                {
 
-                type: "OPEN",
+                    type: "OPEN",
 
-                payload: openState,
+                    payload: openState,
 
-            });
+                }
+            );
 
 
-            dispatch({
+            dispatch(
+                {
 
-                type: "SET_VALUE",
+                    type: "SET_VALUE",
 
-                payload:
-                    value ??
-                    getModalInitialValue(
-                        files,
-                        openState
-                    ),
+                    payload:
+                        value ??
+                        getModalInitialValue(
+                            files,
+                            openState
+                        ),
 
-            });
+                }
+            );
 
 
         },
@@ -155,38 +159,43 @@ export default function useFileActionsHandler(
 
     const actionContext =
         useMemo<FileActionsHandlerContext>(
-            () => ({
-                files,
-                dispatch: reduxDispatch,
-                viewedUserEmail:
-                    viewedUser?.email ?? "unknown",
-                loggedInUserEmail:
-                    loggedInUser?.email ?? null,
-                loggedInUser,
-                totalFiles,
-                filesLimit,
-                premiumHandler,
-                closeModal: close,
-                setModalError: setError,
-            }),
+            () => (
+                {
+                    files,
+                    dispatch: reduxDispatch,
+                    viewedUserEmail:
+                        viewedUser?.email ?? "unknown",
+                    loggedInUserEmail:
+                        loggedInUser?.email ?? null,
+                    loggedInUser,
+                    viewedUser,
+                    totalFiles,
+                    filesLimit,
+                    premiumHandler,
+                    closeModal: close,
+                    setModalError: setError,
+                }
+            ),
             [
                 files,
+                viewedUser,
                 reduxDispatch,
-                viewedUser?.email,
                 loggedInUser,
                 totalFiles,
                 premiumHandler,
                 close,
-                setError,
+                setError
             ]
         );
 
     const contextMenuHandler =
-        useContextMenuHandler({
-            openModal: open,
-            openDeleteModal,
-            actionContext,
-        });
+        useContextMenuHandler(
+            {
+                openModal: open,
+                openDeleteModal,
+                actionContext,
+            }
+        );
 
     const {
         copiedFile,

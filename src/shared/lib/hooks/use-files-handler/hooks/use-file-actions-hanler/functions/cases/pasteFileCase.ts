@@ -35,7 +35,7 @@ export function pasteFileCase(
 
         setModalError,
 
-        loggedInUser,
+        viewedUser,
 
         totalFiles,
 
@@ -76,7 +76,7 @@ export function pasteFileCase(
     if (
         isFilesLimitExceeded(
             {
-                loggedInUser,
+                viewedUser,
                 totalFiles,
                 filesToAdd,
                 filesLimit,

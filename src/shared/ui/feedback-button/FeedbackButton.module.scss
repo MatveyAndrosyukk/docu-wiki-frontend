@@ -1,45 +1,5 @@
 .feedbackButton {
-  position: fixed;
-  right: 24px;
-  bottom: 30px;
-
-  width: 52px;
-  height: 52px;
-
-  border-radius: 50%;
-  border: 1px solid #2B2C2D;
-
-  background: #202222;
-  color: white;
-
-  font-size: 20px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+ color: #8D9191;
   cursor: pointer;
-
-  z-index: 999;
-
-  transition: all .2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    background: #292B2B;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  @media (min-width: 1271px) and (max-width: 1445px) {
-    right: 0;
-    left: 24px;
-  }
-
-  @media (max-width: 1270px) {
-    right: 24px;
-    bottom: 10px;
-  }
+  margin-right: 15px;
 }

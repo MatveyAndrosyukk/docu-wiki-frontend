@@ -266,16 +266,6 @@ const MainPage: FC<Props> = (
                 )
             }
 
-            {
-                !isMobile &&
-
-                <FeedbackButton
-                    onClick={
-                        () => setIsFeedbackOpen(true)
-                    }
-                />
-            }
-
             <FeedbackModal
                 isOpen={isFeedbackOpen}
 

@@ -16,6 +16,7 @@ import {isUserCanEdit} from "../../../../shared/lib/utils/permissions-utils/isUs
 import {formatDate} from "./utils/formatDate";
 import parseFileTextToHTML from "./utils/parse-file-content-utils/parseFileTextToHTML";
 import {selectOpenedFile} from "../../../../store/selectors/selectOpenedFile";
+import ReportModal from "../../../../shared/ui/modal-windows/report-modal/ReportModal";
 
 interface Props {
     viewedUserEmail: string | undefined;
@@ -40,6 +41,10 @@ const OpenedFile: React.FC<Props> = (
     >(null);
 
     const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(
+        false
+    );
+
+    const [isReportModalOpen, setIsReportModalOpen] = useState(
         false
     );
 
@@ -456,6 +461,12 @@ const OpenedFile: React.FC<Props> = (
                     className={
                         styles['report-file']
                     }
+
+                    onClick={
+                        () => setIsReportModalOpen(
+                            true
+                        )
+                    }
                 >
                     <ReportSvg
                         className={
@@ -491,6 +502,28 @@ const OpenedFile: React.FC<Props> = (
                     }
                 />
             </div>
+
+            <ReportModal
+                isOpen={
+                    isReportModalOpen
+                }
+
+                onClose={
+
+                    () => setIsReportModalOpen(
+                        false
+                    )
+
+                }
+
+                fileId={
+                    openedFile.id
+                }
+
+                userEmail={
+                    loggedInUser?.email
+                }
+            />
         </div>
     );
 }

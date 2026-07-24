@@ -193,8 +193,12 @@ $button-block-hover-bg: #191A1A;
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-user {
@@ -295,6 +299,17 @@ $button-block-hover-bg: #191A1A;
   color: #E8E8E8;
   font-size: 13px;
   font-weight: 700;
+}
+
+.file-tree__premium-active--inactive {
+  background: #2B2C2D;
+  color: #8D9191;
+
+  .file-tree__premium-badge {
+    background: rgba(141, 145, 145, 0.15);
+    border-color: rgba(141, 145, 145, 0.3);
+    color: #8D9191;
+  }
 }
 
 .file-tree__premium-badge {

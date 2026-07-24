@@ -17,6 +17,7 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
 import {useAuthContext} from "../../../../context/auth-context/hooks/useAuthContext";
+import FeedbackButton from "../../../../shared/ui/feedback-button/FeedbackButton";
 
 interface Props {
     setIsFeedbackOpen: Dispatch<React.SetStateAction<boolean>>;
@@ -89,8 +90,20 @@ const Header: FC<Props> = (
     };
 
     const handleRedirectToMainPage = () => {
+        const user = loggedInUser;
 
-        navigate('/');
+        if (!user){
+
+            navigate(
+                `/`
+            );
+
+            return;
+        }
+
+        navigate(
+            `/${encodeURIComponent(user.name)}`
+        );
     }
 
     return (
@@ -287,6 +300,12 @@ const Header: FC<Props> = (
                                     styles['header__buttons']
                                 }
                                 >
+                                    <FeedbackButton
+                                        onClick={
+                                            () => setIsFeedbackOpen(true)
+                                        }
+                                    />
+
                                     <UserSvg
                                         className={
                                             styles['header__user']
