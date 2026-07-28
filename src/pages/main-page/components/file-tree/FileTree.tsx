@@ -122,6 +122,12 @@ const FileTree: FC<FileTreeProps> = React.memo(
         const blockViewHandler = useCallback(
             async () => {
 
+                if (!loggedInUser) {
+                    loginHandler.actions.openModal();
+
+                    return;
+                }
+
                 if (!viewedUser?.email) return;
 
                 if (!isLoggedInUserPremium) {
@@ -195,6 +201,16 @@ const FileTree: FC<FileTreeProps> = React.memo(
             authStatus === 'authenticated',
             viewedUser
         );
+
+        const handleUpgradeClick = () => {
+            if (!loggedInUser) {
+                loginHandler.actions.openModal();
+
+                return;
+            }
+
+            setIsPremiumModalOpen(true);
+        };
 
         return (
             <div
@@ -347,27 +363,27 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                 {
 
                                                     authStatus === 'authenticated' && (
-                                                        <div
-                                                            className={
-                                                                `${styles['file-tree__button-block']}
-                                                                ${!isLoggedInUserPremium
-                                                                    ? styles['file-tree__button-block--premium']
-                                                                    : ''
-                                                                }`
-                                                            }
+                                                            <div
+                                                                className={
+                                                                    `${styles['file-tree__button-block']}
+                                                                    ${!isLoggedInUserPremium
+                                                                        ? styles['file-tree__button-block--premium']
+                                                                        : ''
+                                                                    }`
+                                                                }
 
-                                                            title={
-                                                                viewedUser?.isViewBlocked
-                                                                    ? 'Unblock view for other users'
-                                                                    : 'Block view for other users'
-                                                            }
+                                                                title={
+                                                                    viewedUser?.isViewBlocked
+                                                                        ? 'Unblock view for other users'
+                                                                        : 'Block view for other users'
+                                                                }
 
-                                                            onClick={
-                                                                blockViewHandler
-                                                            }
-                                                        >
-                                                            <LockSvg/>
-                                                        </div>
+                                                                onClick={
+                                                                    blockViewHandler
+                                                                }
+                                                            >
+                                                                <LockSvg/>
+                                                            </div>
                                                     )
                                                 }
                                             </div>
@@ -476,7 +492,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                             }
 
                             onClick={
-                                () => setIsPremiumModalOpen(true)
+                                handleUpgradeClick
                             }
                         >
                             Upgrade

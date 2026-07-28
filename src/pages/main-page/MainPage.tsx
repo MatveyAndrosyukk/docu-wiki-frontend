@@ -73,8 +73,6 @@ const MainPage: FC<Props> = (
 
     const reduxDispatch = useDispatch();
 
-    const width = useWindowWidth();
-
     const files = useSelector(selectFileTree);
 
     const openedFile = useSelector(selectOpenedFile);
@@ -86,8 +84,6 @@ const MainPage: FC<Props> = (
     const viewedUser = useSelector(
         (state: RootState) => state.user.viewedUser
     );
-
-    const isMobile = width < 1066;
 
     const currentUserEmail =
         viewedUserEmail ??
