@@ -17,6 +17,7 @@ import {useAppContext} from "../../../../context/app-context/hooks/useAppContext
 import {useWindowWidth} from "../../../../shared/lib/hooks/useWindowWidth";
 import {useNotificationHandler} from "../../../../shared/lib/hooks/use-notification-handler/useNotificationHandler";
 import {useElementOutsideEvent} from "../../../../shared/lib/hooks/useElementOutsideEvent";
+import {isUserPremiumActive} from "../../../../shared/lib/utils/permissions-utils/isUserPremiumActive";
 
 interface FileTreeProps {
     viewedUserEmail: string | undefined;
@@ -64,6 +65,16 @@ const FileTree: FC<FileTreeProps> = React.memo(
             (state: RootState) => state.user.isViewedUserLoading
         );
 
+        const isViewedUserPremium =
+            isUserPremiumActive(
+                viewedUser
+            );
+
+        const isLoggedInUserPremium =
+            isUserPremiumActive(
+                loggedInUser
+            );
+
         const {loginHandler} = authHandler;
 
         const {setIsPremiumModalOpen} = premiumHandler;
@@ -88,7 +99,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
             0;
 
         const isWarning =
-            !viewedUser?.isPremium &&
+            !isViewedUserPremium &&
             filesCount >= 15;
 
         const fileTreeStyles = useMemo(
@@ -113,7 +124,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
                 if (!viewedUser?.email) return;
 
-                if (!loggedInUser?.isPremium) {
+                if (!isLoggedInUserPremium) {
 
                     setIsPremiumModalOpen(true);
 
@@ -140,7 +151,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 reduxDispatch,
                 viewedUser,
                 notificationHandler,
-                loggedInUser,
+                isLoggedInUserPremium,
                 setIsPremiumModalOpen
             ]
         );
@@ -339,7 +350,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                         <div
                                                             className={
                                                                 `${styles['file-tree__button-block']}
-                                                                ${!loggedInUser?.isPremium
+                                                                ${!isLoggedInUserPremium
                                                                     ? styles['file-tree__button-block--premium']
                                                                     : ''
                                                                 }`
@@ -378,7 +389,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                                                 >
                                                     {
 
-                                                        viewedUser?.isPremium
+                                                        isViewedUserPremium
                                                             ? `${viewedUser?.amountOfFiles ?? 0} files`
                                                             : `${viewedUser?.amountOfFiles ?? 0} / 20 files`
                                                     }
@@ -399,7 +410,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
 
                                                         style={
                                                             {
-                                                                width: viewedUser?.isPremium
+                                                                width: isViewedUserPremium
                                                                     ? '100%'
                                                                     : `${Math.min(
                                                                         ((viewedUser?.amountOfFiles ?? 0) / 20) * 100,
@@ -438,7 +449,7 @@ const FileTree: FC<FileTreeProps> = React.memo(
                 </div>
 
                 {
-                    viewedUser?.isPremium ? (
+                    isViewedUserPremium ? (
 
                         <div
                             className={

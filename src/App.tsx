@@ -4,6 +4,8 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import MainPageWrapper from "./pages/main-page/MainPageWrapper";
 import VerifyPage from "./pages/verify-page/VerifyPage";
 import useRefreshToken from "./shared/lib/hooks/useRefreshToken";
+import PaymentSuccessPage from "./pages/payment-page/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/payment-page/PaymentCancelPage";
 
 function App() {
 
@@ -41,6 +43,19 @@ function App() {
                     path="/:username/file/:fileId"
                     element={
                         <MainPageWrapper/>
+                    }
+                />
+                <Route
+                    path="/payment/success"
+                    element={
+                        <PaymentSuccessPage/>
+                    }
+                />
+
+                <Route
+                    path="/payment/cancel"
+                    element={
+                        <PaymentCancelPage/>
                     }
                 />
             </Routes>

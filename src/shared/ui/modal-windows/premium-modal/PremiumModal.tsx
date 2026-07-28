@@ -1,7 +1,10 @@
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 import Modal from '../modal/Modal';
 import styles from './PremiumModal.module.scss';
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
+import {AppDispatch} from '../../../../store';
+import {useDispatch} from 'react-redux';
+import {createPayment} from "../../../../store/thunks/payments/createPayment";
 
 const PremiumModal: FC = () => {
 
@@ -9,13 +12,62 @@ const PremiumModal: FC = () => {
         premiumHandler
     } = useAppContext();
 
-    const handleUpgrade = () => {
-        console.log('OPEN STRIPE');
+    const reduxDispatch = useDispatch<AppDispatch>();
+
+    const [
+        isPaymentLoading,
+        setIsPaymentLoading
+    ] = useState(false);
+
+    const [
+        paymentError,
+        setPaymentError
+    ] = useState<string | null>(null);
+
+    const handleUpgrade = async () => {
+
+        if (isPaymentLoading) {
+            return;
+        }
+
+        setIsPaymentLoading(true);
+
+        setPaymentError(null);
+
+        try {
+
+            const result = await reduxDispatch(
+                createPayment()
+            ).unwrap();
+
+            window.location.href =
+                result.invoiceUrl;
+
+        } catch (error) {
+
+            console.error(
+                'Payment creation failed:',
+                error
+            );
+
+            setPaymentError(
+                'Failed to create payment. Please try again.'
+            );
+
+            setIsPaymentLoading(false);
+        }
     };
 
     const closeModal = () => {
+
+        if (isPaymentLoading) {
+            return;
+        }
+
         premiumHandler.setIsPremiumModalOpen(false);
-    }
+
+        setPaymentError(null);
+    };
 
     return (
         <Modal
@@ -39,6 +91,7 @@ const PremiumModal: FC = () => {
                 >
                     Upgrade to Premium
                 </div>
+
                 <div
                     className={
                         styles['premium-modal__subtitle']
@@ -46,6 +99,7 @@ const PremiumModal: FC = () => {
                 >
                     Unlock private workspaces, collaboration and unlimited files.
                 </div>
+
                 <div
                     className={
                         styles['premium-modal__plans']
@@ -72,6 +126,7 @@ const PremiumModal: FC = () => {
                             <div>✓ 20 files</div>
                             <div>✓ Public workspace</div>
                         </div>
+
                         <button
                             className={
                                 styles['premium-modal__current']
@@ -79,13 +134,12 @@ const PremiumModal: FC = () => {
                         >
                             Current Plan
                         </button>
-
                     </div>
 
                     <div
                         className={`
-                        ${styles['premium-modal__plan']} 
-                        ${styles['premium-modal__plan--premium']}
+                            ${styles['premium-modal__plan']} 
+                            ${styles['premium-modal__plan--premium']}
                         `}
                     >
                         <div
@@ -95,6 +149,7 @@ const PremiumModal: FC = () => {
                         >
                             MOST POPULAR
                         </div>
+
                         <div
                             className={
                                 styles['premium-modal__plan-name']
@@ -102,29 +157,58 @@ const PremiumModal: FC = () => {
                         >
                             Premium ✨
                         </div>
+
                         <div
                             className={
                                 styles['premium-modal__features']
                             }
                         >
                             <div>✓ Unlimited files</div>
+
                             <div>
                                 ✓ Block files from other users
                             </div>
+
                             <div>
                                 ✓ Add editors to your workspace
                             </div>
                         </div>
+
+                        {
+                            paymentError && (
+                                <div
+                                    className={
+                                        styles['premium-modal__error']
+                                    }
+                                >
+                                    {paymentError}
+                                </div>
+                            )
+                        }
+
                         <button
                             onClick={
                                 handleUpgrade
                             }
 
-                            className={
-                                styles['premium-modal__upgrade']
+                            disabled={
+                                isPaymentLoading
                             }
+
+                            className={`
+                                ${styles['premium-modal__upgrade']}
+                                ${
+                                isPaymentLoading
+                                    ? styles['premium-modal__upgrade--loading']
+                                    : ''
+                            }
+                            `}
                         >
-                            Upgrade to Premium
+                            {
+                                isPaymentLoading
+                                    ? 'Creating payment...'
+                                    : 'Upgrade to Premium'
+                            }
                         </button>
                     </div>
                 </div>

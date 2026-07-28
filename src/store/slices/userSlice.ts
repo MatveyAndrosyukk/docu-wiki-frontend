@@ -31,11 +31,11 @@ export interface User {
 
     whoCanEdit: User[];
 
-    isPremium: boolean;
-
     isViewBlocked: boolean;
 
     amountOfFiles: number;
+
+    premiumExpiresAt: Date;
 }
 
 interface UserState {

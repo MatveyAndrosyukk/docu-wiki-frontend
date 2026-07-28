@@ -8,6 +8,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useAppContext} from "../../../../context/app-context/hooks/useAppContext";
 import {UserHandlerActionsState} from "../../../lib/hooks/use-user-handler/user-handler.types";
+import {isUserPremiumActive} from "../../../lib/utils/permissions-utils/isUserPremiumActive";
 
 interface Props {
     userHandler: UserHandlerActionsState
@@ -52,7 +53,11 @@ const UserModal: FC<Props> = (
 
     const promoteClick = () => {
 
-        if (!loggedInUser?.isPremium) {
+        if (
+            !isUserPremiumActive(
+                loggedInUser
+            )
+        ) {
 
             premiumHandler.setIsPremiumModalOpen(
                 true

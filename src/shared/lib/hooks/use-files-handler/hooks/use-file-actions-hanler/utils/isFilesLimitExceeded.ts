@@ -1,5 +1,6 @@
 import {isUserAdminOrOwner} from "../../../../../utils/permissions-utils/isUserAdminOrOwner";
 import {User} from "../../../../../../../store/slices/userSlice";
+import {isUserPremiumActive} from "../../../../../utils/permissions-utils/isUserPremiumActive";
 
 interface Params {
     viewedUser: User | null;
@@ -24,7 +25,11 @@ export function isFilesLimitExceeded(
         return true;
     }
 
-    if (viewedUser.isPremium) {
+    if (
+        isUserPremiumActive(
+            viewedUser
+        )
+    ) {
         return false;
     }
 
