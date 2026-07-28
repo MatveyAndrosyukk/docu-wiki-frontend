@@ -28,7 +28,7 @@ export default function parseListContent(
         ) {
         const line = lines[i].trim();
 
-        if (line.startsWith('[C]')) {
+        if (/^\[C\b/.test(line)) {
             const result = parseCodeBlock(
                 lines,
                 i,
