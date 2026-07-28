@@ -1,4 +1,36 @@
 .modal {
+
+  &__close {
+    position: fixed;
+
+    top: 5px;
+    right: 7px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #686D6D;
+
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+            color .2s ease,
+            transform .2s ease;
+
+    &:hover {
+      color: #D7D9D9;
+      transform: scale(1.1);
+    }
+  }
+
   &__overlay {
     position: fixed;
     inset: 0;

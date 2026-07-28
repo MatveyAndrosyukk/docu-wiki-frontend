@@ -28,6 +28,15 @@ const Modal: FC<ModalProps> = (
                 onClose
             }
         >
+            <button
+                type="button"
+                className={styles['modal__close']}
+                onClick={onClose}
+                aria-label="Close modal"
+            >
+                ×
+            </button>
+
             <div
                 className={
                     styles['modal__content']

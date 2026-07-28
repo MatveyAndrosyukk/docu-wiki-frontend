@@ -92,22 +92,6 @@ const FeedbackModal: React.FC<Props> = ({
                         e => e.stopPropagation()
                     }
                 >
-                    <button
-                        type="button"
-
-                        className={
-                            styles.close
-                        }
-
-                        onClick={
-                            onClose
-                        }
-
-                        aria-label="Close modal"
-                    >
-                        ×
-                    </button>
-
                     <p
                         className={
                             styles.title
