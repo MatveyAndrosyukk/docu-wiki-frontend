@@ -55,9 +55,7 @@ const MainPageWrapper = () => {
             );
         },
         [
-            email,
             navigate,
-            setEmail,
             username
         ]
     );

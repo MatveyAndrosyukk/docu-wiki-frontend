@@ -9,6 +9,13 @@ export async function performRegisterAsync(
     email: string,
     password: string,
     name: string,): Promise<RegisterResponse> {
+
+    console.log({
+        email,
+        password,
+        name,
+    });
+
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -19,7 +26,10 @@ export async function performRegisterAsync(
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        const message = errorData?.message || 'Registration failed';
+
+        const message =
+            errorData?.message || 'Registration failed';
+
         throw new Error(message);
     }
 

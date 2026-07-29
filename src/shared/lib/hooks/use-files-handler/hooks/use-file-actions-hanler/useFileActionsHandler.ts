@@ -57,17 +57,17 @@ export default function useFileActionsHandler(
     const files =
         useSelector(selectFileTree);
 
-    const {
-        viewedUser,
-        loggedInUser,
-        totalFiles,
-    } = useSelector(
-        (state: RootState) => ({
-            viewedUser: state.user.viewedUser,
-            loggedInUser: state.user.loggedInUser,
-            totalFiles:
-                state.user.viewedUser?.amountOfFiles ?? 0,
-        })
+    const viewedUser = useSelector(
+        (state: RootState) => state.user.viewedUser
+    );
+
+    const loggedInUser = useSelector(
+        (state: RootState) => state.user.loggedInUser
+    );
+
+    const totalFiles = useSelector(
+        (state: RootState) =>
+            state.user.viewedUser?.amountOfFiles ?? 0
     );
 
     const open = useCallback(

@@ -74,6 +74,7 @@ export function registrationReducer(
         case "RESET":
             return {
                 ...initialState,
+                message: state.message,
             };
 
         default:

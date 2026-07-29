@@ -117,27 +117,6 @@ export default function useRegistrationHandler(): RegisterActionsState {
 
                 dispatch(
                     {
-                        type: "SET_LOADING",
-                        payload: false
-                    }
-                );
-
-                dispatch(
-                    {
-                        type: "SET_IS_MODAL",
-                        payload: false
-                    }
-                );
-
-                dispatch(
-                    {
-                        type: "SET_ERROR",
-                        payload: null
-                    }
-                );
-
-                dispatch(
-                    {
                         type: "SET_MESSAGE",
                         payload: "Confirmation link sent"
                     }
