@@ -9,6 +9,7 @@ import {ReactComponent as LineImage} from "../../../pages/main-page/components/o
 import {ReactComponent as LinkImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/link.svg";
 import {ReactComponent as ImgImage} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/image.svg";
 import {ReactComponent as NumberList} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/number-list.svg";
+import {ReactComponent as Number} from "../../../pages/main-page/components/opened-file/components/edit-mode/images/number.svg";
 
 
 export const createEditorToolbar = (
@@ -43,7 +44,13 @@ export const createEditorToolbar = (
     {
         title: 'Numbers',
         icon: NumberList,
-        action: () => wrapSelection('[NL]\n\n[N]', '[/N]\n\n[/NL]'),
+        action: () => wrapSelection('[NL]\n\n[N]\n\n', '\n\n[/N]\n\n[/NL]'),
+        style: {width: '14px', height: '14px'}
+    },
+    {
+        title: 'Number',
+        icon: Number,
+        action: () => wrapSelection('[N]\n\n', '\n\n[/N]'),
         style: {width: '14px', height: '14px'}
     },
     {

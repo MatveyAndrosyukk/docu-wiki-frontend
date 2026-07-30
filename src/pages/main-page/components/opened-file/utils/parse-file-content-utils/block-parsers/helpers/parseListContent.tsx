@@ -28,6 +28,42 @@ export default function parseListContent(
         ) {
         const line = lines[i].trim();
 
+        if (line === "[N]") {
+
+            let content = "";
+            i++;
+
+            while (
+                i < lines.length &&
+                lines[i].trim() !== "[/N]"
+                ) {
+                content +=
+                    (content ? "\n" : "") +
+                    lines[i];
+
+                i++;
+            }
+
+            elements.push(
+                <div
+                    key={`list-text-${i}`}
+                    className={
+                        styles["opened-file__content-text"]
+                    }
+                >
+                    {parseInline(
+                        `[N]${content}[/N]`,
+                        onImageClick,
+                        pendingImages,
+                        numberingRef
+                    )}
+                </div>
+            );
+
+            i++;
+            continue;
+        }
+
         if (/^\[C\b/.test(line)) {
             const result = parseCodeBlock(
                 lines,
